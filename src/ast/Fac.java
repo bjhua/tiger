@@ -23,7 +23,7 @@ public class Fac
           new util.Flist<ast.exp.T>().addAll(new ast.exp.Num(10)))));
 
   // // class "Fac"
-  static ast.classs.Class fac = new ast.classs.Class("F", null,
+  static ast.classs.Class fac = new ast.classs.Class("Fac", null,
       new util.Flist<ast.dec.T>().addAll(),
       new util.Flist<ast.method.T>().addAll(new ast.method.Method(
           new ast.type.Int(), "ComputeFac", new util.Flist<ast.dec.T>()
