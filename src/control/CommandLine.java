@@ -94,6 +94,7 @@ public class CommandLine
       if (!cargs[i].startsWith("-")) {
         if (filename == null) {
           filename = cargs[i];
+          System.out.println("--------"+filename);
           continue;
         } else {
           System.out.println("Error: can only compile one Java file a time");
