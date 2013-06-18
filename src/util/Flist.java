@@ -7,7 +7,7 @@ public class Flist<X>
   }
 
   public java.util.LinkedList<X> addAll(
-      @SuppressWarnings("unchecked") X... args)
+      X... args)
   {
     java.util.LinkedList<X> list = new java.util.LinkedList<X>();
     for (X arg : args)
