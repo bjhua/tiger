@@ -1,6 +1,6 @@
 package elaborator;
 
-import util.Todo;
+
 
 public class MethodTable
 {
@@ -43,7 +43,7 @@ public class MethodTable
 
   public void dump()
   {
-    new Todo();
+	  System.out.println(this.table.toString());
   }
 
   @Override

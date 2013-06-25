@@ -1,6 +1,7 @@
 package elaborator;
 
-import util.Todo;
+import java.util.Iterator;
+
 
 public class ClassTable
 {
@@ -81,7 +82,14 @@ public class ClassTable
 
   public void dump()
   {
-    new Todo();
+	  System.out.println("\nclass table dump infomation:");
+	  for (Iterator<String> classNames = this.table.keySet().iterator(); 
+			  classNames.hasNext();) {
+		  String className = (String) classNames.next();
+		  ClassBinding cb = this.table.get(className);
+		  System.out.println("\nclass " + className + ":");
+		  cb.toString();
+		  }
   }
 
   @Override

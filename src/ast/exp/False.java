@@ -2,7 +2,7 @@ package ast.exp;
 
 public class False extends T
 {
-  public False(T left, T right)
+  public False()
   {
   }
 
