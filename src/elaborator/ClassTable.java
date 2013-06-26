@@ -25,10 +25,10 @@ public class ClassTable
 
   // put a field into this table
   // Duplication is not allowed
-  public void put(String c, String id, ast.type.T type)
+  public void put(String c, String id, ast.type.T type, int lineNum)
   {
     ClassBinding cb = this.table.get(c);
-    cb.put(id, type);
+    cb.put(id, type, lineNum);
     return;
   }
 
@@ -54,6 +54,7 @@ public class ClassTable
   {
     ClassBinding cb = this.table.get(className);
     ast.type.T type = cb.fields.get(xid);
+    cb.used.put(xid, true);
     while (type == null) { // search all parent classes until found or fail
       if (cb.extendss == null)
         return type;

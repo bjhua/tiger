@@ -478,10 +478,11 @@ public class Parser {
 		if (type != null && current.kind == Kind.TOKEN_ID) {
 			preList.clear();
 			id = current.lexeme;
+			int lineNum = current.lineNum;
 			eatToken(Kind.TOKEN_ID);
 			eatToken(Kind.TOKEN_SEMI);
 			production.pop();
-			return new ast.dec.Dec(type, id);
+			return new ast.dec.Dec(type, id, lineNum);
 		} else {
 			preList.add(current);
 			return null;
@@ -521,15 +522,17 @@ public class Parser {
 			ast.type.T type = parseType();
 			preList.clear();
 			String id = current.lexeme;
+			int lineNum = current.lineNum;
 			eatToken(Kind.TOKEN_ID);
-			formals.add(new ast.dec.Dec(type, id));
+			formals.add(new ast.dec.Dec(type, id, lineNum));
 			while (current.kind == Kind.TOKEN_COMMER) {
 				advance();
 				type = parseType();
 				preList.clear();
 				id = current.lexeme;
+				lineNum = current.lineNum;
 				eatToken(Kind.TOKEN_ID);
-				formals.add(new ast.dec.Dec(type, id));
+				formals.add(new ast.dec.Dec(type, id, lineNum));
 			}
 		}
 		production.pop();
