@@ -5,10 +5,10 @@ import codegen.C.Visitor;
 public class AssignArray extends T
 {
   public String id;
-  public ast.exp.T index;
-  public ast.exp.T exp;
+  public codegen.C.exp.T index;
+  public codegen.C.exp.T exp;
 
-  public AssignArray(String id, ast.exp.T index, ast.exp.T exp)
+  public AssignArray(String id, codegen.C.exp.T index, codegen.C.exp.T exp)
   {
     this.id = id;
     this.index = index;
