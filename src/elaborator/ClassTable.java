@@ -1,6 +1,7 @@
 package elaborator;
 
-import util.Todo;
+import java.util.Iterator;
+
 
 public class ClassTable
 {
@@ -24,10 +25,10 @@ public class ClassTable
 
   // put a field into this table
   // Duplication is not allowed
-  public void put(String c, String id, ast.type.T type)
+  public void put(String c, String id, ast.type.T type, int lineNum)
   {
     ClassBinding cb = this.table.get(c);
-    cb.put(id, type);
+    cb.put(id, type, lineNum);
     return;
   }
 
@@ -53,6 +54,7 @@ public class ClassTable
   {
     ClassBinding cb = this.table.get(className);
     ast.type.T type = cb.fields.get(xid);
+    cb.used.put(xid, true);
     while (type == null) { // search all parent classes until found or fail
       if (cb.extendss == null)
         return type;
@@ -81,7 +83,14 @@ public class ClassTable
 
   public void dump()
   {
-    new Todo();
+	  System.out.println("\nclass table dump infomation:");
+	  for (Iterator<String> classNames = this.table.keySet().iterator(); 
+			  classNames.hasNext();) {
+		  String className = (String) classNames.next();
+		  ClassBinding cb = this.table.get(className);
+		  System.out.println("\nclass " + className + ":");
+		  cb.toString();
+		  }
   }
 
   @Override
