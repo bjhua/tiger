@@ -5,10 +5,12 @@ import codegen.C.Visitor;
 public class Id extends T
 {
   public String id;
+  public boolean isField;
 
-  public Id(String id)
+  public Id(String id, boolean isField)
   {
     this.id = id;
+    this.isField = isField;
   }
 
   @Override
