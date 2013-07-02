@@ -30,6 +30,8 @@ public interface Visitor
   public void visit(codegen.C.exp.This e);
 
   public void visit(codegen.C.exp.Times e);
+  
+  public void visit(codegen.C.exp.Paren e);
 
   // statements
   public void visit(codegen.C.stm.Assign s);
@@ -68,4 +70,5 @@ public interface Visitor
 
   // program
   public void visit(codegen.C.program.Program p);
+
 }

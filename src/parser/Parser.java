@@ -163,7 +163,7 @@ public class Parser {
 			advance();
 			exp = parseExp();
 			eatToken(Kind.TOKEN_RPAREN);
-			return exp;
+			return new ast.exp.Paren(exp);
 		case TOKEN_NUM:
 			Integer num = Integer.parseInt(current.lexeme);
 			advance();
@@ -390,7 +390,7 @@ public class Parser {
 				advance();
 				ast.exp.T assignExp = parseExp();
 				eatToken(Kind.TOKEN_SEMI);
-				return new ast.stm.Assign(id, assignExp);
+				return new ast.stm.Assign(new ast.exp.Id(id), assignExp);
 			case TOKEN_LBRACK:
 				advance();
 				ast.exp.T index = parseExp();
@@ -398,7 +398,7 @@ public class Parser {
 				eatToken(Kind.TOKEN_ASSIGN);
 				ast.exp.T arrayExp = parseExp();
 				eatToken(Kind.TOKEN_SEMI);
-				return new ast.stm.AssignArray(id, index, arrayExp);
+				return new ast.stm.AssignArray(new ast.exp.Id(id), index, arrayExp);
 			default:
 				error(lexer.getFileName() + ":" + current.lineNum
 						+ ":Expected assign or left-brack!");

@@ -31,8 +31,8 @@ public class Fac
           new util.Flist<ast.dec.T>().addAll(new ast.dec.Dec(
               new ast.type.Int(), "num_aux")), new util.Flist<ast.stm.T>()
               .addAll(new ast.stm.If(new ast.exp.Lt(new ast.exp.Id("num"),
-                  new ast.exp.Num(1)), new ast.stm.Assign("num_aux",
-                  new ast.exp.Num(1)), new ast.stm.Assign("num_aux",
+                  new ast.exp.Num(1)), new ast.stm.Assign(new ast.exp.Id("num_aux"),
+                  new ast.exp.Num(1)), new ast.stm.Assign(new ast.exp.Id("num_aux"),
                   new ast.exp.Times(new ast.exp.Id("num"), new ast.exp.Call(
                       new ast.exp.This(), "ComputeFac",
                       new util.Flist<ast.exp.T>().addAll(new ast.exp.Sub(

@@ -2,8 +2,6 @@ package elaborator;
 
 import java.util.Iterator;
 
-
-
 public class ElaboratorVisitor implements ast.Visitor
 {
   public ClassTable classTable; // symbol table for class
@@ -29,6 +27,13 @@ public class ElaboratorVisitor implements ast.Visitor
 
   // /////////////////////////////////////////////////////
   // expressions
+  
+  @Override
+  public void visit(ast.exp.Paren e)
+  {
+	  e.exp.accept(this);
+  }
+  
   @Override
   public void visit(ast.exp.Add e)
   {
@@ -296,10 +301,14 @@ public class ElaboratorVisitor implements ast.Visitor
   public void visit(ast.stm.Assign s)
   {
     // first look up the id in method table
-    ast.type.T type = this.methodTable.get(s.id);
+	s.id.accept(this);
+    ast.type.T type = this.methodTable.get(s.id.id);
     // if search failed, then s.id must
     if (type == null)
-      type = this.classTable.get(this.currentClass, s.id);
+    {
+    	type = this.classTable.get(this.currentClass, s.id.id);
+    	s.id.isField = true;
+    }
     if (type == null) {
     	//error
     	System.out.println("Undefined identifier: " + s.id);
@@ -308,9 +317,9 @@ public class ElaboratorVisitor implements ast.Visitor
     s.type = type;
     if (!this.type.toString().equals(type.toString())) {
     	if (type instanceof ast.type.Class) {
-    		ClassBinding cb = this.classTable.get(s.id);
+    		ClassBinding cb = this.classTable.get(s.id.id);
 			while (cb.extendss != null) {
-				type = this.classTable.get(cb.extendss, s.id);
+				type = this.classTable.get(cb.extendss, s.id.id);
 				cb = this.classTable.get(cb.extendss);
 				if (type != null && this.type.toString().equals(type.toString()))
 					return;
@@ -327,9 +336,13 @@ public class ElaboratorVisitor implements ast.Visitor
   @Override
   public void visit(ast.stm.AssignArray s)
   {
-	  ast.type.T type = this.methodTable.get(s.id);
+	  s.id.accept(this);
+	  ast.type.T type = this.methodTable.get(s.id.id);
 	  if (type == null)
-		  type = this.classTable.get(this.currentClass, s.id);
+	  {
+		  type = this.classTable.get(this.currentClass, s.id.id);
+		  s.id.isField = true;
+	  }
 	  if (type == null) {
 		//error
 	    System.out.println("Undefined identifier: " + s.id);
@@ -543,4 +556,5 @@ public class ElaboratorVisitor implements ast.Visitor
 	}
 
   }
+
 }

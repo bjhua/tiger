@@ -38,6 +38,16 @@ public class PrettyPrintVisitor implements Visitor
 
   // /////////////////////////////////////////////////////
   // expressions
+  
+
+  @Override
+  public void visit(ast.exp.Paren e)
+  {
+	  this.say("(");
+	  e.exp.accept(this);
+	  this.say(")");
+  }
+  
   @Override
   public void visit(ast.exp.Add e)
   {
@@ -146,7 +156,7 @@ public class PrettyPrintVisitor implements Visitor
   @Override
   public void visit(ast.exp.Num e)
   {
-    System.out.print(e.num);
+    System.out.print(Integer.toString(e.num));
     return;
   }
 
@@ -189,7 +199,8 @@ public class PrettyPrintVisitor implements Visitor
   public void visit(ast.stm.Assign s)
   {
     this.printSpaces();
-    this.say(s.id + " = ");
+    s.id.accept(this);
+    this.say(" = ");
     s.exp.accept(this);
     this.sayln(";");
     return;
@@ -199,7 +210,8 @@ public class PrettyPrintVisitor implements Visitor
   public void visit(ast.stm.AssignArray s)
   {
 	  this.printSpaces();
-	  this.say(s.id + "[");
+	  s.id.accept(this);
+	  this.say("[");
 	  s.index.accept(this);
 	  this.say("] = ");
 	  s.exp.accept(this);
@@ -389,4 +401,5 @@ public class PrettyPrintVisitor implements Visitor
     }
     System.out.println("\n\n");
   }
+
 }
