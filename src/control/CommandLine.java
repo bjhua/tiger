@@ -39,7 +39,7 @@ public class CommandLine
   public CommandLine()
   {
     this.args = new util.Flist<Arg<Object>>().addAll(new Arg<Object>("codegen",
-        "{bytecode|C|x86}", "which code generator to use", Kind.String,
+        "{bytecode|C|dalvik|x86}", "which code generator to use", Kind.String,
         new F<Object>() {
           @Override
           public void f(Object ss)
@@ -50,6 +50,9 @@ public class CommandLine
             } 
             else if (s.equals("C")){
               control.Control.codegen = control.Control.Codegen_Kind_t.C;
+            }
+            else if (s.equals("dalvik")){
+              control.Control.codegen = control.Control.Codegen_Kind_t.Dalvik;
             }
             else if (s.equals("x86")){
               control.Control.codegen = control.Control.Codegen_Kind_t.X86;

@@ -38,7 +38,7 @@ public class TranslateVisitor implements ast.Visitor
   // 
   public String genId()
   {
-    return new util.Temp().toString();
+    return util.Temp.next();
   }
 
   // /////////////////////////////////////////////////////
