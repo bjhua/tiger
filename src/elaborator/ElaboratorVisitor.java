@@ -52,22 +52,35 @@ public class ElaboratorVisitor implements ast.Visitor
     } else
       error();
     MethodType mty = this.classTable.getm(ty.id, e.id);
+    java.util.LinkedList<ast.type.T> declaredArgTypes
+    = new java.util.LinkedList<ast.type.T>();
+    for (ast.dec.T dec: mty.argsType){
+      declaredArgTypes.add(((ast.dec.Dec)dec).type);
+    }
     java.util.LinkedList<ast.type.T> argsty = new java.util.LinkedList<ast.type.T>();
     for (ast.exp.T a : e.args) {
       a.accept(this);
       argsty.addLast(this.type);
     }
-    if (mty.argsType.size() != argsty.size())
+    if (declaredArgTypes.size() != argsty.size())
       error();
+    // For now, the following code only checks that
+    // the types for actual and formal arguments should
+    // be the same. However, in MiniJava, the actual type
+    // of the parameter can also be a subtype (sub-class) of the 
+    // formal type. That is, one can pass an object of type "A"
+    // to a method expecting a type "B", whenever type "A" is
+    // a sub-class of type "B".
+    // Modify the following code accordingly:
     for (int i = 0; i < argsty.size(); i++) {
-      ast.dec.Dec dec = (ast.dec.Dec) mty.argsType.get(i);
-      if (dec.type.toString().equals(argsty.get(i).toString()))
+      if (declaredArgTypes.toString().equals(argsty.get(i).toString()))
         ;
       else
         error();
     }
     this.type = mty.retType;
-    e.at = argsty;
+    // the following two types should be the declared types.
+    e.at = declaredArgTypes;
     e.rt = this.type;
     return;
   }
