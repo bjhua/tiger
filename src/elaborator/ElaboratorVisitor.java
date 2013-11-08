@@ -73,7 +73,7 @@ public class ElaboratorVisitor implements ast.Visitor
     // a sub-class of type "B".
     // Modify the following code accordingly:
     for (int i = 0; i < argsty.size(); i++) {
-      if (declaredArgTypes.toString().equals(argsty.get(i).toString()))
+      if (declaredArgTypes.get(i).toString().equals(argsty.get(i).toString()))
         ;
       else
         error();
