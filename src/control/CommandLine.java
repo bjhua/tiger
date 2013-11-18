@@ -125,7 +125,7 @@ public class CommandLine
             return;
           }
         }), new Arg<Object>("testFac", null,
-        "whether or not to test the Tiger compiler on Fac.java", Kind.Empty, new F<Object>() {
+        "whether or not to test Fac.java", Kind.Empty, new F<Object>() {
           @Override
           public void f(Object s)
           {
@@ -138,6 +138,33 @@ public class CommandLine
           public void f(Object s)
           {
             Control.testlexer = true;
+            return;
+          }
+        }), new Arg<Object>("trace", "<method>", "which method to trace",
+        Kind.String, new F<Object>() {
+          @Override
+          public void f(Object s)
+          {
+            Control.trace = (String)s;
+            return;
+          }
+        }), new Arg<Object>("verbose", "{0|1|2}", "how verbose to be",
+        Kind.Int, new F<Object>() {
+          @Override
+          public void f(Object n)
+          {
+            int i = (Integer)n;
+            switch (i){
+            case 0:
+              Control.verbose = Control.Verbose_t.Silent;
+              break;
+            case 1:
+              Control.verbose = Control.Verbose_t.Pass;
+              break;
+            default:
+              Control.verbose = Control.Verbose_t.Detailed;
+              break;            
+            }
             return;
           }
         }));
@@ -252,7 +279,7 @@ public class CommandLine
     System.out.println("Available options:");
     for (Arg<Object> a : this.args) {
       int current = a.name.length();
-      System.out.print("-" + a.name + " ");
+      System.out.print("   -" + a.name + " ");
       if (a.option != null) {
         current += a.option.length();
         System.out.print(a.option);

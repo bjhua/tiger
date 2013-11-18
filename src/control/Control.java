@@ -25,7 +25,14 @@ public class Control
   public enum Codegen_Kind_t {
     Bytecode, C, Dalvik, X86
   }
-
   public static Codegen_Kind_t codegen = Codegen_Kind_t.C;
-
+  
+  // verbose level
+  public enum Verbose_t{
+    Silent, Pass, Detailed
+  }
+  public static Verbose_t verbose = Verbose_t.Silent;
+  
+  //
+  public static String trace = "";
 }
