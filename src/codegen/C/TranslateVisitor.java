@@ -71,7 +71,9 @@ public class TranslateVisitor implements ast.Visitor
       x.accept(this);
       args.add(this.exp);
     }
-    this.exp = new codegen.C.exp.Call(newid, exp, e.id, args);
+    e.rt.accept(this);
+    codegen.C.type.T retType = this.type;
+    this.exp = new codegen.C.exp.Call(newid, exp, e.id, args, retType);
     return;
   }
 

@@ -1,6 +1,6 @@
 package ast.optimizations;
 
-// Constant folding optimizations on an AST.
+// Algebraic simplification optimizations on an AST.
 
 public class AlgSimp implements ast.Visitor
 {
@@ -207,9 +207,14 @@ public class AlgSimp implements ast.Visitor
     
  // You should comment out this line of code:
     this.program = p;
-    // You should uncomment out this line of code:
-    //this.program =
-    //    new ast.program.Program(this.mainClass, newClasses);
+
+    if (control.Control.trace.equals("ast.AlgSimp")){
+      System.out.println("before optimization:");
+      ast.PrettyPrintVisitor pp = new ast.PrettyPrintVisitor();
+      p.accept(pp);
+      System.out.println("after optimization:");
+      this.program.accept(pp);
+    }
     return;
   }
 }

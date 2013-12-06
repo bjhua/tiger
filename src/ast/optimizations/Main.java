@@ -2,40 +2,49 @@ package ast.optimizations;
 
 public class Main
 {
-  public ast.program.T doit (ast.program.T ast)
+  public ast.program.T program;
+  
+  public void accept(ast.program.T ast)
   {
-    control.CompilerPass deadClassPass
-    = new control.CompilerPass("Dead class elimination");
-    deadClassPass.start();
     DeadClass dceVisitor = new DeadClass();
-    ast.accept(dceVisitor);
-    ast = dceVisitor.program;
-    deadClassPass.finish();
+    control.CompilerPass deadClassPass = new control.CompilerPass(
+        "Dead class elimination", ast, dceVisitor);
+    if (control.Control.skipPass("ast.DeadClass")){
+    }else{
+      deadClassPass.doit();
+      ast = dceVisitor.program;
+    }
     
-    control.CompilerPass deadCodePass
-    = new control.CompilerPass("Dead code elimination");
-    deadCodePass.start();
     DeadCode dcodeVisitor = new DeadCode();
-    ast.accept(dcodeVisitor);
-    ast = dcodeVisitor.program;
-    deadCodePass.finish();
+    control.CompilerPass deadCodePass = new control.CompilerPass(
+        "Dead code elimination", ast, dcodeVisitor);
+    if (control.Control.skipPass("ast.DeadCode")){
+    }else{
+      deadCodePass.doit();
+      ast = dcodeVisitor.program;
+    }
     
-    control.CompilerPass algPass
-    = new control.CompilerPass("Algebraic simplification");
-    algPass.start();
+
     AlgSimp algVisitor = new AlgSimp();
-    ast.accept(algVisitor);
-    ast = algVisitor.program;
-    algPass.finish();
-    
-    control.CompilerPass constFoldPass
-    = new control.CompilerPass("Const folding");
-    constFoldPass.start();
+    control.CompilerPass algPass = new control.CompilerPass(
+        "Algebraic simplification", ast, algVisitor);
+    if (control.Control.skipPass("ast.AlgSimp")){
+    }else{
+      algPass.doit();
+      ast = algVisitor.program;
+    }
+
     ConstFold cfVisitor = new ConstFold();
-    ast.accept(cfVisitor);
-    ast = cfVisitor.program;
-    constFoldPass.finish();
+    control.CompilerPass constFoldPass = new control.CompilerPass(
+        "Const folding", ast, cfVisitor);
+    if (control.Control.skipPass("ast.ConstFold")){
+    }else{
+      constFoldPass.doit();
+      ast = cfVisitor.program;
+    }    
+
+    program = ast;
     
-    return ast;
+    return;
   }
 }

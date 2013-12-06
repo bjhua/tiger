@@ -1,6 +1,6 @@
 package ast.optimizations;
 
-// Constant folding optimizations on an AST.
+// Dead class elimination optimizations on an AST.
 
 public class DeadClass implements ast.Visitor
 {
@@ -231,10 +231,6 @@ public class DeadClass implements ast.Visitor
   @Override
   public void visit(ast.classs.Class c)
   {
-    // Lab 5, exercise 1:
-    // Your code here:
-
-    return;
   }
 
   // main class
@@ -275,13 +271,15 @@ public class DeadClass implements ast.Visitor
         newClasses.add(c);
     }
 
-    // You should comment out this line of code:
-    //this.program = p;
-    // You should uncomment out this line of code:
+    
     this.program =
     new ast.program.Program(p.mainClass, newClasses);
+    
     if (control.Control.trace.equals("ast.DeadClass")){
+      System.out.println("before optimization:");
       ast.PrettyPrintVisitor pp = new ast.PrettyPrintVisitor();
+      p.accept(pp);
+      System.out.println("after optimization:");
       this.program.accept(pp);
     }
       

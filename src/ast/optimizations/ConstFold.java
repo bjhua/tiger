@@ -207,9 +207,14 @@ public class ConstFold implements ast.Visitor
     
  // You should comment out this line of code:
     this.program = p;
-    // You should uncomment out this line of code:
-    //this.program =
-    //    new ast.program.Program(this.mainClass, newClasses);
+
+    if (control.Control.isTracing("ast.ConstFold")){
+      System.out.println("before optimization:");
+      ast.PrettyPrintVisitor pp = new ast.PrettyPrintVisitor();
+      p.accept(pp);
+      System.out.println("after optimization:");
+      this.program.accept(pp);
+    }
     return;
   }
 }

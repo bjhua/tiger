@@ -1,32 +1,14 @@
-package codegen.C;
+package cfg;
 
 import control.Control;
 
 public class PrettyPrintVisitor implements Visitor
 {
-  private int indentLevel;
   private java.io.BufferedWriter writer;
-
-  public PrettyPrintVisitor()
-  {
-    this.indentLevel = 2;
-  }
-
-  private void indent()
-  {
-    this.indentLevel += 2;
-  }
-
-  private void unIndent()
-  {
-    this.indentLevel -= 2;
-  }
 
   private void printSpaces()
   {
-    int i = this.indentLevel;
-    while (i-- != 0)
-      this.say(" ");
+    this.say("  ");
   }
 
   private void sayln(String s)
@@ -51,200 +33,195 @@ public class PrettyPrintVisitor implements Visitor
   }
 
   // /////////////////////////////////////////////////////
-  // expressions
+  // operand
   @Override
-  public void visit(codegen.C.exp.Add e)
+  public void visit(cfg.operand.Int operand)
   {
+    this.say(new Integer(operand.i).toString());
   }
 
   @Override
-  public void visit(codegen.C.exp.And e)
+  public void visit(cfg.operand.Var operand)
   {
-  }
-
-  @Override
-  public void visit(codegen.C.exp.ArraySelect e)
-  {
-  }
-
-  @Override
-  public void visit(codegen.C.exp.Call e)
-  {
-    this.say("(" + e.assign + "=");
-    e.exp.accept(this);
-    this.say(", ");
-    this.say(e.assign + "->vptr->" + e.id + "(" + e.assign);
-    int size = e.args.size();
-    if (size == 0) {
-      this.say("))");
-      return;
-    }
-    for (codegen.C.exp.T x : e.args) {
-      this.say(", ");
-      x.accept(this);
-    }
-    this.say("))");
-    return;
-  }
-
-  @Override
-  public void visit(codegen.C.exp.Id e)
-  {
-    this.say(e.id);
-  }
-
-  @Override
-  public void visit(codegen.C.exp.Length e)
-  {
-  }
-
-  @Override
-  public void visit(codegen.C.exp.Lt e)
-  {
-    e.left.accept(this);
-    this.say(" < ");
-    e.right.accept(this);
-    return;
-  }
-
-  @Override
-  public void visit(codegen.C.exp.NewIntArray e)
-  {
-  }
-
-  @Override
-  public void visit(codegen.C.exp.NewObject e)
-  {
-    this.say("((struct " + e.id + "*)(Tiger_new (&" + e.id
-        + "_vtable_, sizeof(struct " + e.id + "))))");
-    return;
-  }
-
-  @Override
-  public void visit(codegen.C.exp.Not e)
-  {
-  }
-
-  @Override
-  public void visit(codegen.C.exp.Num e)
-  {
-    this.say(Integer.toString(e.num));
-    return;
-  }
-
-  @Override
-  public void visit(codegen.C.exp.Sub e)
-  {
-    e.left.accept(this);
-    this.say(" - ");
-    e.right.accept(this);
-    return;
-  }
-
-  @Override
-  public void visit(codegen.C.exp.This e)
-  {
-    this.say("this");
-  }
-
-  @Override
-  public void visit(codegen.C.exp.Times e)
-  {
-    e.left.accept(this);
-    this.say(" * ");
-    e.right.accept(this);
-    return;
+    this.say(operand.id);
   }
 
   // statements
   @Override
-  public void visit(codegen.C.stm.Assign s)
+  public void visit(cfg.stm.Add s)
   {
     this.printSpaces();
-    this.say(s.id + " = ");
-    s.exp.accept(this);
+    this.say(s.dst + " = ");
+    s.left.accept(this);
+    this.say(" + ");
+    s.right.accept(this);
     this.say(";");
     return;
   }
 
   @Override
-  public void visit(codegen.C.stm.AssignArray s)
-  {
-  }
-
-  @Override
-  public void visit(codegen.C.stm.Block s)
-  {
-  }
-
-  @Override
-  public void visit(codegen.C.stm.If s)
+  public void visit(cfg.stm.InvokeVirtual s)
   {
     this.printSpaces();
-    this.say("if (");
-    s.condition.accept(this);
-    this.sayln(")");
-    this.indent();
-    s.thenn.accept(this);
-    this.unIndent();
-    this.sayln("");
-    this.printSpaces();
-    this.sayln("else");
-    this.indent();
-    s.elsee.accept(this);
-    this.sayln("");
-    this.unIndent();
+    this.say(s.dst + " = " + s.obj);
+    this.say("->vptr->" + s.f + "("+s.obj);
+    for (cfg.operand.T x : s.args) {
+      this.say(", ");
+      x.accept(this);
+    }
+    this.say(");");
     return;
   }
 
   @Override
-  public void visit(codegen.C.stm.Print s)
+  public void visit(cfg.stm.Lt s)
+  {
+    this.printSpaces();
+    this.say(s.dst + " = ");
+    s.left.accept(this);
+    this.say(" < ");
+    s.right.accept(this);
+    this.say(";");
+    return;
+  }
+
+  @Override
+  public void visit(cfg.stm.Move s)
+  {
+    this.printSpaces();
+    this.say(s.dst + " = ");
+    s.src.accept(this);
+    this.say(";");
+    return;
+  }
+
+  @Override
+  public void visit(cfg.stm.NewObject s)
+  {
+    this.printSpaces();
+    this.say(s.dst +" = ((struct " + s.c + "*)(Tiger_new (&" + s.c
+        + "_vtable_, sizeof(struct " + s.c + "))));");
+    return;
+  }
+
+  @Override
+  public void visit(cfg.stm.Print s)
   {
     this.printSpaces();
     this.say("System_out_println (");
-    s.exp.accept(this);
+    s.arg.accept(this);
     this.sayln(");");
     return;
   }
 
   @Override
-  public void visit(codegen.C.stm.While s)
+  public void visit(cfg.stm.Sub s)
   {
+    this.printSpaces();
+    this.say(s.dst + " = ");
+    s.left.accept(this);
+    this.say(" - ");
+    s.right.accept(this);
+    this.say(";");
+    return;
+  }
+
+  @Override
+  public void visit(cfg.stm.Times s)
+  {
+    this.printSpaces();
+    this.say(s.dst + " = ");
+    s.left.accept(this);
+    this.say(" * ");
+    s.right.accept(this);
+    this.say(";");
+    return;
+  }
+
+  // transfer
+  @Override
+  public void visit(cfg.transfer.If s)
+  {
+    this.printSpaces();
+    this.say("if (");
+    s.operand.accept(this);
+    this.say(")\n");
+    this.printSpaces();
+    this.say("  goto " + s.truee.toString() + ";\n");
+    this.printSpaces();
+    this.say("else\n");
+    this.printSpaces();
+    this.say("  goto " + s.falsee.toString()+";\n");
+    return;
+  }
+
+  @Override
+  public void visit(cfg.transfer.Goto s)
+  {
+    this.printSpaces();
+    this.say("goto " + s.label.toString()+";\n");
+    return;
+  }
+
+  @Override
+  public void visit(cfg.transfer.Return s)
+  {
+    this.printSpaces();
+    this.say("return ");
+    s.operand.accept(this);
+    this.say(";");
+    return;
   }
 
   // type
   @Override
-  public void visit(codegen.C.type.Class t)
+  public void visit(cfg.type.Class t)
   {
     this.say("struct " + t.id + " *");
   }
 
   @Override
-  public void visit(codegen.C.type.Int t)
+  public void visit(cfg.type.Int t)
   {
     this.say("int");
   }
 
   @Override
-  public void visit(codegen.C.type.IntArray t)
+  public void visit(cfg.type.IntArray t)
   {
   }
 
   // dec
   @Override
-  public void visit(codegen.C.dec.Dec d)
+  public void visit(cfg.dec.Dec d)
   {
+    d.type.accept(this);
+    this.say(" "+d.id);
+    return;
+  }
+  
+  // dec
+  @Override
+  public void visit(cfg.block.Block b)
+  {
+    this.say(b.label.toString()+":\n");
+    for (cfg.stm.T s: b.stms){
+      s.accept(this);
+      this.say("\n");
+    }
+    b.transfer.accept(this);
+    return;
   }
 
   // method
   @Override
-  public void visit(codegen.C.method.Method m)
+  public void visit(cfg.method.Method m)
   {
     m.retType.accept(this);
     this.say(" " + m.classId + "_" + m.id + "(");
     int size = m.formals.size();
-    for (codegen.C.dec.T d : m.formals) {
-      codegen.C.dec.Dec dec = (codegen.C.dec.Dec) d;
+    for (cfg.dec.T d : m.formals) {
+      cfg.dec.Dec dec = (cfg.dec.Dec) d;
       size--;
       dec.type.accept(this);
       this.say(" " + dec.id);
@@ -254,46 +231,49 @@ public class PrettyPrintVisitor implements Visitor
     this.sayln(")");
     this.sayln("{");
 
-    for (codegen.C.dec.T d : m.locals) {
-      codegen.C.dec.Dec dec = (codegen.C.dec.Dec) d;
+    for (cfg.dec.T d : m.locals) {
+      cfg.dec.Dec dec = (cfg.dec.Dec) d;
       this.say("  ");
       dec.type.accept(this);
       this.say(" " + dec.id + ";\n");
     }
     this.sayln("");
-    for (codegen.C.stm.T s : m.stms)
-      s.accept(this);
-    this.say("  return ");
-    m.retExp.accept(this);
-    this.sayln(";");
-    this.sayln("}");
+    for (cfg.block.T block : m.blocks){
+      cfg.block.Block b = (cfg.block.Block)block;
+      b.accept(this);
+    }
+    this.sayln("\n}");
     return;
   }
 
   @Override
-  public void visit(codegen.C.mainMethod.MainMethod m)
+  public void visit(cfg.mainMethod.MainMethod m)
   {
     this.sayln("int Tiger_main ()");
     this.sayln("{");
-    for (codegen.C.dec.T dec : m.locals) {
+    for (cfg.dec.T dec : m.locals) {
       this.say("  ");
-      codegen.C.dec.Dec d = (codegen.C.dec.Dec) dec;
+      cfg.dec.Dec d = (cfg.dec.Dec) dec;
       d.type.accept(this);
       this.say(" ");
       this.sayln(d.id + ";");
     }
-    m.stm.accept(this);
-    this.sayln("}\n");
+    this.sayln("");
+    for (cfg.block.T block : m.blocks) {
+      cfg.block.Block b = (cfg.block.Block) block;
+      b.accept(this);
+    }
+    this.sayln("\n}\n");
     return;
   }
 
   // vtables
   @Override
-  public void visit(codegen.C.vtable.Vtable v)
+  public void visit(cfg.vtable.Vtable v)
   {
     this.sayln("struct " + v.id + "_vtable");
     this.sayln("{");
-    for (codegen.C.Ftuple t : v.ms) {
+    for (cfg.Ftuple t : v.ms) {
       this.say("  ");
       t.ret.accept(this);
       this.sayln(" (*" + t.id + ")();");
@@ -302,11 +282,11 @@ public class PrettyPrintVisitor implements Visitor
     return;
   }
 
-  private void outputVtable(codegen.C.vtable.Vtable v)
+  private void outputVtable(cfg.vtable.Vtable v)
   {
     this.sayln("struct " + v.id + "_vtable " + v.id + "_vtable_ = ");
     this.sayln("{");
-    for (codegen.C.Ftuple t : v.ms) {
+    for (cfg.Ftuple t : v.ms) {
       this.say("  ");
       this.sayln(t.classs + "_" + t.id + ",");
     }
@@ -316,12 +296,12 @@ public class PrettyPrintVisitor implements Visitor
 
   // class
   @Override
-  public void visit(codegen.C.classs.Class c)
+  public void visit(cfg.classs.Class c)
   {
     this.sayln("struct " + c.id);
     this.sayln("{");
     this.sayln("  struct " + c.id + "_vtable *vptr;");
-    for (codegen.C.Tuple t : c.decs) {
+    for (cfg.Tuple t : c.decs) {
       this.say("  ");
       t.type.accept(this);
       this.say(" ");
@@ -333,7 +313,7 @@ public class PrettyPrintVisitor implements Visitor
 
   // program
   @Override
-  public void visit(codegen.C.program.Program p)
+  public void visit(cfg.program.Program p)
   {
     // we'd like to output to a file, rather than the "stdout".
     try {
@@ -341,9 +321,9 @@ public class PrettyPrintVisitor implements Visitor
       if (Control.outputName != null)
         outputName = Control.outputName;
       else if (Control.fileName != null)
-        outputName = Control.fileName + ".c.c";
+        outputName = Control.fileName + ".c";
       else
-        outputName = "a.c.c";
+        outputName = "a.c";
 
       this.writer = new java.io.BufferedWriter(new java.io.OutputStreamWriter(
           new java.io.FileOutputStream(outputName)));
@@ -354,27 +334,28 @@ public class PrettyPrintVisitor implements Visitor
 
     this.sayln("// This is automatically generated by the Tiger compiler.");
     this.sayln("// Do NOT modify!\n");
+    this.sayln("// Control-flow Graph\n");
 
     this.sayln("// structures");
-    for (codegen.C.classs.T c : p.classes) {
+    for (cfg.classs.T c : p.classes) {
       c.accept(this);
     }
 
     this.sayln("// vtables structures");
-    for (codegen.C.vtable.T v : p.vtables) {
+    for (cfg.vtable.T v : p.vtables) {
       v.accept(this);
     }
     this.sayln("");
 
     this.sayln("// methods");
-    for (codegen.C.method.T m : p.methods) {
+    for (cfg.method.T m : p.methods) {
       m.accept(this);
     }
     this.sayln("");
 
     this.sayln("// vtables");
-    for (codegen.C.vtable.T v : p.vtables) {
-      outputVtable((codegen.C.vtable.Vtable) v);
+    for (cfg.vtable.T v : p.vtables) {
+      outputVtable((cfg.vtable.Vtable) v);
     }
     this.sayln("");
 
