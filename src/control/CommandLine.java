@@ -94,6 +94,7 @@ public class CommandLine
       if (!cargs[i].startsWith("-")) {
         if (filename == null) {
           filename = cargs[i];
+          System.out.println("--------"+filename);
           continue;
         } else {
           System.out.println("Error: can only compile one Java file a time");
@@ -207,7 +208,7 @@ public class CommandLine
   public void usage()
   {
     System.out
-        .println("The Tiger compiler. Copyright (C) 2013-, SSE of USTC.\n"
+        .println("The Tiger compiler. Copyright (C) 2013-2013, SSE of USTC.\n"
             + "Usage: java Tiger [options] <filename>\n");
     output();
     return;
