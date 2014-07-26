@@ -150,6 +150,7 @@ public class Main
       compileExp(exp);
       emit("\tpushl\t%eax\n");
       emit("\tpushl\t$slp_format\n");
+      emit("\tcall\tprintf\n");
       emit("\taddl\t$4, %esp\n");
       compileExpList(list);
     } else if (explist instanceof ExpList.Last) {
@@ -159,6 +160,7 @@ public class Main
       compileExp(exp);
       emit("\tpushl\t%eax\n");
       emit("\tpushl\t$slp_format\n");
+      emit("\tcall\tprintf\n");
       emit("\taddl\t$4, %esp\n");
     } else
       new Bug();
@@ -228,8 +230,8 @@ public class Main
           writer.write("\t.int 0\n");
         }
         writer.write("\n\n\t.text\n");
-        writer.write("\t.globl slp_main\n");
-        writer.write("slp_main:\n");
+        writer.write("\t.globl main\n");
+        writer.write("main:\n");
         writer.write("\tpushl\t%ebp\n");
         writer.write("\tmovl\t%esp, %ebp\n");
         writer.write(buf.toString());
