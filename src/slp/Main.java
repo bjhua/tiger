@@ -124,7 +124,7 @@ public class Main
         emit("\tmovl\t%eax, %ecx\n");
         emit("\tmovl\t%edx, %eax\n");
         emit("\tcltd\n");
-        emit("\tdiv\n");
+        emit("\tdiv\t%ecx\n");
         break;
       default:
         new Bug();
@@ -237,7 +237,8 @@ public class Main
         writer.write(buf.toString());
         writer.write("\tleave\n\tret\n\n");
         writer.close();
-        Runtime.getRuntime().exec("gcc slp_gen.s");
+        Process child = Runtime.getRuntime().exec("gcc slp_gen.s");
+        child.waitFor();
         if (!Control.ConSlp.keepasm)
           Runtime.getRuntime().exec("rm -rf slp_gen.s");
       } catch (Exception e) {
