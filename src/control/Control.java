@@ -2,13 +2,20 @@ package control;
 
 public class Control
 {
-  // compiler testing and debugging
-  public static boolean testlexer = false;
+  // the lexer
+  public static class ConLexer
+  {
+    public static boolean test = false;
+    public static boolean dump = false;
+  }
   
-  // lexer and parser
-  public static boolean lex = false;
-
-  // elaborator
-  public static boolean elabClassTable = false;
-  public static boolean elabMethodTable = false;
+  // the straight-line program interpreter
+  public static class ConSlp
+  {
+    public enum T{NONE, ARGS, INTERP, COMPILE, TEST, DIV};
+    
+    public static T action = T.NONE;
+    public static boolean div = false;
+    public static boolean keepasm = false;
+  }
 }

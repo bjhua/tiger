@@ -2,6 +2,9 @@ package control;
 
 import java.util.LinkedList;
 
+import util.Bug;
+import control.Control.ConSlp;
+
 public class CommandLine
 {
   static interface F<X>
@@ -9,7 +12,8 @@ public class CommandLine
     public void f(X x);
   }
 
-  static enum Kind {
+  static enum Kind
+  {
     Empty, Bool, Int, String, StringList,
   }
 
@@ -30,7 +34,6 @@ public class CommandLine
       this.kind = kind;
       this.action = action;
     }
-
   }
 
   private LinkedList<Arg<Object>> args;
@@ -38,49 +41,39 @@ public class CommandLine
   @SuppressWarnings("unchecked")
   public CommandLine()
   {
-    this.args = new util.Flist<Arg<Object>>().addAll(new Arg<Object>("elab",
-        "<arg>", "dump information about elaboration", Kind.String,
-        new F<Object>() {
-          @Override
-          public void f(Object ss)
-          {
-            String s = (String) ss;
-            if (s.equals("classTable")) {
-              control.Control.elabClassTable = true;
-            } else if (s.equals("methodTable"))
-              Control.elabMethodTable = true;
-            else {
-              System.out.println("bad argument: " + s);
-              output();
-              System.exit(1);
-            }
-            return;
-          }
-        }), new Arg<Object>("help", null, "show this help information",
-        Kind.Empty, new F<Object>() {
-          @Override
-          public void f(Object s)
-          {
-            usage();
+    this.args = new util.Flist<Arg<Object>>().list(new Arg<Object>("help",
+        null, "show this help information", Kind.Empty, (s) -> {
+          usage();
+          System.exit(1);
+          return;
+        }), new Arg<Object>("lex", null, "dump the result of lexical analysis",
+        Kind.Empty, (s) -> {
+          Control.ConLexer.dump = true;
+          return;
+        }), new Arg<Object>("slp", "{args|interp|compile}",
+        "run the SLP interpreter", Kind.String, (ss) -> {
+          String s = (String) ss;
+
+          if (s.equals("args")) {
+            ConSlp.action = ConSlp.T.ARGS;
+          } else if (s.equals("interp"))
+            ConSlp.action = ConSlp.T.INTERP;
+          else if (s.equals("compile"))
+            ConSlp.action = ConSlp.T.COMPILE;
+          else if (s.equals("div"))
+            ConSlp.div = true;
+          else if (s.equals("keepasm"))
+            ConSlp.keepasm = true;
+          else {
+            System.out.println("bad argument: " + s);
+            output();
             System.exit(1);
-            return;
           }
-        }), new Arg<Object>("lex", null, "show the result of lexical analysis",
-        Kind.Empty, new F<Object>() {
-          @Override
-          public void f(Object s)
-          {
-            Control.lex = true;
-            return;
-          }
+          return;
         }), new Arg<Object>("testlexer", null,
-        "whether or not to test the lexer", Kind.Empty, new F<Object>() {
-          @Override
-          public void f(Object s)
-          {
-            Control.testlexer = true;
-            return;
-          }
+        "whether or not to test the lexer", Kind.Empty, (s) -> {
+          Control.ConLexer.test = true;
+          return;
         }));
   }
 
@@ -99,8 +92,8 @@ public class CommandLine
           System.out.println("Error: can only compile one Java file a time");
           System.exit(1);
         }
-      } else
-        ;
+      } else {
+      }
 
       boolean found = false;
       for (Arg<Object> arg : this.args) {
@@ -114,12 +107,14 @@ public class CommandLine
           break;
         default:
           if (i >= cargs.length - 1) {
-            System.out.println(arg.name + ": requires an argument");
+            System.out.println("Error: "+cargs[i] + ": requires an argument");
             this.output();
             System.exit(1);
           }
+          i++;
           break;
         }
+
         String theArg = cargs[i];
         switch (arg.kind) {
         case Bool:
@@ -128,7 +123,7 @@ public class CommandLine
           else if (theArg.equals("false"))
             arg.action.f(new Boolean(false));
           else {
-            System.out.println(arg.name + ": requires a boolean");
+            System.out.println("Error: "+arg.name + ": requires a boolean");
             this.output();
             System.exit(1);
           }
@@ -138,7 +133,7 @@ public class CommandLine
           try {
             num = Integer.parseInt(theArg);
           } catch (java.lang.NumberFormatException e) {
-            System.out.println(arg.name + ": requires an integer");
+            System.out.println("Error: "+arg.name + ": requires an integer");
             this.output();
             System.exit(1);
           }
@@ -157,7 +152,7 @@ public class CommandLine
         break;
       }
       if (!found) {
-        System.out.println("undefined switch: " + cargs[i]);
+        System.out.println("invalid option: " + cargs[i]);
         this.output();
         System.exit(1);
       }
@@ -168,7 +163,7 @@ public class CommandLine
   private void outputSpace(int n)
   {
     if (n < 0)
-      util.Error.bug();
+      new Bug();
 
     while (n-- != 0)
       System.out.print(" ");
