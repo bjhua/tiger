@@ -1,14 +1,16 @@
+import static control.Control.ConAst.dumpAst;
+import static control.Control.ConAst.testFac;
+
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
+import ast.Ast.Program;
 import lexer.Lexer;
 import lexer.Token;
-import lexer.Token.Kind;
-
-import control.CommandLine;
-
 import parser.Parser;
+import control.CommandLine;
+import control.Control;
 
 public class Tiger
 {
@@ -24,7 +26,7 @@ public class Tiger
 
     // /////////////////////////////////////////////////////
     // to test the pretty printer on the "test/Fac.java" program
-    if (control.Control.testFac) {
+    if (testFac) {
       System.out.println("Testing the Tiger compiler on Fac.java starting:");
       ast.PrettyPrintVisitor pp = new ast.PrettyPrintVisitor();
       ast.Fac.prog.accept(pp);
@@ -40,13 +42,14 @@ public class Tiger
     // /////////////////////////////////////////////////////
     // it would be helpful to be able to test the lexer
     // independently.
-    if (control.Control.testlexer) {
+    if (Control.ConLexer.test) {
       System.out.println("Testing the lexer. All tokens:");
       try {
         fstream = new BufferedInputStream(new FileInputStream(fname));
         Lexer lexer = new Lexer(fname, fstream);
         Token token = lexer.nextToken();
-        while (token.kind != Kind.TOKEN_EOF) {
+
+        while (token.kind != Token.Kind.TOKEN_EOF) {
           System.out.println(token.toString());
           token = lexer.nextToken();
         }
@@ -59,7 +62,7 @@ public class Tiger
 
     // /////////////////////////////////////////////////////////
     // normal compilation phases.
-    ast.program.T theAst = null;
+    Program.T theAst = null;
 
     // parsing the file, get an AST.
     try {
@@ -75,7 +78,7 @@ public class Tiger
     }
     
     // pretty printing the AST, if necessary
-    if (control.Control.dumpAst) {
+    if (dumpAst) {
       ast.PrettyPrintVisitor pp = new ast.PrettyPrintVisitor();
       theAst.accept(pp);
     }
