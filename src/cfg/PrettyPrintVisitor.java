@@ -318,10 +318,10 @@ public class PrettyPrintVisitor implements Visitor
     // we'd like to output to a file, rather than the "stdout".
     try {
       String outputName = null;
-      if (Control.outputName != null)
-        outputName = Control.outputName;
-      else if (Control.fileName != null)
-        outputName = Control.fileName + ".c";
+      if (Control.ConCodeGen.outputName != null)
+        outputName = Control.ConCodeGen.outputName;
+      else if (Control.ConCodeGen.fileName != null)
+        outputName = Control.ConCodeGen.fileName + ".c";
       else
         outputName = "a.c";
 

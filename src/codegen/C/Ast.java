@@ -175,6 +175,7 @@ public class Ast
       public T exp;
       public String id;
       public LinkedList<T> args;
+      public Type.T retType;
 
       public Call(String assign, T exp, String id, java.util.LinkedList<T> args)
       {
