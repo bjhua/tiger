@@ -1,6 +1,12 @@
 package codegen.bytecode;
 
-import codegen.bytecode.stm.*;
+import codegen.bytecode.Ast.Class.ClassSingle;
+import codegen.bytecode.Ast.Dec.DecSingle;
+import codegen.bytecode.Ast.MainClass.MainClassSingle;
+import codegen.bytecode.Ast.Method.MethodSingle;
+import codegen.bytecode.Ast.Program.ProgramSingle;
+import codegen.bytecode.Ast.Stm.*;
+import codegen.bytecode.Ast.Type.*;
 
 public interface Visitor
 {
@@ -29,7 +35,7 @@ public interface Visitor
 
   public void visit(Invokevirtual s);
 
-  public void visit(Label s);
+  public void visit(LabelJ s);
 
   public void visit(Ldc s);
 
@@ -38,24 +44,24 @@ public interface Visitor
   public void visit(New s);
 
   // type
-  public void visit(codegen.bytecode.type.Class t);
+  public void visit(ClassType t);
 
-  public void visit(codegen.bytecode.type.Int t);
+  public void visit(Int t);
 
-  public void visit(codegen.bytecode.type.IntArray t);
+  public void visit(IntArray t);
 
   // dec
-  public void visit(codegen.bytecode.dec.Dec d);
+  public void visit(DecSingle d);
 
   // method
-  public void visit(codegen.bytecode.method.Method m);
+  public void visit(MethodSingle m);
 
   // class
-  public void visit(codegen.bytecode.classs.Class c);
+  public void visit(ClassSingle c);
 
   // main class
-  public void visit(codegen.bytecode.mainClass.MainClass c);
+  public void visit(MainClassSingle c);
 
   // program
-  public void visit(codegen.bytecode.program.Program p);
+  public void visit(ProgramSingle p);
 }

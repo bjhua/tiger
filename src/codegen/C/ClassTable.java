@@ -1,5 +1,8 @@
 package codegen.C;
 
+import codegen.C.Ast.Dec;
+import codegen.C.Ast.Type;
+
 public class ClassTable
 {
   private java.util.Hashtable<String, ClassBinding> table;
@@ -16,18 +19,18 @@ public class ClassTable
   }
 
   public void initDecs(String current,
-      java.util.LinkedList<codegen.C.dec.T> decs)
+      java.util.LinkedList<Dec.T> decs)
   {
     ClassBinding cb = this.table.get(current);
-    for (codegen.C.dec.T dec : decs) {
-      codegen.C.dec.Dec decc = (codegen.C.dec.Dec) dec;
+    for (Dec.T dec : decs) {
+      Dec.DecSingle decc = (Dec.DecSingle) dec;
       cb.put(current, decc.type, decc.id);
     }
     this.table.put(current, cb);
   }
 
-  public void initMethod(String current, codegen.C.type.T ret,
-      java.util.LinkedList<codegen.C.dec.T> args, String mid)
+  public void initMethod(String current, Type.T ret,
+      java.util.LinkedList<Dec.T> args, String mid)
   {
     ClassBinding cb = this.table.get(current);
     cb.putm(current, ret, args, mid);
