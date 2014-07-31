@@ -1,10 +1,11 @@
 package lexer;
 
+import static control.Control.ConLexer.dump;
+
 import java.io.InputStream;
 
-import util.Todo;
-
 import lexer.Token.Kind;
+import util.Todo;
 
 public class Lexer
 {
@@ -62,7 +63,7 @@ public class Lexer
       e.printStackTrace();
       System.exit(1);
     }
-    if (control.Control.lex)
+    if (dump)
       System.out.println(t.toString());
     return t;
   }

@@ -1,22 +1,26 @@
 package elaborator;
 
+import java.util.LinkedList;
+
+import ast.Ast.Dec;
+import ast.Ast.Type;
 import util.Todo;
 
 public class MethodTable
 {
-  private java.util.Hashtable<String, ast.type.T> table;
+  private java.util.Hashtable<String, Type.T> table;
 
   public MethodTable()
   {
-    this.table = new java.util.Hashtable<String, ast.type.T>();
+    this.table = new java.util.Hashtable<String, Type.T>();
   }
 
   // Duplication is not allowed
-  public void put(java.util.LinkedList<ast.dec.T> formals,
-      java.util.LinkedList<ast.dec.T> locals)
+  public void put(LinkedList<Dec.T> formals,
+      LinkedList<Dec.T> locals)
   {
-    for (ast.dec.T dec : formals) {
-      ast.dec.Dec decc = (ast.dec.Dec) dec;
+    for (Dec.T dec : formals) {
+      Dec.DecSingle decc = (Dec.DecSingle) dec;
       if (this.table.get(decc.id) != null) {
         System.out.println("duplicated parameter: " + decc.id);
         System.exit(1);
@@ -24,8 +28,8 @@ public class MethodTable
       this.table.put(decc.id, decc.type);
     }
 
-    for (ast.dec.T dec : locals) {
-      ast.dec.Dec decc = (ast.dec.Dec) dec;
+    for (Dec.T dec : locals) {
+      Dec.DecSingle decc = (Dec.DecSingle) dec;
       if (this.table.get(decc.id) != null) {
         System.out.println("duplicated variable: " + decc.id);
         System.exit(1);
@@ -36,7 +40,7 @@ public class MethodTable
   }
 
   // return null for non-existing keys
-  public ast.type.T get(String id)
+  public Type.T get(String id)
   {
     return this.table.get(id);
   }

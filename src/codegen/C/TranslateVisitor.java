@@ -1,22 +1,51 @@
 package codegen.C;
 
+import java.util.LinkedList;
+
+import codegen.C.Ast.Class;
+import codegen.C.Ast.Class.ClassSingle;
+import codegen.C.Ast.Dec;
+import codegen.C.Ast.Exp;
+import codegen.C.Ast.Exp.Call;
+import codegen.C.Ast.Exp.Id;
+import codegen.C.Ast.Exp.Lt;
+import codegen.C.Ast.Exp.NewObject;
+import codegen.C.Ast.Exp.Num;
+import codegen.C.Ast.Exp.Sub;
+import codegen.C.Ast.Exp.This;
+import codegen.C.Ast.Exp.Times;
+import codegen.C.Ast.MainMethod;
+import codegen.C.Ast.MainMethod.MainMethodSingle;
+import codegen.C.Ast.Method;
+import codegen.C.Ast.Method.MethodSingle;
+import codegen.C.Ast.Program;
+import codegen.C.Ast.Program.ProgramSingle;
+import codegen.C.Ast.Stm;
+import codegen.C.Ast.Stm.Assign;
+import codegen.C.Ast.Stm.If;
+import codegen.C.Ast.Stm.Print;
+import codegen.C.Ast.Type;
+import codegen.C.Ast.Type.ClassType;
+import codegen.C.Ast.Vtable;
+import codegen.C.Ast.Vtable.VtableSingle;
+
 // Given a Java ast, translate it into a C ast and outputs it.
 
 public class TranslateVisitor implements ast.Visitor
 {
   private ClassTable table;
   private String classId;
-  private codegen.C.type.T type; // type after translation
-  private codegen.C.dec.T dec;
-  private codegen.C.stm.T stm;
-  private codegen.C.exp.T exp;
-  private codegen.C.method.T method;
-  private java.util.LinkedList<codegen.C.dec.T> tmpVars;
-  private java.util.LinkedList<codegen.C.classs.T> classes;
-  private java.util.LinkedList<codegen.C.vtable.T> vtables;
-  private java.util.LinkedList<codegen.C.method.T> methods;
-  private codegen.C.mainMethod.T mainMethod;
-  public codegen.C.program.T program;
+  private Type.T type; // type after translation
+  private Dec.T dec;
+  private Stm.T stm;
+  private Exp.T exp;
+  private Method.T method;
+  private LinkedList<Dec.T> tmpVars;
+  private LinkedList<Class.T> classes;
+  private LinkedList<Vtable.T> vtables;
+  private LinkedList<Method.T> methods;
+  private MainMethod.T mainMethod;
+  public Program.T program;
 
   public TranslateVisitor()
   {
@@ -27,15 +56,15 @@ public class TranslateVisitor implements ast.Visitor
     this.stm = null;
     this.exp = null;
     this.method = null;
-    this.classes = new java.util.LinkedList<codegen.C.classs.T>();
-    this.vtables = new java.util.LinkedList<codegen.C.vtable.T>();
-    this.methods = new java.util.LinkedList<codegen.C.method.T>();
+    this.classes = new LinkedList<Class.T>();
+    this.vtables = new LinkedList<Vtable.T>();
+    this.methods = new LinkedList<Method.T>();
     this.mainMethod = null;
     this.program = null;
   }
 
   // //////////////////////////////////////////////////////
-  // 
+  //
   public String genId()
   {
     return util.Temp.next();
@@ -44,242 +73,244 @@ public class TranslateVisitor implements ast.Visitor
   // /////////////////////////////////////////////////////
   // expressions
   @Override
-  public void visit(ast.exp.Add e)
+  public void visit(ast.Ast.Exp.Add e)
   {
   }
 
   @Override
-  public void visit(ast.exp.And e)
+  public void visit(ast.Ast.Exp.And e)
   {
   }
 
   @Override
-  public void visit(ast.exp.ArraySelect e)
+  public void visit(ast.Ast.Exp.ArraySelect e)
   {
   }
 
   @Override
-  public void visit(ast.exp.Call e)
+  public void visit(ast.Ast.Exp.Call e)
   {
     e.exp.accept(this);
     String newid = this.genId();
-    this.tmpVars.add(new codegen.C.dec.Dec(new codegen.C.type.Class(e.type),
-        newid));
-    codegen.C.exp.T exp = this.exp;
-    java.util.LinkedList<codegen.C.exp.T> args = new java.util.LinkedList<codegen.C.exp.T>();
-    for (ast.exp.T x : e.args) {
+    this.tmpVars.add(new Dec.DecSingle(new Type.ClassType(e.type), newid));
+    Exp.T exp = this.exp;
+    LinkedList<Exp.T> args = new LinkedList<Exp.T>();
+    for (ast.Ast.Exp.T x : e.args) {
       x.accept(this);
       args.add(this.exp);
     }
-    this.exp = new codegen.C.exp.Call(newid, exp, e.id, args);
+    this.exp = new Call(newid, exp, e.id, args);
     return;
   }
 
   @Override
-  public void visit(ast.exp.False e)
+  public void visit(ast.Ast.Exp.False e)
   {
   }
 
   @Override
-  public void visit(ast.exp.Id e)
+  public void visit(ast.Ast.Exp.Id e)
   {
-    this.exp = new codegen.C.exp.Id(e.id);
+    this.exp = new Id(e.id);
     return;
   }
 
   @Override
-  public void visit(ast.exp.Length e)
+  public void visit(ast.Ast.Exp.Length e)
   {
   }
 
   @Override
-  public void visit(ast.exp.Lt e)
+  public void visit(ast.Ast.Exp.Lt e)
   {
     e.left.accept(this);
-    codegen.C.exp.T left = this.exp;
+    Exp.T left = this.exp;
     e.right.accept(this);
-    codegen.C.exp.T right = this.exp;
-    this.exp = new codegen.C.exp.Lt(left, right);
+    Exp.T right = this.exp;
+    this.exp = new Lt(left, right);
     return;
   }
 
   @Override
-  public void visit(ast.exp.NewIntArray e)
+  public void visit(ast.Ast.Exp.NewIntArray e)
   {
   }
 
   @Override
-  public void visit(ast.exp.NewObject e)
+  public void visit(ast.Ast.Exp.NewObject e)
   {
-    this.exp = new codegen.C.exp.NewObject(e.id);
+    this.exp = new NewObject(e.id);
     return;
   }
 
   @Override
-  public void visit(ast.exp.Not e)
+  public void visit(ast.Ast.Exp.Not e)
   {
   }
 
   @Override
-  public void visit(ast.exp.Num e)
+  public void visit(ast.Ast.Exp.Num e)
   {
-    this.exp = new codegen.C.exp.Num(e.num);
+    this.exp = new Num(e.num);
     return;
   }
 
   @Override
-  public void visit(ast.exp.Sub e)
+  public void visit(ast.Ast.Exp.Sub e)
   {
     e.left.accept(this);
-    codegen.C.exp.T left = this.exp;
+    Exp.T left = this.exp;
     e.right.accept(this);
-    codegen.C.exp.T right = this.exp;
-    this.exp = new codegen.C.exp.Sub(left, right);
+    Exp.T right = this.exp;
+    this.exp = new Sub(left, right);
     return;
   }
 
   @Override
-  public void visit(ast.exp.This e)
+  public void visit(ast.Ast.Exp.This e)
   {
-    this.exp = new codegen.C.exp.This();
+    this.exp = new This();
     return;
   }
 
   @Override
-  public void visit(ast.exp.Times e)
+  public void visit(ast.Ast.Exp.Times e)
   {
     e.left.accept(this);
-    codegen.C.exp.T left = this.exp;
+    Exp.T left = this.exp;
     e.right.accept(this);
-    codegen.C.exp.T right = this.exp;
-    this.exp = new codegen.C.exp.Times(left, right);
+    Exp.T right = this.exp;
+    this.exp = new Times(left, right);
     return;
   }
 
   @Override
-  public void visit(ast.exp.True e)
+  public void visit(ast.Ast.Exp.True e)
   {
   }
 
+  // //////////////////////////////////////////////
   // statements
   @Override
-  public void visit(ast.stm.Assign s)
+  public void visit(ast.Ast.Stm.Assign s)
   {
     s.exp.accept(this);
-    this.stm = new codegen.C.stm.Assign(s.id, this.exp);
+    this.stm = new Assign(s.id, this.exp);
     return;
   }
 
   @Override
-  public void visit(ast.stm.AssignArray s)
+  public void visit(ast.Ast.Stm.AssignArray s)
   {
   }
 
   @Override
-  public void visit(ast.stm.Block s)
+  public void visit(ast.Ast.Stm.Block s)
   {
   }
 
   @Override
-  public void visit(ast.stm.If s)
+  public void visit(ast.Ast.Stm.If s)
   {
     s.condition.accept(this);
-    codegen.C.exp.T condition = this.exp;
+    Exp.T condition = this.exp;
     s.thenn.accept(this);
-    codegen.C.stm.T thenn = this.stm;
+    Stm.T thenn = this.stm;
     s.elsee.accept(this);
-    codegen.C.stm.T elsee = this.stm;
-    this.stm = new codegen.C.stm.If(condition, thenn, elsee);
+    Stm.T elsee = this.stm;
+    this.stm = new If(condition, thenn, elsee);
     return;
   }
 
   @Override
-  public void visit(ast.stm.Print s)
+  public void visit(ast.Ast.Stm.Print s)
   {
     s.exp.accept(this);
-    this.stm = new codegen.C.stm.Print(this.exp);
+    this.stm = new Print(this.exp);
     return;
   }
 
   @Override
-  public void visit(ast.stm.While s)
+  public void visit(ast.Ast.Stm.While s)
   {
   }
 
+  // ///////////////////////////////////////////
   // type
   @Override
-  public void visit(ast.type.Boolean t)
+  public void visit(ast.Ast.Type.Boolean t)
   {
   }
 
   @Override
-  public void visit(ast.type.Class t)
+  public void visit(ast.Ast.Type.ClassType t)
   {
   }
 
   @Override
-  public void visit(ast.type.Int t)
+  public void visit(ast.Ast.Type.Int t)
   {
-    this.type = new codegen.C.type.Int();
+    this.type = new Type.Int();
   }
 
   @Override
-  public void visit(ast.type.IntArray t)
+  public void visit(ast.Ast.Type.IntArray t)
   {
   }
 
+  // ////////////////////////////////////////////////
   // dec
   @Override
-  public void visit(ast.dec.Dec d)
+  public void visit(ast.Ast.Dec.DecSingle d)
   {
     d.type.accept(this);
-    this.dec = new codegen.C.dec.Dec(this.type, d.id);
+    this.dec = new codegen.C.Ast.Dec.DecSingle(this.type, d.id);
     return;
   }
 
   // method
   @Override
-  public void visit(ast.method.Method m)
+  public void visit(ast.Ast.Method.MethodSingle m)
   {
-    this.tmpVars = new java.util.LinkedList<codegen.C.dec.T>();
+    this.tmpVars = new LinkedList<Dec.T>();
     m.retType.accept(this);
-    codegen.C.type.T newRetType = this.type;
-    java.util.LinkedList<codegen.C.dec.T> newFormals = new java.util.LinkedList<codegen.C.dec.T>();
-    newFormals.add(new codegen.C.dec.Dec(
-        new codegen.C.type.Class(this.classId), "this"));
-    for (ast.dec.T d : m.formals) {
+    Type.T newRetType = this.type;
+    LinkedList<Dec.T> newFormals = new LinkedList<Dec.T>();
+    newFormals.add(new Dec.DecSingle(
+        new ClassType(this.classId), "this"));
+    for (ast.Ast.Dec.T d : m.formals) {
       d.accept(this);
       newFormals.add(this.dec);
     }
-    java.util.LinkedList<codegen.C.dec.T> locals = new java.util.LinkedList<codegen.C.dec.T>();
-    for (ast.dec.T d : m.locals) {
+    LinkedList<Dec.T> locals = new LinkedList<Dec.T>();
+    for (ast.Ast.Dec.T d : m.locals) {
       d.accept(this);
       locals.add(this.dec);
     }
-    java.util.LinkedList<codegen.C.stm.T> newStm = new java.util.LinkedList<codegen.C.stm.T>();
-    for (ast.stm.T s : m.stms) {
+    LinkedList<Stm.T> newStm = new LinkedList<Stm.T>();
+    for (ast.Ast.Stm.T s : m.stms) {
       s.accept(this);
       newStm.add(this.stm);
     }
     m.retExp.accept(this);
-    codegen.C.exp.T retExp = this.exp;
-    for (codegen.C.dec.T dec : this.tmpVars) {
+    Exp.T retExp = this.exp;
+    for (Dec.T dec : this.tmpVars) {
       locals.add(dec);
     }
-    this.method = new codegen.C.method.Method(newRetType, this.classId, m.id,
+    this.method = new MethodSingle(newRetType, this.classId, m.id,
         newFormals, locals, newStm, retExp);
     return;
   }
 
   // class
   @Override
-  public void visit(ast.classs.Class c)
+  public void visit(ast.Ast.Class.ClassSingle c)
   {
     ClassBinding cb = this.table.get(c.id);
-    this.classes.add(new codegen.C.classs.Class(c.id, cb.fields));
-    this.vtables.add(new codegen.C.vtable.Vtable(c.id, cb.methods));
+    this.classes.add(new ClassSingle(c.id, cb.fields));
+    this.vtables.add(new VtableSingle(c.id, cb.methods));
     this.classId = c.id;
-    for (ast.method.T m : c.methods) {
+    for (ast.Ast.Method.T m : c.methods) {
       m.accept(this);
       this.methods.add(this.method);
     }
@@ -288,17 +319,17 @@ public class TranslateVisitor implements ast.Visitor
 
   // main class
   @Override
-  public void visit(ast.mainClass.MainClass c)
+  public void visit(ast.Ast.MainClass.MainClassSingle c)
   {
     ClassBinding cb = this.table.get(c.id);
-    codegen.C.classs.T newc = new codegen.C.classs.Class(c.id, cb.fields);
+    Class.T newc = new ClassSingle(c.id, cb.fields);
     this.classes.add(newc);
-    this.vtables.add(new codegen.C.vtable.Vtable(c.id, cb.methods));
+    this.vtables.add(new VtableSingle(c.id, cb.methods));
 
-    this.tmpVars = new java.util.LinkedList<codegen.C.dec.T>();
+    this.tmpVars = new LinkedList<Dec.T>();
 
     c.stm.accept(this);
-    codegen.C.mainMethod.T mthd = new codegen.C.mainMethod.MainMethod(
+    MainMethod.T mthd = new MainMethodSingle(
         this.tmpVars, this.stm);
     this.mainMethod = mthd;
     return;
@@ -306,57 +337,57 @@ public class TranslateVisitor implements ast.Visitor
 
   // /////////////////////////////////////////////////////
   // the first pass
-  public void scanMain(ast.mainClass.T m)
+  public void scanMain(ast.Ast.MainClass.T m)
   {
-    this.table.init(((ast.mainClass.MainClass) m).id, null);
+    this.table.init(((ast.Ast.MainClass.MainClassSingle) m).id, null);
     // this is a special hacking in that we don't want to
     // enter "main" into the table.
     return;
   }
 
-  public void scanClasses(java.util.LinkedList<ast.classs.T> cs)
+  public void scanClasses(java.util.LinkedList<ast.Ast.Class.T> cs)
   {
     // put empty chuncks into the table
-    for (ast.classs.T c : cs) {
-      ast.classs.Class cc = (ast.classs.Class) c;
+    for (ast.Ast.Class.T c : cs) {
+      ast.Ast.Class.ClassSingle cc = (ast.Ast.Class.ClassSingle) c;
       this.table.init(cc.id, cc.extendss);
     }
 
     // put class fields and methods into the table
-    for (ast.classs.T c : cs) {
-      ast.classs.Class cc = (ast.classs.Class) c;
-      java.util.LinkedList<codegen.C.dec.T> newDecs = new java.util.LinkedList<codegen.C.dec.T>();
-      for (ast.dec.T dec : cc.decs) {
+    for (ast.Ast.Class.T c : cs) {
+      ast.Ast.Class.ClassSingle cc = (ast.Ast.Class.ClassSingle) c;
+      LinkedList<Dec.T> newDecs = new LinkedList<Dec.T>();
+      for (ast.Ast.Dec.T dec : cc.decs) {
         dec.accept(this);
         newDecs.add(this.dec);
       }
       this.table.initDecs(cc.id, newDecs);
 
       // all methods
-      java.util.LinkedList<ast.method.T> methods = cc.methods;
-      for (ast.method.T mthd : methods) {
-        ast.method.Method m = (ast.method.Method) mthd;
-        java.util.LinkedList<codegen.C.dec.T> newArgs = new java.util.LinkedList<codegen.C.dec.T>();
-        for (ast.dec.T arg : m.formals) {
+      java.util.LinkedList<ast.Ast.Method.T> methods = cc.methods;
+      for (ast.Ast.Method.T mthd : methods) {
+        ast.Ast.Method.MethodSingle m = (ast.Ast.Method.MethodSingle) mthd;
+        LinkedList<Dec.T> newArgs = new LinkedList<Dec.T>();
+        for (ast.Ast.Dec.T arg : m.formals) {
           arg.accept(this);
           newArgs.add(this.dec);
         }
         m.retType.accept(this);
-        codegen.C.type.T newRet = this.type;
+        Type.T newRet = this.type;
         this.table.initMethod(cc.id, newRet, newArgs, m.id);
       }
     }
 
     // calculate all inheritance information
-    for (ast.classs.T c : cs) {
-      ast.classs.Class cc = (ast.classs.Class) c;
+    for (ast.Ast.Class.T c : cs) {
+      ast.Ast.Class.ClassSingle cc = (ast.Ast.Class.ClassSingle) c;
       this.table.inherit(cc.id);
     }
   }
 
-  public void scanProgram(ast.program.T p)
+  public void scanProgram(ast.Ast.Program.T p)
   {
-    ast.program.Program pp = (ast.program.Program) p;
+    ast.Ast.Program.ProgramSingle pp = (ast.Ast.Program.ProgramSingle) p;
     scanMain(pp.mainClass);
     scanClasses(pp.classes);
     return;
@@ -367,7 +398,7 @@ public class TranslateVisitor implements ast.Visitor
 
   // program
   @Override
-  public void visit(ast.program.Program p)
+  public void visit(ast.Ast.Program.ProgramSingle p)
   {
     // The first pass is to scan the whole program "p", and
     // to collect all information of inheritance.
@@ -375,10 +406,10 @@ public class TranslateVisitor implements ast.Visitor
 
     // do translations
     p.mainClass.accept(this);
-    for (ast.classs.T classs : p.classes) {
+    for (ast.Ast.Class.T classs : p.classes) {
       classs.accept(this);
     }
-    this.program = new codegen.C.program.Program(this.classes, this.vtables,
+    this.program = new ProgramSingle(this.classes, this.vtables,
         this.methods, this.mainMethod);
     return;
   }

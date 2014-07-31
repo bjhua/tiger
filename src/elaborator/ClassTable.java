@@ -1,5 +1,6 @@
 package elaborator;
 
+import ast.Ast.Type;
 import util.Todo;
 
 public class ClassTable
@@ -24,7 +25,7 @@ public class ClassTable
 
   // put a field into this table
   // Duplication is not allowed
-  public void put(String c, String id, ast.type.T type)
+  public void put(String c, String id, Type.T type)
   {
     ClassBinding cb = this.table.get(c);
     cb.put(id, type);
@@ -49,10 +50,10 @@ public class ClassTable
 
   // get type of some field
   // return null for non-existing field.
-  public ast.type.T get(String className, String xid)
+  public Type.T get(String className, String xid)
   {
     ClassBinding cb = this.table.get(className);
-    ast.type.T type = cb.fields.get(xid);
+    Type.T type = cb.fields.get(xid);
     while (type == null) { // search all parent classes until found or fail
       if (cb.extendss == null)
         return type;
