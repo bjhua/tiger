@@ -1,11 +1,16 @@
 package elaborator;
 
+import java.util.LinkedList;
+
+import ast.Ast.Dec;
+import ast.Ast.Type;
+
 public class MethodType
 {
-  public ast.type.T retType;
-  public java.util.LinkedList<ast.dec.T> argsType;
+  public Type.T retType;
+  public LinkedList<Dec.T> argsType;
 
-  public MethodType(ast.type.T retType, java.util.LinkedList<ast.dec.T> decs)
+  public MethodType(Type.T retType, LinkedList<Dec.T> decs)
   {
     this.retType = retType;
     this.argsType = decs;
@@ -15,8 +20,8 @@ public class MethodType
   public String toString()
   {
     String s = "";
-    for (ast.dec.T dec : this.argsType) {
-      ast.dec.Dec decc = (ast.dec.Dec) dec;
+    for (Dec.T dec : this.argsType) {
+      Dec.DecSingle decc = (Dec.DecSingle) dec;
       s = decc.type.toString() + "*" + s;
     }
     s = s + " -> " + this.retType.toString();

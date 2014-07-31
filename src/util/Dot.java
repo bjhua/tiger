@@ -84,7 +84,7 @@ public class Dot
       w.close();
       fw.close();
     } catch (Throwable o) {
-      new util.Error();
+      new util.Bug();
     }
     return;
   }
@@ -112,7 +112,7 @@ public class Dot
       postfix = "jpg";
       break;
     default:
-      new util.Error();
+      new util.Bug();
       break;
     }
     String[] args = { "dot", format, name + ".dot", "-o", name + "." + postfix };
@@ -148,7 +148,7 @@ public class Dot
       new Thread(new StreamDrainer(process.getErrorStream())).start();
       process.getOutputStream().close();
       int exitValue = process.waitFor();
-      if (!control.Control.dumpDot) {
+      if (!control.Control.ConAst.dumpDot) {
         if (new File(name + ".dot").delete())
           ;
         else

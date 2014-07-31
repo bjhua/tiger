@@ -1,22 +1,23 @@
+import static control.Control.ConAst.dumpAst;
+import static control.Control.ConAst.testFac;
+
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
+import ast.Ast.Program;
 import lexer.Lexer;
 import lexer.Token;
-import lexer.Token.Kind;
-
+import parser.Parser;
 import control.CommandLine;
 import control.Control;
-
-import parser.Parser;
 
 public class Tiger
 {
   static Tiger tiger;
   static CommandLine cmd;
   static InputStream fstream;
-  public ast.program.T theAst;
+  public ast.Ast.Program.T theAst;
 
   // lex and parse
   private void lexAndParse(String fname)
@@ -42,7 +43,8 @@ public class Tiger
 
     // /////////////////////////////////////////////////////
     // to test the pretty printer on the "test/Fac.java" program
-    if (control.Control.testFac) {
+    if (testFac) {
+      System.out.println("Testing the Tiger compiler on Fac.java starting:");
       ast.PrettyPrintVisitor pp = new ast.PrettyPrintVisitor();
       control.CompilerPass ppPass = new control.CompilerPass(
           "Pretty printing AST", ast.Fac.prog, pp);
@@ -61,16 +63,16 @@ public class Tiger
       control.CompilerPass optAstPass = new control.CompilerPass(
           "Optimizing AST", optAstPasses, ast.Fac.prog);
       optAstPass.doit();
-      ast.Fac.prog = (ast.program.Program) optAstPasses.program;
+      ast.Fac.prog = (ast.Ast.Program.T) optAstPasses.program;
 
       // Compile this program to C.
       codegen.C.TranslateVisitor transC = new codegen.C.TranslateVisitor();
       control.CompilerPass genCCodePass = new control.CompilerPass(
           "Translation to C code", ast.Fac.prog, transC);
       genCCodePass.doit();
-      codegen.C.program.T cAst = transC.program;
+      codegen.C.Ast.Program.T cAst = transC.program;
 
-      if (control.Control.dumpC) {
+      if (control.Control.ConAst.dumpC) {
         codegen.C.PrettyPrintVisitor ppC = new codegen.C.PrettyPrintVisitor();
         control.CompilerPass ppCCodePass = new control.CompilerPass(
             "C code printing", cAst, ppC);
@@ -99,13 +101,13 @@ public class Tiger
       cfgOptPass.doit();
 
       // code generation
-      switch (control.Control.codegen) {
+      switch (control.Control.ConCodeGen.codegen) {
       case Bytecode:
         codegen.bytecode.TranslateVisitor trans = new codegen.bytecode.TranslateVisitor();
         control.CompilerPass genBytecodePass = new control.CompilerPass(
             "Bytecode generation", ast.Fac.prog, trans);
         genBytecodePass.doit();
-        codegen.bytecode.program.T bytecodeAst = trans.program;
+        codegen.bytecode.Ast.Program.T bytecodeAst = trans.program;
 
         codegen.bytecode.PrettyPrintVisitor ppbc = new codegen.bytecode.PrettyPrintVisitor();
         control.CompilerPass ppBytecodePass = new control.CompilerPass(
@@ -113,6 +115,7 @@ public class Tiger
         ppBytecodePass.doit();
         break;
       case C:
+
         cfg.PrettyPrintVisitor ppCfg = new cfg.PrettyPrintVisitor();
         control.CompilerPass ppCfgCodePass = new control.CompilerPass(
             "C code printing", cfgAst, ppCfg);
@@ -123,7 +126,7 @@ public class Tiger
         control.CompilerPass genDalvikCodePass = new control.CompilerPass(
             "Dalvik code generation", ast.Fac.prog, transDalvik);
         genDalvikCodePass.doit();
-        codegen.dalvik.program.T dalvikAst = transDalvik.program;
+        codegen.dalvik.Ast.Program.T dalvikAst = transDalvik.program;
 
         codegen.dalvik.PrettyPrintVisitor ppDalvik = new codegen.dalvik.PrettyPrintVisitor();
         control.CompilerPass ppDalvikCodePass = new control.CompilerPass(
@@ -143,18 +146,19 @@ public class Tiger
       cmd.usage();
       return;
     }
-    Control.fileName = fname;
+    Control.ConCodeGen.fileName = fname;
 
     // /////////////////////////////////////////////////////
     // it would be helpful to be able to test the lexer
     // independently.
-    if (control.Control.testlexer) {
+    if (Control.ConLexer.test) {
       System.out.println("Testing the lexer. All tokens:");
       try {
         fstream = new BufferedInputStream(new FileInputStream(fname));
         Lexer lexer = new Lexer(fname, fstream);
         Token token = lexer.nextToken();
-        while (token.kind != Kind.TOKEN_EOF) {
+
+        while (token.kind != Token.Kind.TOKEN_EOF) {
           System.out.println(token.toString());
           token = lexer.nextToken();
         }
@@ -167,14 +171,14 @@ public class Tiger
 
     // /////////////////////////////////////////////////////////
     // normal compilation phases.
-    ast.program.T theAst = null;
+    Program.T theAst = null;
 
     control.CompilerPass lexAndParsePass = new control.CompilerPass(
         "Lex and parse", tiger, fname);
     lexAndParsePass.doitName("lexAndParse");
 
     // pretty printing the AST, if necessary
-    if (control.Control.dumpAst) {
+    if (dumpAst) {
       ast.PrettyPrintVisitor pp = new ast.PrettyPrintVisitor();
       control.CompilerPass ppAstPass = new control.CompilerPass(
           "Pretty printing the AST", theAst, pp);
@@ -195,14 +199,13 @@ public class Tiger
     theAst = optAstPasses.program;
 
     // code generation
-    switch (control.Control.codegen) {
+    switch (control.Control.ConCodeGen.codegen) {
     case Bytecode:
       codegen.bytecode.TranslateVisitor trans = new codegen.bytecode.TranslateVisitor();
       control.CompilerPass genBytecodePass = new control.CompilerPass(
           "Bytecode generation", theAst, trans);
       genBytecodePass.doit();
-      codegen.bytecode.program.T bytecodeAst = trans.program;
-
+      codegen.bytecode.Ast.Program.T bytecodeAst = trans.program;
       codegen.bytecode.PrettyPrintVisitor ppbc = new codegen.bytecode.PrettyPrintVisitor();
       control.CompilerPass ppBytecodePass = new control.CompilerPass(
           "Bytecode printing", bytecodeAst, ppbc);
@@ -213,8 +216,7 @@ public class Tiger
       control.CompilerPass genCCodePass = new control.CompilerPass(
           "C code generation", theAst, transC);
       genCCodePass.doit();
-      codegen.C.program.T cAst = transC.program;
-
+      codegen.C.Ast.Program.T cAst = transC.program;
       codegen.C.PrettyPrintVisitor ppc = new codegen.C.PrettyPrintVisitor();
       control.CompilerPass ppCCodePass = new control.CompilerPass(
           "C code printing", cAst, ppc);
@@ -225,7 +227,7 @@ public class Tiger
       control.CompilerPass genDalvikCodePass = new control.CompilerPass(
           "Dalvik code generation", theAst, transDalvik);
       genDalvikCodePass.doit();
-      codegen.dalvik.program.T dalvikAst = transDalvik.program;
+      codegen.dalvik.Ast.Program.T dalvikAst = transDalvik.program;
 
       codegen.dalvik.PrettyPrintVisitor ppDalvik = new codegen.dalvik.PrettyPrintVisitor();
       control.CompilerPass ppDalvikCodePass = new control.CompilerPass(
@@ -238,7 +240,6 @@ public class Tiger
     default:
       break;
     }
-
     return;
   }
 

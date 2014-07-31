@@ -2,6 +2,19 @@ package codegen.dalvik;
 
 import java.util.LinkedList;
 
+import codegen.dalvik.Ast.Class;
+import codegen.dalvik.Ast.Class.ClassSingle;
+import codegen.dalvik.Ast.Dec;
+import codegen.dalvik.Ast.Dec.DecSingle;
+import codegen.dalvik.Ast.MainClass;
+import codegen.dalvik.Ast.MainClass.MainClassSingle;
+import codegen.dalvik.Ast.Method;
+import codegen.dalvik.Ast.Method.MethodSingle;
+import codegen.dalvik.Ast.Program;
+import codegen.dalvik.Ast.Program.ProgramSingle;
+import codegen.dalvik.Ast.Stm;
+import codegen.dalvik.Ast.Stm.*;
+import codegen.dalvik.Ast.Type;
 import util.Label;
 import util.Temp;
 
@@ -10,53 +23,55 @@ import util.Temp;
 public class TranslateVisitor implements ast.Visitor
 {
   private String classId;
-  private codegen.dalvik.type.T type; // type after translation
-  private codegen.dalvik.dec.T dec;
+  private Type.T type; // type after translation
+  private Dec.T dec;
   // these two fields are expression-related: after
   // translating an expression, we get the expression's
   // type "etype" and the expression name "evar";
-  private codegen.dalvik.type.T etype;
+  private Type.T etype;
   private String evar;
-  private java.util.LinkedList<codegen.dalvik.dec.T> tmpVars;
-  private LinkedList<codegen.dalvik.stm.T> stms;
-  private codegen.dalvik.method.T method;
-  private codegen.dalvik.classs.T classs;
-  private codegen.dalvik.mainClass.T mainClass;
-  public codegen.dalvik.program.T program;
+  private LinkedList<Dec.T> tmpVars;
+  private LinkedList<Stm.T> stms;
+  private Method.T method;
+  private Class.T clazz;
+  private MainClass.T mainClass;
+  public Program.T program;
 
   public TranslateVisitor()
   {
     this.classId = null;
     this.type = null;
     this.dec = null;
-    this.tmpVars = new java.util.LinkedList<codegen.dalvik.dec.T>();
+    this.tmpVars = new LinkedList<Dec.T>();
     this.etype = null;
     this.evar = null;
-    this.stms = new java.util.LinkedList<codegen.dalvik.stm.T>();
+    this.stms = new LinkedList<Stm.T>();
     this.method = null;
-    this.classs = null;
+    this.clazz = null;
     this.mainClass = null;
     this.program = null;
   }
-  
+
   static int count = 0;
-  String getTemp ()
+
+  String getTemp()
   {
     // however, we should check that "count<=256"
-    return "v"+count++;
+    return "v" + count++;
   }
-  void resetCount ()
+
+  void resetCount()
   {
     count = 0;
   }
-  
+
   // utility functions
-  private void emitDec (codegen.dalvik.type.T ty, String id)
+  private void emitDec(Type.T ty, String id)
   {
-    this.tmpVars.addLast(new codegen.dalvik.dec.Dec(ty, id));
+    this.tmpVars.addLast(new DecSingle(ty, id));
   }
 
-  private void emit(codegen.dalvik.stm.T s)
+  private void emit(Stm.T s)
   {
     this.stms.add(s);
   }
@@ -64,47 +79,48 @@ public class TranslateVisitor implements ast.Visitor
   // /////////////////////////////////////////////////////
   // expressions
   @Override
-  public void visit(ast.exp.Add e)
+  public void visit(ast.Ast.Exp.Add e)
   {
   }
 
   @Override
-  public void visit(ast.exp.And e)
+  public void visit(ast.Ast.Exp.And e)
   {
   }
 
   @Override
-  public void visit(ast.exp.ArraySelect e)
+  public void visit(ast.Ast.Exp.ArraySelect e)
   {
   }
 
   @Override
-  public void visit(ast.exp.Call e)
+  public void visit(ast.Ast.Exp.Call e)
   {
     e.exp.accept(this);
-    for (ast.exp.T x : e.args) {
+    for (ast.Ast.Exp.T x : e.args) {
       x.accept(this);
     }
     e.rt.accept(this);
-    codegen.dalvik.type.T rt = this.type;
-    java.util.LinkedList<codegen.dalvik.type.T> at = new java.util.LinkedList<codegen.dalvik.type.T>();
-    for (ast.type.T t : e.at) {
+    Type.T rt = this.type;
+    java.util.LinkedList<Type.T> at = new LinkedList<Type.T>();
+    for (ast.Ast.Type.T t : e.at) {
       t.accept(this);
       at.add(this.type);
     }
-    emit(new codegen.dalvik.stm.Invokevirtual(e.id, e.type, at, rt));
+    emit(new Invokevirtual(e.id, e.type, at, rt));
     return;
   }
 
   @Override
-  public void visit(ast.exp.False e)
+  public void visit(ast.Ast.Exp.False e)
   {
   }
 
   @Override
-  public void visit(ast.exp.Id e)
+  public void visit(ast.Ast.Exp.Id e)
   {
-    e.type.accept(this);;
+    e.type.accept(this);
+    ;
     this.evar = e.id;
     this.etype = this.type;
     // but what about this is a field?
@@ -112,12 +128,12 @@ public class TranslateVisitor implements ast.Visitor
   }
 
   @Override
-  public void visit(ast.exp.Length e)
+  public void visit(ast.Ast.Exp.Length e)
   {
   }
 
   @Override
-  public void visit(ast.exp.Lt e)
+  public void visit(ast.Ast.Exp.Lt e)
   {
     Label tl = new Label(), fl = new Label(), el = new Label();
     e.left.accept(this);
@@ -126,51 +142,51 @@ public class TranslateVisitor implements ast.Visitor
     String rname = this.evar;
     String newname = util.Temp.next();
     this.evar = newname;
-    this.etype = new codegen.dalvik.type.Int();
-    emit(new codegen.dalvik.stm.Iflt(lname, rname, tl));
-    emit(new codegen.dalvik.stm.Label(fl));
-    emit(new codegen.dalvik.stm.Const(newname, 0));
-    emit(new codegen.dalvik.stm.Goto32(el));
-    emit(new codegen.dalvik.stm.Label(tl));
-    emit(new codegen.dalvik.stm.Const(newname, 1));
-    emit(new codegen.dalvik.stm.Goto32(el));
-    emit(new codegen.dalvik.stm.Label(el));
+    this.etype = new Type.Int();
+    emit(new Iflt(lname, rname, tl));
+    emit(new LabelJ(fl));
+    emit(new Const(newname, 0));
+    emit(new Goto32(el));
+    emit(new LabelJ(tl));
+    emit(new Const(newname, 1));
+    emit(new Goto32(el));
+    emit(new LabelJ(el));
     return;
   }
 
   @Override
-  public void visit(ast.exp.NewIntArray e)
+  public void visit(ast.Ast.Exp.NewIntArray e)
   {
   }
 
   @Override
-  public void visit(ast.exp.NewObject e)
+  public void visit(ast.Ast.Exp.NewObject e)
   {
     String newname = Temp.next();
     this.evar = newname;
-    this.etype = new codegen.dalvik.type.Class(e.id);
-    emit(new codegen.dalvik.stm.NewInstance(newname, e.id));
+    this.etype = new Type.ClassType(e.id);
+    emit(new NewInstance(newname, e.id));
     return;
   }
 
   @Override
-  public void visit(ast.exp.Not e)
+  public void visit(ast.Ast.Exp.Not e)
   {
   }
 
   @Override
-  public void visit(ast.exp.Num e)
+  public void visit(ast.Ast.Exp.Num e)
   {
     String newname = Temp.next();
     this.evar = newname;
-    this.etype = new codegen.dalvik.type.Int();
-    emitDec (this.type, newname);
-    emit(new codegen.dalvik.stm.Const(newname, e.num));
+    this.etype = new Type.Int();
+    emitDec(this.type, newname);
+    emit(new Const(newname, e.num));
     return;
   }
 
   @Override
-  public void visit(ast.exp.Sub e)
+  public void visit(ast.Ast.Exp.Sub e)
   {
     e.left.accept(this);
     String left = this.evar;
@@ -178,20 +194,20 @@ public class TranslateVisitor implements ast.Visitor
     String right = this.evar;
     String newname = Temp.next();
     this.evar = newname;
-    this.etype = new codegen.dalvik.type.Int();
-    emitDec (this.etype, this.evar);
-    emit(new codegen.dalvik.stm.Subint(newname, left, right));
+    this.etype = new Type.Int();
+    emitDec(this.etype, this.evar);
+    emit(new Subint(newname, left, right));
     return;
   }
 
   @Override
-  public void visit(ast.exp.This e)
+  public void visit(ast.Ast.Exp.This e)
   {
     return;
   }
 
   @Override
-  public void visit(ast.exp.Times e)
+  public void visit(ast.Ast.Exp.Times e)
   {
     e.left.accept(this);
     String left = this.evar;
@@ -199,126 +215,128 @@ public class TranslateVisitor implements ast.Visitor
     String right = this.evar;
     String newname = Temp.next();
     this.evar = newname;
-    this.etype = new codegen.dalvik.type.Int();
-    emit(new codegen.dalvik.stm.Mulint(newname, left, right));
+    this.etype = new Type.Int();
+    emit(new Mulint(newname, left, right));
     return;
   }
 
   @Override
-  public void visit(ast.exp.True e)
+  public void visit(ast.Ast.Exp.True e)
   {
   }
 
+  // ///////////////////////////////////////////////////
   // statements
   @Override
-  public void visit(ast.stm.Assign s)
+  public void visit(ast.Ast.Stm.Assign s)
   {
     s.exp.accept(this);
     String right = this.evar;
     s.type.accept(this);
-    codegen.dalvik.type.T ty = this.type;
-    if (ty instanceof codegen.dalvik.type.Int){
-      emit(new codegen.dalvik.stm.Move16(s.id, right));
-    }
-    else {
-      emit(new codegen.dalvik.stm.Moveobject16(s.id, right));
+    Type.T ty = this.type;
+    if (ty instanceof Type.Int) {
+      emit(new Move16(s.id, right));
+    } else {
+      emit(new Moveobject16(s.id, right));
     }
     return;
   }
 
   @Override
-  public void visit(ast.stm.AssignArray s)
+  public void visit(ast.Ast.Stm.AssignArray s)
   {
   }
 
   @Override
-  public void visit(ast.stm.Block s)
+  public void visit(ast.Ast.Stm.Block s)
   {
   }
 
   @Override
-  public void visit(ast.stm.If s)
+  public void visit(ast.Ast.Stm.If s)
   {
     Label tl = new Label(), fl = new Label(), el = new Label();
+
     s.condition.accept(this);
     String evar = this.evar;
-    emit(new codegen.dalvik.stm.Ifnez(evar, tl));
-    emit(new codegen.dalvik.stm.Label(fl));
+    emit(new Ifnez(evar, tl));
+    emit(new LabelJ(fl));
     s.elsee.accept(this);
-    emit(new codegen.dalvik.stm.Goto32(el));
-    emit(new codegen.dalvik.stm.Label(tl));
+    emit(new Goto32(el));
+    emit(new LabelJ(tl));
     s.thenn.accept(this);
-    emit(new codegen.dalvik.stm.Goto32(el));
-    emit(new codegen.dalvik.stm.Label(el));
+    emit(new Goto32(el));
+    emit(new LabelJ(el));
     return;
   }
 
   @Override
-  public void visit(ast.stm.Print s)
+  public void visit(ast.Ast.Stm.Print s)
   {
     String newname = Temp.next();
     s.exp.accept(this);
-    emit(new codegen.dalvik.stm.Print(newname, this.evar));
+    emit(new Print(newname, this.evar));
     return;
   }
 
   @Override
-  public void visit(ast.stm.While s)
+  public void visit(ast.Ast.Stm.While s)
   {
   }
 
+  // ////////////////////////////////////////////////////////
   // type
   @Override
-  public void visit(ast.type.Boolean t)
+  public void visit(ast.Ast.Type.Boolean t)
   {
   }
 
   @Override
-  public void visit(ast.type.Class t)
+  public void visit(ast.Ast.Type.ClassType t)
   {
   }
 
   @Override
-  public void visit(ast.type.Int t)
+  public void visit(ast.Ast.Type.Int t)
   {
-    this.type = new codegen.dalvik.type.Int();
+    this.type = new Type.Int();
   }
 
   @Override
-  public void visit(ast.type.IntArray t)
+  public void visit(ast.Ast.Type.IntArray t)
   {
   }
-  
+
   // dec
   @Override
-  public void visit(ast.dec.Dec d)
+  public void visit(ast.Ast.Dec.DecSingle d)
   {
     d.type.accept(this);
-    this.dec = new codegen.dalvik.dec.Dec(this.type, d.id);
+    this.dec = new DecSingle(this.type, d.id);
     return;
   }
 
   // method
   @Override
-  public void visit(ast.method.Method m)
+  public void visit(ast.Ast.Method.MethodSingle m)
   {
     // There are two passes here:
     // In the 1st pass, the method is translated
     // into a three-address-code like intermediate representation.
     m.retType.accept(this);
-    codegen.dalvik.type.T newRetType = this.type;
-    java.util.LinkedList<codegen.dalvik.dec.T> newFormals = new java.util.LinkedList<codegen.dalvik.dec.T>();
-    for (ast.dec.T d : m.formals) {
+    Type.T newRetType = this.type;
+    LinkedList<Dec.T> newFormals = new LinkedList<Dec.T>();
+    for (ast.Ast.Dec.T d : m.formals) {
       d.accept(this);
       newFormals.add(this.dec);
     }
-    java.util.LinkedList<codegen.dalvik.dec.T> locals = new java.util.LinkedList<codegen.dalvik.dec.T>();
-    for (ast.dec.T d : m.locals) {
+    LinkedList<Dec.T> locals = new LinkedList<Dec.T>();
+    for (ast.Ast.Dec.T d : m.locals) {
       d.accept(this);
       locals.add(this.dec);
     }
-    this.stms = new java.util.LinkedList<codegen.dalvik.stm.T>();
-    for (ast.stm.T s : m.stms) {
+    this.stms = new LinkedList<Stm.T>();
+    for (ast.Ast.Stm.T s : m.stms) {
       s.accept(this);
     }
 
@@ -327,68 +345,65 @@ public class TranslateVisitor implements ast.Visitor
     String retName = this.evar;
 
     if (m.retType.getNum() > 0)
-      emit(new codegen.dalvik.stm.ReturnObject(retName));
+      emit(new ReturnObject(retName));
     else
-      emit(new codegen.dalvik.stm.Return(retName));
+      emit(new Return(retName));
 
     // in the second pass, you should rename all method
     // parameters according to the "p"-convention; and
     // rename all method locals according to the "v"-convention.
     // Your code here:
-    
-    
-    
+
     // cook the final method.
-    this.method = new codegen.dalvik.method.Method(newRetType, m.id,
-        this.classId, newFormals, locals, this.stms, 0, 0);
+    this.method = new MethodSingle(newRetType, m.id, this.classId, newFormals,
+        locals, this.stms, 0, 0);
     return;
   }
 
+  // ///////////////////////////////////////////////////////////////
   // class
   @Override
-  public void visit(ast.classs.Class c)
+  public void visit(ast.Ast.Class.ClassSingle c)
   {
     this.classId = c.id;
-    java.util.LinkedList<codegen.dalvik.dec.T> newDecs = new java.util.LinkedList<codegen.dalvik.dec.T>();
-    for (ast.dec.T dec : c.decs) {
+    LinkedList<Dec.T> newDecs = new LinkedList<Dec.T>();
+    for (ast.Ast.Dec.T dec : c.decs) {
       dec.accept(this);
       newDecs.add(this.dec);
     }
-    java.util.LinkedList<codegen.dalvik.method.T> newMethods = new java.util.LinkedList<codegen.dalvik.method.T>();
-    for (ast.method.T m : c.methods) {
+    LinkedList<Method.T> newMethods = new LinkedList<Method.T>();
+    for (ast.Ast.Method.T m : c.methods) {
       m.accept(this);
       newMethods.add(this.method);
     }
-    this.classs = new codegen.dalvik.classs.Class(c.id, c.extendss, newDecs,
-        newMethods);
+    this.clazz = new ClassSingle(c.id, c.extendss, newDecs, newMethods);
     return;
   }
 
+  // /////////////////////////////////////////////////////////////////
   // main class
   @Override
-  public void visit(ast.mainClass.MainClass c)
+  public void visit(ast.Ast.MainClass.MainClassSingle c)
   {
     c.stm.accept(this);
-    this.mainClass = new codegen.dalvik.mainClass.MainClass(c.id, c.arg,
-        this.stms);
-    this.stms = new java.util.LinkedList<codegen.dalvik.stm.T>();
+    this.mainClass = new MainClassSingle(c.id, c.arg, this.stms);
+    this.stms = new LinkedList<Stm.T>();
     return;
   }
 
   // program
   @Override
-  public void visit(ast.program.Program p)
+  public void visit(ast.Ast.Program.ProgramSingle p)
   {
     // do translations
     p.mainClass.accept(this);
 
-    java.util.LinkedList<codegen.dalvik.classs.T> newClasses = new java.util.LinkedList<codegen.dalvik.classs.T>();
-    for (ast.classs.T classs : p.classes) {
+    LinkedList<Class.T> newClasses = new LinkedList<Class.T>();
+    for (ast.Ast.Class.T classs : p.classes) {
       classs.accept(this);
-      newClasses.add(this.classs);
+      newClasses.add(this.clazz);
     }
-    this.program = new codegen.dalvik.program.Program(this.mainClass,
-        newClasses);
+    this.program = new ProgramSingle(this.mainClass, newClasses);
     return;
   }
 }

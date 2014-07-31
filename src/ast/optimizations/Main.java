@@ -2,9 +2,9 @@ package ast.optimizations;
 
 public class Main
 {
-  public ast.program.T program;
+  public ast.Ast.Program.T program;
   
-  public void accept(ast.program.T ast)
+  public void accept(ast.Ast.Program.T ast)
   {
     DeadClass dceVisitor = new DeadClass();
     control.CompilerPass deadClassPass = new control.CompilerPass(

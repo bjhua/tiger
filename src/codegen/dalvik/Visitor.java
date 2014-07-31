@@ -1,10 +1,12 @@
 package codegen.dalvik;
 
-import codegen.dalvik.type.*;
-import codegen.dalvik.stm.*;
-import codegen.dalvik.dec.*;
-import codegen.dalvik.program.*;
-import codegen.dalvik.mainClass.*;
+import codegen.dalvik.Ast.Class.ClassSingle;
+import codegen.dalvik.Ast.Method.MethodSingle;
+import codegen.dalvik.Ast.Type.*;
+import codegen.dalvik.Ast.Stm.*;
+import codegen.dalvik.Ast.Dec.*;
+import codegen.dalvik.Ast.Program.*;
+import codegen.dalvik.Ast.MainClass.*;
 
 public interface Visitor
 {
@@ -27,7 +29,7 @@ public interface Visitor
 
   public void visit(Invokevirtual s);
 
-  public void visit(Label s);
+  public void visit(LabelJ s);
   
   public void visit(Move16 s);
   
@@ -40,24 +42,24 @@ public interface Visitor
   public void visit(NewInstance s);
 
   // type
-  public void visit(codegen.dalvik.type.Class t);
+  public void visit(ClassType t);
 
   public void visit(Int t);
 
   public void visit(IntArray t);
 
   // dec
-  public void visit(Dec d);
+  public void visit(DecSingle d);
 
   // method
-  public void visit(codegen.dalvik.method.Method m);
+  public void visit(MethodSingle m);
 
   // class
-  public void visit(codegen.dalvik.classs.Class c);
+  public void visit(ClassSingle c);
 
   // main class
-  public void visit(MainClass c);
+  public void visit(MainClassSingle c);
 
   // program
-  public void visit(Program p);
+  public void visit(ProgramSingle p);
 }

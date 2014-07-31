@@ -1,11 +1,48 @@
 package elaborator;
 
+import java.util.LinkedList;
+
+import ast.Ast.Class;
+import ast.Ast.Class.ClassSingle;
+import ast.Ast.Dec;
+import ast.Ast.Exp;
+import ast.Ast.Exp.Add;
+import ast.Ast.Exp.And;
+import ast.Ast.Exp.ArraySelect;
+import ast.Ast.Exp.Call;
+import ast.Ast.Exp.False;
+import ast.Ast.Exp.Id;
+import ast.Ast.Exp.Length;
+import ast.Ast.Exp.Lt;
+import ast.Ast.Exp.NewIntArray;
+import ast.Ast.Exp.NewObject;
+import ast.Ast.Exp.Not;
+import ast.Ast.Exp.Num;
+import ast.Ast.Exp.Sub;
+import ast.Ast.Exp.This;
+import ast.Ast.Exp.Times;
+import ast.Ast.Exp.True;
+import ast.Ast.MainClass;
+import ast.Ast.Method;
+import ast.Ast.Method.MethodSingle;
+import ast.Ast.Program.ProgramSingle;
+import ast.Ast.Stm;
+import ast.Ast.Stm.Assign;
+import ast.Ast.Stm.AssignArray;
+import ast.Ast.Stm.Block;
+import ast.Ast.Stm.If;
+import ast.Ast.Stm.Print;
+import ast.Ast.Stm.While;
+import ast.Ast.Type;
+import ast.Ast.Type.ClassType;
+import control.Control.ConAst;
+
 public class ElaboratorVisitor implements ast.Visitor
 {
   public ClassTable classTable; // symbol table for class
   public MethodTable methodTable; // symbol table for each method
   public String currentClass; // the class name being elaborated
-  public ast.type.T type; // type of the expression being elaborated
+  public Type.T type; // type of the expression being elaborated
 
   public ElaboratorVisitor()
   {
@@ -24,41 +61,42 @@ public class ElaboratorVisitor implements ast.Visitor
   // /////////////////////////////////////////////////////
   // expressions
   @Override
-  public void visit(ast.exp.Add e)
+  public void visit(Add e)
   {
   }
 
   @Override
-  public void visit(ast.exp.And e)
+  public void visit(And e)
   {
   }
 
   @Override
-  public void visit(ast.exp.ArraySelect e)
+  public void visit(ArraySelect e)
   {
   }
 
   @Override
-  public void visit(ast.exp.Call e)
+  public void visit(Call e)
   {
-    ast.type.T leftty;
-    ast.type.Class ty = null;
+    Type.T leftty;
+    Type.ClassType ty = null;
 
     e.exp.accept(this);
     leftty = this.type;
-    if (leftty instanceof ast.type.Class) {
-      ty = (ast.type.Class) leftty;
+    if (leftty instanceof ClassType) {
+      ty = (ClassType) leftty;
       e.type = ty.id;
     } else
       error();
     MethodType mty = this.classTable.getm(ty.id, e.id);
-    java.util.LinkedList<ast.type.T> declaredArgTypes
-    = new java.util.LinkedList<ast.type.T>();
-    for (ast.dec.T dec: mty.argsType){
-      declaredArgTypes.add(((ast.dec.Dec)dec).type);
+
+    java.util.LinkedList<Type.T> declaredArgTypes
+    = new java.util.LinkedList<Type.T>();
+    for (Dec.T dec: mty.argsType){
+      declaredArgTypes.add(((Dec.DecSingle)dec).type);
     }
-    java.util.LinkedList<ast.type.T> argsty = new java.util.LinkedList<ast.type.T>();
-    for (ast.exp.T a : e.args) {
+    java.util.LinkedList<Type.T> argsty = new LinkedList<Type.T>();
+    for (Exp.T a : e.args) {
       a.accept(this);
       argsty.addLast(this.type);
     }
@@ -73,7 +111,8 @@ public class ElaboratorVisitor implements ast.Visitor
     // a sub-class of type "B".
     // Modify the following code accordingly:
     for (int i = 0; i < argsty.size(); i++) {
-      if (declaredArgTypes.get(i).toString().equals(argsty.get(i).toString()))
+      Dec.DecSingle dec = (Dec.DecSingle) mty.argsType.get(i);
+      if (dec.type.toString().equals(argsty.get(i).toString()))
         ;
       else
         error();
@@ -86,15 +125,15 @@ public class ElaboratorVisitor implements ast.Visitor
   }
 
   @Override
-  public void visit(ast.exp.False e)
+  public void visit(False e)
   {
   }
 
   @Override
-  public void visit(ast.exp.Id e)
+  public void visit(Id e)
   {
     // first look up the id in method table
-    ast.type.T type = this.methodTable.get(e.id);
+    Type.T type = this.methodTable.get(e.id);
     // if search failed, then s.id must be a class field.
     if (type == null) {
       type = this.classTable.get(this.currentClass, e.id);
@@ -111,88 +150,88 @@ public class ElaboratorVisitor implements ast.Visitor
   }
 
   @Override
-  public void visit(ast.exp.Length e)
+  public void visit(Length e)
   {
   }
 
   @Override
-  public void visit(ast.exp.Lt e)
+  public void visit(Lt e)
   {
     e.left.accept(this);
-    ast.type.T ty = this.type;
+    Type.T ty = this.type;
     e.right.accept(this);
     if (!this.type.toString().equals(ty.toString()))
       error();
-    this.type = new ast.type.Boolean();
+    this.type = new Type.Boolean();
     return;
   }
 
   @Override
-  public void visit(ast.exp.NewIntArray e)
+  public void visit(NewIntArray e)
   {
   }
 
   @Override
-  public void visit(ast.exp.NewObject e)
+  public void visit(NewObject e)
   {
-    this.type = new ast.type.Class(e.id);
+    this.type = new Type.ClassType(e.id);
     return;
   }
 
   @Override
-  public void visit(ast.exp.Not e)
+  public void visit(Not e)
   {
   }
 
   @Override
-  public void visit(ast.exp.Num e)
+  public void visit(Num e)
   {
-    this.type = new ast.type.Int();
+    this.type = new Type.Int();
     return;
   }
 
   @Override
-  public void visit(ast.exp.Sub e)
+  public void visit(Sub e)
   {
     e.left.accept(this);
-    ast.type.T leftty = this.type;
+    Type.T leftty = this.type;
     e.right.accept(this);
     if (!this.type.toString().equals(leftty.toString()))
       error();
-    this.type = new ast.type.Int();
+    this.type = new Type.Int();
     return;
   }
 
   @Override
-  public void visit(ast.exp.This e)
+  public void visit(This e)
   {
-    this.type = new ast.type.Class(this.currentClass);
+    this.type = new Type.ClassType(this.currentClass);
     return;
   }
 
   @Override
-  public void visit(ast.exp.Times e)
+  public void visit(Times e)
   {
     e.left.accept(this);
-    ast.type.T leftty = this.type;
+    Type.T leftty = this.type;
     e.right.accept(this);
     if (!this.type.toString().equals(leftty.toString()))
       error();
-    this.type = new ast.type.Int();
+    this.type = new Type.Int();
     return;
   }
 
   @Override
-  public void visit(ast.exp.True e)
+  public void visit(True e)
   {
   }
 
   // statements
   @Override
-  public void visit(ast.stm.Assign s)
+  public void visit(Assign s)
   {
     // first look up the id in method table
-    ast.type.T type = this.methodTable.get(s.id);
+    Type.T type = this.methodTable.get(s.id);
     // if search failed, then s.id must
     if (type == null)
       type = this.classTable.get(this.currentClass, s.id);
@@ -205,17 +244,17 @@ public class ElaboratorVisitor implements ast.Visitor
   }
 
   @Override
-  public void visit(ast.stm.AssignArray s)
+  public void visit(AssignArray s)
   {
   }
 
   @Override
-  public void visit(ast.stm.Block s)
+  public void visit(Block s)
   {
   }
 
   @Override
-  public void visit(ast.stm.If s)
+  public void visit(If s)
   {
     s.condition.accept(this);
     if (!this.type.toString().equals("@boolean"))
@@ -226,7 +265,7 @@ public class ElaboratorVisitor implements ast.Visitor
   }
 
   @Override
-  public void visit(ast.stm.Print s)
+  public void visit(Print s)
   {
     s.exp.accept(this);
     if (!this.type.toString().equals("@int"))
@@ -235,49 +274,49 @@ public class ElaboratorVisitor implements ast.Visitor
   }
 
   @Override
-  public void visit(ast.stm.While s)
+  public void visit(While s)
   {
   }
 
   // type
   @Override
-  public void visit(ast.type.Boolean t)
+  public void visit(Type.Boolean t)
   {
   }
 
   @Override
-  public void visit(ast.type.Class t)
+  public void visit(Type.ClassType t)
   {
   }
 
   @Override
-  public void visit(ast.type.Int t)
+  public void visit(Type.Int t)
   {
     System.out.println("aaaa");
   }
 
   @Override
-  public void visit(ast.type.IntArray t)
+  public void visit(Type.IntArray t)
   {
   }
 
   // dec
   @Override
-  public void visit(ast.dec.Dec d)
+  public void visit(Dec.DecSingle d)
   {
   }
 
   // method
   @Override
-  public void visit(ast.method.Method m)
+  public void visit(Method.MethodSingle m)
   {
     // construct the method table
     this.methodTable.put(m.formals, m.locals);
 
-    if (control.Control.elabMethodTable)
+    if (ConAst.elabMethodTable)
       this.methodTable.dump();
 
-    for (ast.stm.T s : m.stms)
+    for (Stm.T s : m.stms)
       s.accept(this);
     m.retExp.accept(this);
     return;
@@ -285,11 +324,11 @@ public class ElaboratorVisitor implements ast.Visitor
 
   // class
   @Override
-  public void visit(ast.classs.Class c)
+  public void visit(Class.ClassSingle c)
   {
     this.currentClass = c.id;
 
-    for (ast.method.T m : c.methods) {
+    for (Method.T m : c.methods) {
       m.accept(this);
     }
     return;
@@ -297,7 +336,7 @@ public class ElaboratorVisitor implements ast.Visitor
 
   // main class
   @Override
-  public void visit(ast.mainClass.MainClass c)
+  public void visit(MainClass.MainClassSingle c)
   {
     this.currentClass = c.id;
     // "main" has an argument "arg" of type "String[]", but
@@ -310,21 +349,21 @@ public class ElaboratorVisitor implements ast.Visitor
   // ////////////////////////////////////////////////////////
   // step 1: build class table
   // class table for Main class
-  private void buildMainClass(ast.mainClass.MainClass main)
+  private void buildMainClass(MainClass.MainClassSingle main)
   {
     this.classTable.put(main.id, new ClassBinding(null));
   }
 
   // class table for normal classes
-  private void buildClass(ast.classs.Class c)
+  private void buildClass(ClassSingle c)
   {
     this.classTable.put(c.id, new ClassBinding(c.extendss));
-    for (ast.dec.T dec : c.decs) {
-      ast.dec.Dec d = (ast.dec.Dec) dec;
+    for (Dec.T dec : c.decs) {
+      Dec.DecSingle d = (Dec.DecSingle) dec;
       this.classTable.put(c.id, d.id, d.type);
     }
-    for (ast.method.T method : c.methods) {
-      ast.method.Method m = (ast.method.Method) method;
+    for (Method.T method : c.methods) {
+      MethodSingle m = (MethodSingle) method;
       this.classTable.put(c.id, m.id, new MethodType(m.retType, m.formals));
     }
   }
@@ -334,19 +373,19 @@ public class ElaboratorVisitor implements ast.Visitor
 
   // program
   @Override
-  public void visit(ast.program.Program p)
+  public void visit(ProgramSingle p)
   {
     // ////////////////////////////////////////////////
     // step 1: build a symbol table for class (the class table)
     // a class table is a mapping from class names to class bindings
     // classTable: className -> ClassBinding{extends, fields, methods}
-    buildMainClass((ast.mainClass.MainClass) p.mainClass);
-    for (ast.classs.T c : p.classes) {
-      buildClass((ast.classs.Class) c);
+    buildMainClass((MainClass.MainClassSingle) p.mainClass);
+    for (Class.T c : p.classes) {
+      buildClass((ClassSingle) c);
     }
 
     // we can double check that the class table is OK!
-    if (control.Control.elabClassTable) {
+    if (control.Control.ConAst.elabClassTable) {
       this.classTable.dump();
     }
 
@@ -354,7 +393,7 @@ public class ElaboratorVisitor implements ast.Visitor
     // step 2: elaborate each class in turn, under the class table
     // built above.
     p.mainClass.accept(this);
-    for (ast.classs.T c : p.classes) {
+    for (Class.T c : p.classes) {
       c.accept(this);
     }
 

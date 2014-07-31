@@ -1,12 +1,28 @@
 package ast.optimizations;
 
+import ast.Ast.Class;
+import ast.Ast.Class.ClassSingle;
+import ast.Ast.Dec.DecSingle;
+import ast.Ast.MainClass;
+import ast.Ast.MainClass.MainClassSingle;
+import ast.Ast.Method.MethodSingle;
+import ast.Ast.Program;
+import ast.Ast.Program.ProgramSingle;
+import ast.Ast.Type.Boolean;
+import ast.Ast.Type.ClassType;
+import ast.Ast.Type.Int;
+import ast.Ast.Type.IntArray;
+import ast.Ast.Exp.*;
+import ast.Ast.Stm.*;
+import ast.Ast.Type.*;
+
 // Constant folding optimizations on an AST.
 
 public class ConstFold implements ast.Visitor
 {
-  private ast.classs.T newClass;
-  private ast.mainClass.T mainClass;
-  public ast.program.T program;
+  private Class.T newClass;
+  private MainClass.T mainClass;
+  public Program.T program;
   
   public ConstFold()
   {
@@ -25,168 +41,168 @@ public class ConstFold implements ast.Visitor
   // /////////////////////////////////////////////////////
   // expressions
   @Override
-  public void visit(ast.exp.Add e)
+  public void visit(Add e)
   {
   }
 
   @Override
-  public void visit(ast.exp.And e)
+  public void visit(And e)
   {
   }
 
   @Override
-  public void visit(ast.exp.ArraySelect e)
+  public void visit(ArraySelect e)
   {
   }
 
   @Override
-  public void visit(ast.exp.Call e)
-  {
-    return;
-  }
-
-  @Override
-  public void visit(ast.exp.False e)
-  {
-  }
-
-  @Override
-  public void visit(ast.exp.Id e)
+  public void visit(Call e)
   {
     return;
   }
 
   @Override
-  public void visit(ast.exp.Length e)
+  public void visit(False e)
   {
   }
 
   @Override
-  public void visit(ast.exp.Lt e)
-  {
-    return;
-  }
-
-  @Override
-  public void visit(ast.exp.NewIntArray e)
-  {
-  }
-
-  @Override
-  public void visit(ast.exp.NewObject e)
+  public void visit(Id e)
   {
     return;
   }
 
   @Override
-  public void visit(ast.exp.Not e)
+  public void visit(Length e)
   {
   }
 
   @Override
-  public void visit(ast.exp.Num e)
-  {
-    return;
-  }
-
-  @Override
-  public void visit(ast.exp.Sub e)
+  public void visit(Lt e)
   {
     return;
   }
 
   @Override
-  public void visit(ast.exp.This e)
+  public void visit(NewIntArray e)
+  {
+  }
+
+  @Override
+  public void visit(NewObject e)
   {
     return;
   }
 
   @Override
-  public void visit(ast.exp.Times e)
+  public void visit(Not e)
+  {
+  }
+
+  @Override
+  public void visit(Num e)
+  {
+    return;
+  }
+
+  @Override
+  public void visit(Sub e)
+  {
+    return;
+  }
+
+  @Override
+  public void visit(This e)
+  {
+    return;
+  }
+
+  @Override
+  public void visit(Times e)
   {
     
     return;
   }
 
   @Override
-  public void visit(ast.exp.True e)
+  public void visit(True e)
   {
   }
 
   // statements
   @Override
-  public void visit(ast.stm.Assign s)
+  public void visit(Assign s)
   {
     
     return;
   }
 
   @Override
-  public void visit(ast.stm.AssignArray s)
+  public void visit(AssignArray s)
   {
   }
 
   @Override
-  public void visit(ast.stm.Block s)
+  public void visit(Block s)
   {
   }
 
   @Override
-  public void visit(ast.stm.If s)
+  public void visit(If s)
   {
    
     return;
   }
 
   @Override
-  public void visit(ast.stm.Print s)
+  public void visit(Print s)
   {
     return;
   }
 
   @Override
-  public void visit(ast.stm.While s)
+  public void visit(While s)
   {
   }
 
   // type
   @Override
-  public void visit(ast.type.Boolean t)
+  public void visit(Boolean t)
   {
   }
 
   @Override
-  public void visit(ast.type.Class t)
+  public void visit(ClassType t)
   {
   }
 
   @Override
-  public void visit(ast.type.Int t)
+  public void visit(Int t)
   {
   }
 
   @Override
-  public void visit(ast.type.IntArray t)
+  public void visit(IntArray t)
   {
   }
 
   // dec
   @Override
-  public void visit(ast.dec.Dec d)
+  public void visit(DecSingle d)
   {
     return;
   }
 
   // method
   @Override
-  public void visit(ast.method.Method m)
+  public void visit(MethodSingle m)
   {
     return;
   }
 
   // class
   @Override
-  public void visit(ast.classs.Class c)
+  public void visit(ClassSingle c)
   {
     
     return;
@@ -194,7 +210,7 @@ public class ConstFold implements ast.Visitor
 
   // main class
   @Override
-  public void visit(ast.mainClass.MainClass c)
+  public void visit(MainClassSingle c)
   {
     
     return;
@@ -202,7 +218,7 @@ public class ConstFold implements ast.Visitor
 
   // program
   @Override
-  public void visit(ast.program.Program p)
+  public void visit(ProgramSingle p)
   {
     
  // You should comment out this line of code:

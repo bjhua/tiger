@@ -80,7 +80,7 @@ public class Graph<X>
   {
     for (Node n : this.graph)
       if (n.data.equals(data))
-        new util.Error();
+        new util.Bug();
 
     Node node = new Node(data);
     this.addNode(node);
@@ -106,7 +106,7 @@ public class Graph<X>
     Node t = this.lookupNode(to);
 
     if (f == null || t == null)
-      new util.Error();
+      new util.Bug();
 
     this.addEdge(f, t);
   }
@@ -126,7 +126,7 @@ public class Graph<X>
   {
     Node startNode = this.lookupNode(start);
     if (startNode == null)
-      new util.Error();
+      new util.Bug();
 
     java.util.HashSet<Node> visited = new java.util.HashSet<Node>();
 
@@ -156,7 +156,7 @@ public class Graph<X>
       dot.visualize(fname);
     } catch (Exception e) {
       e.printStackTrace();
-      new util.Error();
+      new util.Bug();
     }
   }
 }

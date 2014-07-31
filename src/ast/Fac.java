@@ -1,5 +1,26 @@
 package ast;
 
+import ast.Ast.Dec;
+import ast.Ast.Exp;
+import ast.Ast.Exp.Call;
+import ast.Ast.Exp.Id;
+import ast.Ast.Exp.Lt;
+import ast.Ast.Exp.NewObject;
+import ast.Ast.Exp.Num;
+import ast.Ast.Exp.Sub;
+import ast.Ast.Exp.This;
+import ast.Ast.Exp.Times;
+import ast.Ast.MainClass;
+import ast.Ast.MainClass.MainClassSingle;
+import ast.Ast.Method;
+import ast.Ast.Program;
+import ast.Ast.Program.ProgramSingle;
+import ast.Ast.Stm;
+import ast.Ast.Stm.Assign;
+import ast.Ast.Stm.If;
+import ast.Ast.Stm.Print;
+import ast.Ast.Type;
+
 public class Fac
 {
   // Lab2, exercise 2: read the following code and make
@@ -17,31 +38,31 @@ public class Fac
    */
 
   // // main class: "Factorial"
-  static ast.mainClass.MainClass factorial = new ast.mainClass.MainClass(
-      "Factorial", "a", new ast.stm.Print(new ast.exp.Call(
-          new ast.exp.NewObject("Fac"), "ComputeFac",
-          new util.Flist<ast.exp.T>().addAll(new ast.exp.Num(10)))));
+  static MainClass.T factorial = new MainClassSingle(
+      "Factorial", "a", new Print(new Call(
+          new NewObject("Fac"), "ComputeFac",
+          new util.Flist<Exp.T>().list(new Num(10)))));
 
   // // class "Fac"
-  static ast.classs.Class fac = new ast.classs.Class("Fac", null,
-      new util.Flist<ast.dec.T>().addAll(),
-      new util.Flist<ast.method.T>().addAll(new ast.method.Method(
-          new ast.type.Int(), "ComputeFac", new util.Flist<ast.dec.T>()
-              .addAll(new ast.dec.Dec(new ast.type.Int(), "num")),
-          new util.Flist<ast.dec.T>().addAll(new ast.dec.Dec(
-              new ast.type.Int(), "num_aux")), new util.Flist<ast.stm.T>()
-              .addAll(new ast.stm.If(new ast.exp.Lt(new ast.exp.Id("num"),
-                  new ast.exp.Num(1)), new ast.stm.Assign("num_aux",
-                  new ast.exp.Num(1)), new ast.stm.Assign("num_aux",
-                  new ast.exp.Times(new ast.exp.Id("num"), new ast.exp.Call(
-                      new ast.exp.This(), "ComputeFac",
-                      new util.Flist<ast.exp.T>().addAll(new ast.exp.Sub(
-                          new ast.exp.Id("num"), new ast.exp.Num(1)))))))),
-          new ast.exp.Id("num_aux"))));
+  static ast.Ast.Class.T fac = new ast.Ast.Class.ClassSingle("F", null,
+      new util.Flist<Dec.T>().list(),
+      new util.Flist<Method.T>().list(new Method.MethodSingle(
+          new Type.Int(), "ComputeFac", new util.Flist<Dec.T>()
+              .list(new Dec.DecSingle(new Type.Int(), "num")),
+          new util.Flist<Dec.T>().list(new Dec.DecSingle(
+              new Type.Int(), "num_aux")), new util.Flist<Stm.T>()
+              .list(new If(new Lt(new Id("num"),
+                  new Num(1)), new Assign("num_aux",
+                  new Num(1)), new Assign("num_aux",
+                  new Times(new Id("num"), new Call(
+                      new This(), "ComputeFac",
+                      new util.Flist<Exp.T>().list(new Sub(
+                          new Id("num"), new Num(1)))))))),
+          new Id("num_aux"))));
 
   // program
-  public static ast.program.Program prog = new ast.program.Program(factorial,
-      new util.Flist<ast.classs.T>().addAll(fac));
+  public static Program.T prog = new ProgramSingle(factorial,
+      new util.Flist<ast.Ast.Class.T>().list(fac));
 
   // Lab2, exercise 2: you should write some code to
   // represent the program "test/Sum.java".

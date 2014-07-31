@@ -1,22 +1,28 @@
 package codegen.C;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+
+import codegen.C.Ast.Dec;
+import codegen.C.Ast.Type;
+
 public class ClassBinding
 {
   public String extendss; // null for non-existing extends
   public boolean visited; // whether or not this class has been visited
-  public java.util.LinkedList<Tuple> fields; // all fields
-  public java.util.ArrayList<Ftuple> methods; // all methods
+  public LinkedList<Tuple> fields; // all fields
+  public ArrayList<Ftuple> methods; // all methods
 
   public ClassBinding(String extendss)
   {
     this.extendss = extendss;
     this.visited = false;
-    this.fields = new java.util.LinkedList<Tuple>();
-    this.methods = new java.util.ArrayList<Ftuple>();
+    this.fields = new LinkedList<Tuple>();
+    this.methods = new ArrayList<Ftuple>();
   }
 
   // put a single field
-  public void put(String c, codegen.C.type.T type, String var)
+  public void put(String c, Type.T type, String var)
   {
     this.fields.add(new Tuple(c, type, var));
   }
@@ -36,8 +42,8 @@ public class ClassBinding
     this.methods = ms;
   }
 
-  public void putm(String c, codegen.C.type.T ret,
-      java.util.LinkedList<codegen.C.dec.T> args, String mthd)
+  public void putm(String c, Type.T ret,
+      java.util.LinkedList<Dec.T> args, String mthd)
   {
     Ftuple t = new Ftuple(c, ret, args, mthd);
     this.methods.add(t);

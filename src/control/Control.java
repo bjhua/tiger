@@ -2,42 +2,55 @@ package control;
 
 public class Control
 {
-  // source file
-  public static String fileName = null;
-
-  // compiler testing and debugging
-  public static boolean testlexer = false;
-  public static boolean testFac = false;
-
-  // lexer and parser
-  public static boolean lex = false;
-
-  // ast
-  public static boolean dumpAst = false;
-  public static boolean dumpC = false;
-  public static boolean dumpCyclone = false;
-  public static boolean dumpDot = false;
-  
-  // graph visualization
-  public enum Visualize_Kind_t {
-    None, Bmp, Pdf, Ps, Jpg
+  // the lexer
+  public static class ConLexer
+  {
+    public static boolean test = false;
+    public static boolean dump = false;
   }
-  public static Visualize_Kind_t visualize = Visualize_Kind_t.None;
-
-
   
-  // elaborator
-  public static boolean elabClassTable = false;
-  public static boolean elabMethodTable = false;
-  
-
-  // code generator
-  public static String outputName = null;
-
-  public enum Codegen_Kind_t {
-    Bytecode, C, Dalvik, X86
+  // the straight-line program interpreter
+  public static class ConSlp
+  {
+    public enum T{NONE, ARGS, INTERP, COMPILE, TEST, DIV};
+    
+    public static T action = T.NONE;
+    public static boolean div = false;
+    public static boolean keepasm = false;
   }
-  public static Codegen_Kind_t codegen = Codegen_Kind_t.C;
+  
+  // Ast and elaborator
+  public static class ConAst
+  {
+    public static boolean dumpAst = false;
+    public static boolean testFac = false;
+    public static boolean dumpC = false;
+    public static boolean dumpCyclone = false;
+    public static boolean dumpDot = false;
+
+    // elaborator
+    public static boolean elabClassTable = false;
+    public static boolean elabMethodTable = false;
+  }
+  
+  public static class ConCodeGen
+  {
+    public static String fileName = null;
+
+    public static String outputName = null;
+
+    public static enum Kind_t {
+      Bytecode, C, Dalvik, X86
+    }
+
+    public static Kind_t codegen = Kind_t.C;
+  }
+  
+//graph visualization
+ public enum Visualize_Kind_t {
+   None, Bmp, Pdf, Ps, Jpg
+ }
+ public static Visualize_Kind_t visualize = Visualize_Kind_t.None;
   
   // verbose level
   public enum Verbose_t{

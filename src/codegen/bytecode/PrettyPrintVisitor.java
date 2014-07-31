@@ -1,5 +1,20 @@
 package codegen.bytecode;
 
+import codegen.bytecode.Ast.Class;
+import codegen.bytecode.Ast.MainClass.MainClassSingle;
+import codegen.bytecode.Ast.Method;
+import codegen.bytecode.Ast.Class.ClassSingle;
+import codegen.bytecode.Ast.Dec;
+import codegen.bytecode.Ast.Dec.DecSingle;
+import codegen.bytecode.Ast.Method.MethodSingle;
+import codegen.bytecode.Ast.Program.ProgramSingle;
+import codegen.bytecode.Ast.Stm;
+import codegen.bytecode.Ast.Type;
+import codegen.bytecode.Ast.Type.ClassType;
+import codegen.bytecode.Ast.Type.Int;
+import codegen.bytecode.Ast.Type.IntArray;
+import codegen.bytecode.Ast.Stm.*;
+
 public class PrettyPrintVisitor implements Visitor
 {
   private java.io.BufferedWriter writer;
@@ -44,66 +59,66 @@ public class PrettyPrintVisitor implements Visitor
   // /////////////////////////////////////////////////////
   // statements
   @Override
-  public void visit(codegen.bytecode.stm.Aload s)
+  public void visit(Aload s)
   {
     this.isayln("aload " + s.index);
     return;
   }
 
   @Override
-  public void visit(codegen.bytecode.stm.Areturn s)
+  public void visit(Areturn s)
   {
     this.isayln("areturn");
     return;
   }
 
   @Override
-  public void visit(codegen.bytecode.stm.Astore s)
+  public void visit(Astore s)
   {
     this.isayln("astore " + s.index);
     return;
   }
 
   @Override
-  public void visit(codegen.bytecode.stm.Goto s)
+  public void visit(Goto s)
   {
     this.isayln("goto " + s.l.toString());
     return;
   }
 
   @Override
-  public void visit(codegen.bytecode.stm.Ificmplt s)
+  public void visit(Ificmplt s)
   {
     this.isayln("if_icmplt " + s.l.toString());
     return;
   }
 
   @Override
-  public void visit(codegen.bytecode.stm.Ifne s)
+  public void visit(Ifne s)
   {
     this.isayln("ifne " + s.l.toString());
     return;
   }
 
   @Override
-  public void visit(codegen.bytecode.stm.Iload s)
+  public void visit(Iload s)
   {
     this.isayln("iload " + s.index);
     return;
   }
 
   @Override
-  public void visit(codegen.bytecode.stm.Imul s)
+  public void visit(Imul s)
   {
     this.isayln("imul");
     return;
   }
 
   @Override
-  public void visit(codegen.bytecode.stm.Invokevirtual s)
+  public void visit(Invokevirtual s)
   {
     this.say("    invokevirtual " + s.c + "/" + s.f + "(");
-    for (codegen.bytecode.type.T t : s.at) {
+    for (Type.T t : s.at) {
       t.accept(this);
     }
     this.say(")");
@@ -113,42 +128,42 @@ public class PrettyPrintVisitor implements Visitor
   }
 
   @Override
-  public void visit(codegen.bytecode.stm.Ireturn s)
+  public void visit(Ireturn s)
   {
     this.isayln("ireturn");
     return;
   }
 
   @Override
-  public void visit(codegen.bytecode.stm.Istore s)
+  public void visit(Istore s)
   {
     this.isayln("istore " + s.index);
     return;
   }
 
   @Override
-  public void visit(codegen.bytecode.stm.Isub s)
+  public void visit(Isub s)
   {
     this.isayln("isub");
     return;
   }
 
   @Override
-  public void visit(codegen.bytecode.stm.Label s)
+  public void visit(LabelJ s)
   {
     this.sayln(s.l.toString() + ":");
     return;
   }
 
   @Override
-  public void visit(codegen.bytecode.stm.Ldc s)
+  public void visit(Ldc s)
   {
     this.isayln("ldc " + s.i);
     return;
   }
 
   @Override
-  public void visit(codegen.bytecode.stm.New s)
+  public void visit(New s)
   {
     this.isayln("new " + s.c);
     this.isayln("dup");
@@ -157,7 +172,7 @@ public class PrettyPrintVisitor implements Visitor
   }
 
   @Override
-  public void visit(codegen.bytecode.stm.Print s)
+  public void visit(Print s)
   {
     this.isayln("getstatic java/lang/System/out Ljava/io/PrintStream;");
     this.isayln("swap");
@@ -167,36 +182,36 @@ public class PrettyPrintVisitor implements Visitor
 
   // type
   @Override
-  public void visit(codegen.bytecode.type.Class t)
+  public void visit(ClassType t)
   {
     this.say("L" + t.id + ";");
   }
 
   @Override
-  public void visit(codegen.bytecode.type.Int t)
+  public void visit(Int t)
   {
     this.say("I");
   }
 
   @Override
-  public void visit(codegen.bytecode.type.IntArray t)
+  public void visit(IntArray t)
   {
     this.say("[I");
   }
 
   // dec
   @Override
-  public void visit(codegen.bytecode.dec.Dec d)
+  public void visit(DecSingle d)
   {
   }
 
   // method
   @Override
-  public void visit(codegen.bytecode.method.Method m)
+  public void visit(MethodSingle m)
   {
     this.say(".method public " + m.id + "(");
-    for (codegen.bytecode.dec.T d : m.formals) {
-      codegen.bytecode.dec.Dec dd = (codegen.bytecode.dec.Dec) d;
+    for (Dec.T d : m.formals) {
+      DecSingle dd = (DecSingle) d;
       dd.type.accept(this);
     }
     this.say(")");
@@ -205,7 +220,7 @@ public class PrettyPrintVisitor implements Visitor
     this.sayln(".limit stack 4096");
     this.sayln(".limit locals " + (m.index + 1));
 
-    for (codegen.bytecode.stm.T s : m.stms)
+    for (Stm.T s : m.stms)
       s.accept(this);
 
     this.sayln(".end method");
@@ -214,7 +229,7 @@ public class PrettyPrintVisitor implements Visitor
 
   // class
   @Override
-  public void visit(codegen.bytecode.classs.Class c)
+  public void visit(ClassSingle c)
   {
     // Every class must go into its own class file.
     try {
@@ -236,8 +251,8 @@ public class PrettyPrintVisitor implements Visitor
       this.sayln(".super " + c.extendss);
 
     // fields
-    for (codegen.bytecode.dec.T d : c.decs) {
-      codegen.bytecode.dec.Dec dd = (codegen.bytecode.dec.Dec) d;
+    for (Dec.T d : c.decs) {
+      DecSingle dd = (DecSingle) d;
       this.say(".field public " + dd.id);
       dd.type.accept(this);
       this.sayln("");
@@ -253,7 +268,7 @@ public class PrettyPrintVisitor implements Visitor
     this.isayln("return");
     this.sayln(".end method\n\n");
 
-    for (codegen.bytecode.method.T m : c.methods) {
+    for (Method.T m : c.methods) {
       m.accept(this);
     }
 
@@ -268,7 +283,7 @@ public class PrettyPrintVisitor implements Visitor
 
   // main class
   @Override
-  public void visit(codegen.bytecode.mainClass.MainClass c)
+  public void visit(MainClassSingle c)
   {
     // Every class must go into its own class file.
     try {
@@ -287,7 +302,7 @@ public class PrettyPrintVisitor implements Visitor
     this.sayln(".method public static main([Ljava/lang/String;)V");
     this.isayln(".limit stack 4096");
     this.isayln(".limit locals 2");
-    for (codegen.bytecode.stm.T s : c.stms)
+    for (Stm.T s : c.stms)
       s.accept(this);
     this.isayln("return");
     this.sayln(".end method");
@@ -303,12 +318,12 @@ public class PrettyPrintVisitor implements Visitor
 
   // program
   @Override
-  public void visit(codegen.bytecode.program.Program p)
+  public void visit(ProgramSingle p)
   {
 
     p.mainClass.accept(this);
 
-    for (codegen.bytecode.classs.T c : p.classes) {
+    for (Class.T c : p.classes) {
       c.accept(this);
     }
 

@@ -350,7 +350,7 @@ public class Parser
     return;
   }
 
-  public ast.program.T parse()
+  public ast.Ast.Program.T parse()
   {
     parseProgram();
     return null;

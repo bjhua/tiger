@@ -1,13 +1,51 @@
 package ast.optimizations;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+
+import ast.Ast.Class.ClassSingle;
+import ast.Ast.Dec.DecSingle;
+import ast.Ast.Exp;
+import ast.Ast.Exp.Add;
+import ast.Ast.Exp.And;
+import ast.Ast.Exp.ArraySelect;
+import ast.Ast.Exp.Call;
+import ast.Ast.Exp.False;
+import ast.Ast.Exp.Id;
+import ast.Ast.Exp.Length;
+import ast.Ast.Exp.Lt;
+import ast.Ast.Exp.NewIntArray;
+import ast.Ast.Exp.NewObject;
+import ast.Ast.Exp.Not;
+import ast.Ast.Exp.Num;
+import ast.Ast.Exp.Sub;
+import ast.Ast.Exp.This;
+import ast.Ast.Exp.Times;
+import ast.Ast.Exp.True;
+import ast.Ast.MainClass.MainClassSingle;
+import ast.Ast.Method.MethodSingle;
+import ast.Ast.Program;
+import ast.Ast.Program.ProgramSingle;
+import ast.Ast.Stm;
+import ast.Ast.Stm.Assign;
+import ast.Ast.Stm.AssignArray;
+import ast.Ast.Stm.Block;
+import ast.Ast.Stm.If;
+import ast.Ast.Stm.Print;
+import ast.Ast.Stm.While;
+import ast.Ast.Type.Boolean;
+import ast.Ast.Type.ClassType;
+import ast.Ast.Type.Int;
+import ast.Ast.Type.IntArray;
+
 // Dead class elimination optimizations on an AST.
 
 public class DeadClass implements ast.Visitor
 {
-  private java.util.HashSet<String> set;
-  private java.util.LinkedList<String> worklist;
-  private ast.classs.T newClass;
-  public ast.program.T program;
+  private HashSet<String> set;
+  private LinkedList<String> worklist;
+  private ast.Ast.Class.T newClass;
+  public Program.T program;
 
   public DeadClass()
   {
@@ -20,7 +58,7 @@ public class DeadClass implements ast.Visitor
   // /////////////////////////////////////////////////////
   // expressions
   @Override
-  public void visit(ast.exp.Add e)
+  public void visit(Add e)
   {
     e.left.accept(this);
     e.right.accept(this);
@@ -28,7 +66,7 @@ public class DeadClass implements ast.Visitor
   }
 
   @Override
-  public void visit(ast.exp.And e)
+  public void visit(And e)
   {
     e.left.accept(this);
     e.right.accept(this);
@@ -36,7 +74,7 @@ public class DeadClass implements ast.Visitor
   }
 
   @Override
-  public void visit(ast.exp.ArraySelect e)
+  public void visit(ArraySelect e)
   {
     e.array.accept(this);
     e.index.accept(this);
@@ -44,36 +82,36 @@ public class DeadClass implements ast.Visitor
   }
 
   @Override
-  public void visit(ast.exp.Call e)
+  public void visit(Call e)
   {
     e.exp.accept(this);
-    for (ast.exp.T arg : e.args) {
+    for (Exp.T arg : e.args) {
       arg.accept(this);
     }
     return;
   }
 
   @Override
-  public void visit(ast.exp.False e)
+  public void visit(False e)
   {
     return;
   }
 
   @Override
-  public void visit(ast.exp.Id e)
+  public void visit(Id e)
   {
     return;
   }
 
   @Override
-  public void visit(ast.exp.Length e)
+  public void visit(Length e)
   {
     e.array.accept(this);
     return;
   }
 
   @Override
-  public void visit(ast.exp.Lt e)
+  public void visit(Lt e)
   {
     e.left.accept(this);
     e.right.accept(this);
@@ -81,14 +119,14 @@ public class DeadClass implements ast.Visitor
   }
 
   @Override
-  public void visit(ast.exp.NewIntArray e)
+  public void visit(NewIntArray e)
   {
     e.exp.accept(this);
     return;
   }
 
   @Override
-  public void visit(ast.exp.NewObject e)
+  public void visit(NewObject e)
   {
     if (this.set.contains(e.id))
       return;
@@ -98,34 +136,20 @@ public class DeadClass implements ast.Visitor
   }
 
   @Override
-  public void visit(ast.exp.Not e)
+  public void visit(Not e)
   {
     e.exp.accept(this);
     return;
   }
 
   @Override
-  public void visit(ast.exp.Num e)
+  public void visit(Num e)
   {
     return;
   }
 
   @Override
-  public void visit(ast.exp.Sub e)
-  {
-    e.left.accept(this);
-    e.right.accept(this);
-    return;
-  }
-
-  @Override
-  public void visit(ast.exp.This e)
-  {
-    return;
-  }
-
-  @Override
-  public void visit(ast.exp.Times e)
+  public void visit(Sub e)
   {
     e.left.accept(this);
     e.right.accept(this);
@@ -133,21 +157,35 @@ public class DeadClass implements ast.Visitor
   }
 
   @Override
-  public void visit(ast.exp.True e)
+  public void visit(This e)
+  {
+    return;
+  }
+
+  @Override
+  public void visit(Times e)
+  {
+    e.left.accept(this);
+    e.right.accept(this);
+    return;
+  }
+
+  @Override
+  public void visit(True e)
   {
     return;
   }
 
   // statements
   @Override
-  public void visit(ast.stm.Assign s)
+  public void visit(Assign s)
   {
     s.exp.accept(this);
     return;
   }
 
   @Override
-  public void visit(ast.stm.AssignArray s)
+  public void visit(AssignArray s)
   {
     s.index.accept(this);
     s.exp.accept(this);
@@ -155,15 +193,15 @@ public class DeadClass implements ast.Visitor
   }
 
   @Override
-  public void visit(ast.stm.Block s)
+  public void visit(Block s)
   {
-    for (ast.stm.T x : s.stms)
+    for (Stm.T x : s.stms)
       x.accept(this);
     return;
   }
 
   @Override
-  public void visit(ast.stm.If s)
+  public void visit(If s)
   {
     s.condition.accept(this);
     s.thenn.accept(this);
@@ -172,14 +210,14 @@ public class DeadClass implements ast.Visitor
   }
 
   @Override
-  public void visit(ast.stm.Print s)
+  public void visit(Print s)
   {
     s.exp.accept(this);
     return;
   }
 
   @Override
-  public void visit(ast.stm.While s)
+  public void visit(While s)
   {
     s.condition.accept(this);
     s.body.accept(this);
@@ -188,40 +226,40 @@ public class DeadClass implements ast.Visitor
 
   // type
   @Override
-  public void visit(ast.type.Boolean t)
+  public void visit(Boolean t)
   {
     return;
   }
 
   @Override
-  public void visit(ast.type.Class t)
+  public void visit(ClassType t)
   {
     return;
   }
 
   @Override
-  public void visit(ast.type.Int t)
+  public void visit(Int t)
   {
     return;
   }
 
   @Override
-  public void visit(ast.type.IntArray t)
+  public void visit(IntArray t)
   {
   }
 
   // dec
   @Override
-  public void visit(ast.dec.Dec d)
+  public void visit(DecSingle d)
   {
     return;
   }
 
   // method
   @Override
-  public void visit(ast.method.Method m)
+  public void visit(MethodSingle m)
   {
-    for (ast.stm.T s : m.stms)
+    for (Stm.T s : m.stms)
       s.accept(this);
     m.retExp.accept(this);
     return;
@@ -229,13 +267,13 @@ public class DeadClass implements ast.Visitor
 
   // class
   @Override
-  public void visit(ast.classs.Class c)
+  public void visit(ClassSingle c)
   {
   }
 
   // main class
   @Override
-  public void visit(ast.mainClass.MainClass c)
+  public void visit(MainClassSingle c)
   {
     c.stm.accept(this);
     return;
@@ -243,10 +281,10 @@ public class DeadClass implements ast.Visitor
 
   // program
   @Override
-  public void visit(ast.program.Program p)
+  public void visit(ProgramSingle p)
   {
     // we push the class name for mainClass onto the worklist
-    ast.mainClass.MainClass mainclass = (ast.mainClass.MainClass) p.mainClass;
+    MainClassSingle mainclass = (MainClassSingle) p.mainClass;
     this.set.add(mainclass.id);
 
     p.mainClass.accept(this);
@@ -254,8 +292,8 @@ public class DeadClass implements ast.Visitor
     while (!this.worklist.isEmpty()) {
       String cid = this.worklist.removeFirst();
 
-      for (ast.classs.T c : p.classes) {
-        ast.classs.Class current = (ast.classs.Class) c;
+      for (ast.Ast.Class.T c : p.classes) {
+        ClassSingle current = (ClassSingle) c;
 
         if (current.id.equals(cid)) {
           c.accept(this);
@@ -264,16 +302,16 @@ public class DeadClass implements ast.Visitor
       }
     }
 
-    java.util.LinkedList<ast.classs.T> newClasses = new java.util.LinkedList<ast.classs.T>();
-    for (ast.classs.T classs : p.classes) {
-      ast.classs.Class c = (ast.classs.Class) classs;
+    LinkedList<ast.Ast.Class.T> newClasses = new LinkedList<ast.Ast.Class.T>();
+    for (ast.Ast.Class.T classes : p.classes) {
+      ClassSingle c = (ClassSingle) classes;
       if (this.set.contains(c.id))
         newClasses.add(c);
     }
 
     
     this.program =
-    new ast.program.Program(p.mainClass, newClasses);
+    new ProgramSingle(p.mainClass, newClasses);
     
     if (control.Control.trace.equals("ast.DeadClass")){
       System.out.println("before optimization:");

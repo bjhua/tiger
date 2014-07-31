@@ -1,5 +1,39 @@
 package codegen.C;
 
+import codegen.C.Ast.Class.ClassSingle;
+import codegen.C.Ast.Dec;
+import codegen.C.Ast.Dec.DecSingle;
+import codegen.C.Ast.Exp;
+import codegen.C.Ast.Exp.Add;
+import codegen.C.Ast.Exp.And;
+import codegen.C.Ast.Exp.ArraySelect;
+import codegen.C.Ast.Exp.Call;
+import codegen.C.Ast.Exp.Id;
+import codegen.C.Ast.Exp.Length;
+import codegen.C.Ast.Exp.Lt;
+import codegen.C.Ast.Exp.NewIntArray;
+import codegen.C.Ast.Exp.NewObject;
+import codegen.C.Ast.Exp.Not;
+import codegen.C.Ast.Exp.Num;
+import codegen.C.Ast.Exp.Sub;
+import codegen.C.Ast.Exp.This;
+import codegen.C.Ast.Exp.Times;
+import codegen.C.Ast.MainMethod.MainMethodSingle;
+import codegen.C.Ast.Method;
+import codegen.C.Ast.Method.MethodSingle;
+import codegen.C.Ast.Program.ProgramSingle;
+import codegen.C.Ast.Stm;
+import codegen.C.Ast.Stm.Assign;
+import codegen.C.Ast.Stm.AssignArray;
+import codegen.C.Ast.Stm.Block;
+import codegen.C.Ast.Stm.If;
+import codegen.C.Ast.Stm.Print;
+import codegen.C.Ast.Stm.While;
+import codegen.C.Ast.Type.ClassType;
+import codegen.C.Ast.Type.Int;
+import codegen.C.Ast.Type.IntArray;
+import codegen.C.Ast.Vtable;
+import codegen.C.Ast.Vtable.VtableSingle;
 import control.Control;
 
 public class PrettyPrintVisitor implements Visitor
@@ -53,22 +87,22 @@ public class PrettyPrintVisitor implements Visitor
   // /////////////////////////////////////////////////////
   // expressions
   @Override
-  public void visit(codegen.C.exp.Add e)
+  public void visit(Add e)
   {
   }
 
   @Override
-  public void visit(codegen.C.exp.And e)
+  public void visit(And e)
   {
   }
 
   @Override
-  public void visit(codegen.C.exp.ArraySelect e)
+  public void visit(ArraySelect e)
   {
   }
 
   @Override
-  public void visit(codegen.C.exp.Call e)
+  public void visit(Call e)
   {
     this.say("(" + e.assign + "=");
     e.exp.accept(this);
@@ -79,7 +113,7 @@ public class PrettyPrintVisitor implements Visitor
       this.say("))");
       return;
     }
-    for (codegen.C.exp.T x : e.args) {
+    for (Exp.T x : e.args) {
       this.say(", ");
       x.accept(this);
     }
@@ -88,18 +122,18 @@ public class PrettyPrintVisitor implements Visitor
   }
 
   @Override
-  public void visit(codegen.C.exp.Id e)
+  public void visit(Id e)
   {
     this.say(e.id);
   }
 
   @Override
-  public void visit(codegen.C.exp.Length e)
+  public void visit(Length e)
   {
   }
 
   @Override
-  public void visit(codegen.C.exp.Lt e)
+  public void visit(Lt e)
   {
     e.left.accept(this);
     this.say(" < ");
@@ -108,12 +142,12 @@ public class PrettyPrintVisitor implements Visitor
   }
 
   @Override
-  public void visit(codegen.C.exp.NewIntArray e)
+  public void visit(NewIntArray e)
   {
   }
 
   @Override
-  public void visit(codegen.C.exp.NewObject e)
+  public void visit(NewObject e)
   {
     this.say("((struct " + e.id + "*)(Tiger_new (&" + e.id
         + "_vtable_, sizeof(struct " + e.id + "))))");
@@ -121,19 +155,19 @@ public class PrettyPrintVisitor implements Visitor
   }
 
   @Override
-  public void visit(codegen.C.exp.Not e)
+  public void visit(Not e)
   {
   }
 
   @Override
-  public void visit(codegen.C.exp.Num e)
+  public void visit(Num e)
   {
     this.say(Integer.toString(e.num));
     return;
   }
 
   @Override
-  public void visit(codegen.C.exp.Sub e)
+  public void visit(Sub e)
   {
     e.left.accept(this);
     this.say(" - ");
@@ -142,13 +176,13 @@ public class PrettyPrintVisitor implements Visitor
   }
 
   @Override
-  public void visit(codegen.C.exp.This e)
+  public void visit(This e)
   {
     this.say("this");
   }
 
   @Override
-  public void visit(codegen.C.exp.Times e)
+  public void visit(Times e)
   {
     e.left.accept(this);
     this.say(" * ");
@@ -158,7 +192,7 @@ public class PrettyPrintVisitor implements Visitor
 
   // statements
   @Override
-  public void visit(codegen.C.stm.Assign s)
+  public void visit(Assign s)
   {
     this.printSpaces();
     this.say(s.id + " = ");
@@ -168,17 +202,17 @@ public class PrettyPrintVisitor implements Visitor
   }
 
   @Override
-  public void visit(codegen.C.stm.AssignArray s)
+  public void visit(AssignArray s)
   {
   }
 
   @Override
-  public void visit(codegen.C.stm.Block s)
+  public void visit(Block s)
   {
   }
 
   @Override
-  public void visit(codegen.C.stm.If s)
+  public void visit(If s)
   {
     this.printSpaces();
     this.say("if (");
@@ -198,7 +232,7 @@ public class PrettyPrintVisitor implements Visitor
   }
 
   @Override
-  public void visit(codegen.C.stm.Print s)
+  public void visit(Print s)
   {
     this.printSpaces();
     this.say("System_out_println (");
@@ -208,43 +242,43 @@ public class PrettyPrintVisitor implements Visitor
   }
 
   @Override
-  public void visit(codegen.C.stm.While s)
+  public void visit(While s)
   {
   }
 
   // type
   @Override
-  public void visit(codegen.C.type.Class t)
+  public void visit(ClassType t)
   {
     this.say("struct " + t.id + " *");
   }
 
   @Override
-  public void visit(codegen.C.type.Int t)
+  public void visit(Int t)
   {
     this.say("int");
   }
 
   @Override
-  public void visit(codegen.C.type.IntArray t)
+  public void visit(IntArray t)
   {
   }
 
   // dec
   @Override
-  public void visit(codegen.C.dec.Dec d)
+  public void visit(DecSingle d)
   {
   }
 
   // method
   @Override
-  public void visit(codegen.C.method.Method m)
+  public void visit(MethodSingle m)
   {
     m.retType.accept(this);
     this.say(" " + m.classId + "_" + m.id + "(");
     int size = m.formals.size();
-    for (codegen.C.dec.T d : m.formals) {
-      codegen.C.dec.Dec dec = (codegen.C.dec.Dec) d;
+    for (Dec.T d : m.formals) {
+      DecSingle dec = (DecSingle) d;
       size--;
       dec.type.accept(this);
       this.say(" " + dec.id);
@@ -254,14 +288,14 @@ public class PrettyPrintVisitor implements Visitor
     this.sayln(")");
     this.sayln("{");
 
-    for (codegen.C.dec.T d : m.locals) {
-      codegen.C.dec.Dec dec = (codegen.C.dec.Dec) d;
+    for (Dec.T d : m.locals) {
+      DecSingle dec = (DecSingle) d;
       this.say("  ");
       dec.type.accept(this);
       this.say(" " + dec.id + ";\n");
     }
     this.sayln("");
-    for (codegen.C.stm.T s : m.stms)
+    for (Stm.T s : m.stms)
       s.accept(this);
     this.say("  return ");
     m.retExp.accept(this);
@@ -271,13 +305,13 @@ public class PrettyPrintVisitor implements Visitor
   }
 
   @Override
-  public void visit(codegen.C.mainMethod.MainMethod m)
+  public void visit(MainMethodSingle m)
   {
     this.sayln("int Tiger_main ()");
     this.sayln("{");
-    for (codegen.C.dec.T dec : m.locals) {
+    for (Dec.T dec : m.locals) {
       this.say("  ");
-      codegen.C.dec.Dec d = (codegen.C.dec.Dec) dec;
+      DecSingle d = (DecSingle) dec;
       d.type.accept(this);
       this.say(" ");
       this.sayln(d.id + ";");
@@ -289,7 +323,7 @@ public class PrettyPrintVisitor implements Visitor
 
   // vtables
   @Override
-  public void visit(codegen.C.vtable.Vtable v)
+  public void visit(VtableSingle v)
   {
     this.sayln("struct " + v.id + "_vtable");
     this.sayln("{");
@@ -302,7 +336,7 @@ public class PrettyPrintVisitor implements Visitor
     return;
   }
 
-  private void outputVtable(codegen.C.vtable.Vtable v)
+  private void outputVtable(VtableSingle v)
   {
     this.sayln("struct " + v.id + "_vtable " + v.id + "_vtable_ = ");
     this.sayln("{");
@@ -316,7 +350,7 @@ public class PrettyPrintVisitor implements Visitor
 
   // class
   @Override
-  public void visit(codegen.C.classs.Class c)
+  public void visit(ClassSingle c)
   {
     this.sayln("struct " + c.id);
     this.sayln("{");
@@ -333,15 +367,15 @@ public class PrettyPrintVisitor implements Visitor
 
   // program
   @Override
-  public void visit(codegen.C.program.Program p)
+  public void visit(ProgramSingle p)
   {
     // we'd like to output to a file, rather than the "stdout".
     try {
       String outputName = null;
-      if (Control.outputName != null)
-        outputName = Control.outputName;
-      else if (Control.fileName != null)
-        outputName = Control.fileName + ".c.c";
+      if (Control.ConCodeGen.outputName != null)
+        outputName = Control.ConCodeGen.outputName;
+      else if (Control.ConCodeGen.fileName != null)
+        outputName = Control.ConCodeGen.fileName + ".c";
       else
         outputName = "a.c.c";
 
@@ -356,25 +390,25 @@ public class PrettyPrintVisitor implements Visitor
     this.sayln("// Do NOT modify!\n");
 
     this.sayln("// structures");
-    for (codegen.C.classs.T c : p.classes) {
+    for (codegen.C.Ast.Class.T c : p.classes) {
       c.accept(this);
     }
 
     this.sayln("// vtables structures");
-    for (codegen.C.vtable.T v : p.vtables) {
+    for (Vtable.T v : p.vtables) {
       v.accept(this);
     }
     this.sayln("");
 
     this.sayln("// methods");
-    for (codegen.C.method.T m : p.methods) {
+    for (Method.T m : p.methods) {
       m.accept(this);
     }
     this.sayln("");
 
     this.sayln("// vtables");
-    for (codegen.C.vtable.T v : p.vtables) {
-      outputVtable((codegen.C.vtable.Vtable) v);
+    for (Vtable.T v : p.vtables) {
+      outputVtable((VtableSingle) v);
     }
     this.sayln("");
 
