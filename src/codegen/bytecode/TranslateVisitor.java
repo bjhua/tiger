@@ -116,13 +116,13 @@ public class TranslateVisitor implements ast.Visitor
     Label tl = new Label(), fl = new Label(), el = new Label();
     e.left.accept(this);
     e.right.accept(this);
-    emit(new Ificmplt(new LabelJ(tl)));
+    emit(new Ificmplt(tl));
     emit(new LabelJ(fl));
     emit(new Ldc(0));
-    emit(new Goto(new LabelJ(el)));
+    emit(new Goto(el));
     emit(new LabelJ(tl));
     emit(new Ldc(1));
-    emit(new Goto(new LabelJ(el)));
+    emit(new Goto(el));
     emit(new LabelJ(el));
     return;
   }
@@ -213,13 +213,13 @@ public class TranslateVisitor implements ast.Visitor
     Label tl = new Label(), fl = new Label(), el = new Label();
     s.condition.accept(this);
 
-    emit(new Ifne(new LabelJ(tl)));
+    emit(new Ifne(tl));
     emit(new LabelJ(fl));
     s.elsee.accept(this);
-    emit(new Goto(new LabelJ(el)));
+    emit(new Goto(el));
     emit(new LabelJ(tl));
     s.thenn.accept(this);
-    emit(new Goto(new LabelJ(el)));
+    emit(new Goto(el));
     emit(new LabelJ(el));
     return;
   }

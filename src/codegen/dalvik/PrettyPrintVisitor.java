@@ -1,8 +1,17 @@
 package codegen.dalvik;
 
-import codegen.dalvik.stm.Ifnez;
-import codegen.dalvik.stm.Move16;
-import codegen.dalvik.stm.Moveobject16;
+import codegen.dalvik.Ast.Class;
+import codegen.dalvik.Ast.Class.ClassSingle;
+import codegen.dalvik.Ast.Dec;
+import codegen.dalvik.Ast.Dec.DecSingle;
+import codegen.dalvik.Ast.MainClass.MainClassSingle;
+import codegen.dalvik.Ast.Method;
+import codegen.dalvik.Ast.Method.MethodSingle;
+import codegen.dalvik.Ast.Program.ProgramSingle;
+import codegen.dalvik.Ast.Stm;
+import codegen.dalvik.Ast.Type;
+import codegen.dalvik.Ast.Type.*;
+import codegen.dalvik.Ast.Stm.*;
 
 public class PrettyPrintVisitor implements Visitor
 {
@@ -48,45 +57,45 @@ public class PrettyPrintVisitor implements Visitor
   // /////////////////////////////////////////////////////
   // statements
   @Override
-  public void visit(codegen.dalvik.stm.ReturnObject s)
+  public void visit(ReturnObject s)
   {
     this.isayln("return-object");
     return;
   }
-  
+
   @Override
-  public void visit(codegen.dalvik.stm.Goto32 s)
+  public void visit(Goto32 s)
   {
     this.isayln("goto/32 " + s.l.toString());
     return;
   }
 
   @Override
-  public void visit(codegen.dalvik.stm.Iflt s)
+  public void visit(Iflt s)
   {
-    this.isayln("if-lt " +s.left+", "+s.right+", "+s.l.toString());
+    this.isayln("if-lt " + s.left + ", " + s.right + ", " + s.l.toString());
     return;
   }
 
   @Override
-  public void visit(codegen.dalvik.stm.Ifne s)
+  public void visit(Ifne s)
   {
     this.isayln("if-ne " + s.l.toString());
     return;
   }
 
   @Override
-  public void visit(codegen.dalvik.stm.Mulint s)
+  public void visit(Mulint s)
   {
-    this.isayln("imul "+s.dst+", "+s.src1+", "+s.src2);
+    this.isayln("imul " + s.dst + ", " + s.src1 + ", " + s.src2);
     return;
   }
 
   @Override
-  public void visit(codegen.dalvik.stm.Invokevirtual s)
+  public void visit(Invokevirtual s)
   {
     this.say("    invokevirtual L" + s.c + ";->" + s.f + "(");
-    for (codegen.dalvik.type.T t : s.at) {
+    for (Type.T t : s.at) {
       t.accept(this);
     }
     this.say(")");
@@ -96,103 +105,107 @@ public class PrettyPrintVisitor implements Visitor
   }
 
   @Override
-  public void visit(codegen.dalvik.stm.Return s)
+  public void visit(Return s)
   {
     this.isayln("return");
     return;
   }
 
   @Override
-  public void visit(codegen.dalvik.stm.Subint s)
+  public void visit(Subint s)
   {
-    this.isayln("sub-int "+s.dst + ", "+s.src1+", "+s.src2);
+    this.isayln("sub-int " + s.dst + ", " + s.src1 + ", " + s.src2);
     return;
   }
 
   @Override
-  public void visit(codegen.dalvik.stm.Label s)
+  public void visit(LabelJ s)
   {
-    this.sayln(":"+s.l.toString());
+    this.sayln(":" + s.l.toString());
     return;
   }
 
   @Override
-  public void visit(codegen.dalvik.stm.Const s)
+  public void visit(Const s)
   {
-    this.isayln("const " + s.dst+", "+s.i);
+    this.isayln("const " + s.dst + ", " + s.i);
     return;
   }
 
   @Override
-  public void visit(codegen.dalvik.stm.NewInstance s)
+  public void visit(NewInstance s)
   {
-    this.isayln("new-instance " + s.dst + ", "+s.c);
-    this.isayln("invoke-direct {" + s.dst+"}, " + s.c+"-><init>()V");
+    this.isayln("new-instance " + s.dst + ", " + s.c);
+    this.isayln("invoke-direct {" + s.dst + "}, " + s.c + "-><init>()V");
     return;
   }
 
   @Override
-  public void visit(codegen.dalvik.stm.Print s)
+  public void visit(Print s)
   {
-    this.isayln("sget-object {"+s.stream+"}, "+"Ljava/lang/System;->out:Ljava/io/PrintStream;");
-    this.isayln("invoke-virtual {"+s.stream+", "+s.src+"}, Ljava/io/PrintStream;->println(I)V");
+    this.isayln("sget-object {" + s.stream + "}, "
+        + "Ljava/lang/System;->out:Ljava/io/PrintStream;");
+    this.isayln("invoke-virtual {" + s.stream + ", " + s.src
+        + "}, Ljava/io/PrintStream;->println(I)V");
     return;
   }
-  
+
   @Override
   public void visit(Ifnez s)
   {
-    this.isayln("if-ne "+s.left+", :"+s.l.toString());
+    this.isayln("if-ne " + s.left + ", :" + s.l.toString());
     return;
   }
 
   @Override
   public void visit(Move16 s)
   {
-    this.isayln("move/16 "+s.left+", "+s.right);
+    this.isayln("move/16 " + s.left + ", " + s.right);
     return;
   }
 
   @Override
   public void visit(Moveobject16 s)
   {
-    this.isayln("move-object/16 "+s.left+s.right);
+    this.isayln("move-object/16 " + s.left + s.right);
     return;
   }
 
-
+  // //////////////////////////////////////////////////////
   // type
   @Override
-  public void visit(codegen.dalvik.type.Class t)
+  public void visit(ClassType t)
   {
     this.say("L" + t.id + ";");
   }
 
   @Override
-  public void visit(codegen.dalvik.type.Int t)
+  public void visit(Int t)
   {
     this.say("I");
   }
 
   @Override
-  public void visit(codegen.dalvik.type.IntArray t)
+  public void visit(IntArray t)
   {
     this.say("[I");
   }
 
+  // //////////////////////////////////////////////////
   // dec
   @Override
-  public void visit(codegen.dalvik.dec.Dec d)
+  public void visit(DecSingle d)
   {
   }
 
+  // //////////////////////////////////////////////////
   // method
   @Override
-  public void visit(codegen.dalvik.method.Method m)
+  public void visit(MethodSingle m)
   {
     this.say(".method public " + m.id + "(");
-    for (codegen.dalvik.dec.T d : m.formals) {
-      codegen.dalvik.dec.Dec dd = (codegen.dalvik.dec.Dec) d;
+    for (Dec.T d : m.formals) {
+      DecSingle dd = (DecSingle) d;
       dd.type.accept(this);
     }
     this.say(")");
@@ -201,7 +214,7 @@ public class PrettyPrintVisitor implements Visitor
     this.sayln(".limit stack 4096");
     this.sayln(".limit locals " + (m.index + 1));
 
-    for (codegen.dalvik.stm.T s : m.stms)
+    for (Stm.T s : m.stms)
       s.accept(this);
 
     this.sayln(".end method");
@@ -210,7 +223,7 @@ public class PrettyPrintVisitor implements Visitor
 
   // class
   @Override
-  public void visit(codegen.dalvik.classs.Class c)
+  public void visit(ClassSingle c)
   {
     // Every class must go into its own class file.
     try {
@@ -232,8 +245,8 @@ public class PrettyPrintVisitor implements Visitor
       this.sayln(".super " + c.extendss);
 
     // fields
-    for (codegen.dalvik.dec.T d : c.decs) {
-      codegen.dalvik.dec.Dec dd = (codegen.dalvik.dec.Dec) d;
+    for (Dec.T d : c.decs) {
+      DecSingle dd = (DecSingle) d;
       this.say(".field public " + dd.id);
       dd.type.accept(this);
       this.sayln("");
@@ -249,7 +262,7 @@ public class PrettyPrintVisitor implements Visitor
     this.isayln("return");
     this.sayln(".end method\n\n");
 
-    for (codegen.dalvik.method.T m : c.methods) {
+    for (Method.T m : c.methods) {
       m.accept(this);
     }
 
@@ -264,7 +277,7 @@ public class PrettyPrintVisitor implements Visitor
 
   // main class
   @Override
-  public void visit(codegen.dalvik.mainClass.MainClass c)
+  public void visit(MainClassSingle c)
   {
     // Every class must go into its own class file.
     try {
@@ -283,7 +296,7 @@ public class PrettyPrintVisitor implements Visitor
     this.sayln(".method public static main([Ljava/lang/String;)V");
     this.isayln(".limit stack 4096");
     this.isayln(".limit locals 2");
-    for (codegen.dalvik.stm.T s : c.stms)
+    for (Stm.T s : c.stms)
       s.accept(this);
     this.isayln("return");
     this.sayln(".end method");
@@ -299,16 +312,15 @@ public class PrettyPrintVisitor implements Visitor
 
   // program
   @Override
-  public void visit(codegen.dalvik.program.Program p)
+  public void visit(ProgramSingle p)
   {
 
     p.mainClass.accept(this);
 
-    for (codegen.dalvik.classs.T c : p.classes) {
+    for (Class.T c : p.classes) {
       c.accept(this);
     }
 
   }
 
-  
 }
