@@ -1,4 +1,4 @@
-package codegen.bytecode;
+package codegen.dalvik;
 
 import java.util.LinkedList;
 
@@ -10,7 +10,7 @@ public class Ast
   // type
   public static class Type
   {
-    public static abstract class T implements codegen.bytecode.Acceptable
+    public static abstract class T implements codegen.dalvik.Acceptable
     {
     }
 
@@ -79,7 +79,7 @@ public class Ast
   // dec
   public static class Dec
   {
-    public static abstract class T implements codegen.bytecode.Acceptable
+    public static abstract class T implements codegen.dalvik.Acceptable
     {
     }
 
@@ -107,17 +107,19 @@ public class Ast
   // statement
   public static class Stm
   {
-    public static abstract class T implements codegen.bytecode.Acceptable
+    public static abstract class T implements codegen.dalvik.Acceptable
     {
     }
 
-    public static class Aload extends T
+    public static class Const extends T
     {
-      public int index;
+      public String dst;
+      public int i;
 
-      public Aload(int index)
+      public Const(String dst, int i)
       {
-        this.index = index;
+        this.dst = dst;
+        this.i = i;
       }
 
       @Override
@@ -127,40 +129,11 @@ public class Ast
       }
     }
 
-    public static class Areturn extends T
-    {
-      public Areturn()
-      {
-      }
-
-      @Override
-      public void accept(Visitor v)
-      {
-        v.visit(this);
-      }
-    }
-
-    public static class Astore extends T
-    {
-      public int index;
-
-      public Astore(int index)
-      {
-        this.index = index;
-      }
-
-      @Override
-      public void accept(Visitor v)
-      {
-        v.visit(this);
-      }
-    }
-
-    public static class Goto extends T
+    public static class Goto32 extends T
     {
       public Label l;
 
-      public Goto(Label l)
+      public Goto32(Label l)
       {
         this.l = l;
       }
@@ -172,12 +145,15 @@ public class Ast
       }
     }
 
-    public static class Ificmplt extends T
+    public static class Iflt extends T
     {
+      public String left, right;
       public Label l;
 
-      public Ificmplt(Label l)
+      public Iflt(String left, String right, Label l)
       {
+        this.left = left;
+        this.right = right;
         this.l = l;
       }
 
@@ -190,10 +166,13 @@ public class Ast
 
     public static class Ifne extends T
     {
+      String left, right;
       public Label l;
 
-      public Ifne(Label l)
+      public Ifne(String left, String right, Label l)
       {
+        this.left = left;
+        this.right = right;
         this.l = l;
       }
 
@@ -204,26 +183,15 @@ public class Ast
       }
     }
 
-    public static class Iload extends T
+    public static class Ifnez extends T
     {
-      public int index;
+      public String left;
+      public Label l;
 
-      public Iload(int index)
+      public Ifnez(String left, Label l)
       {
-        this.index = index;
-      }
-
-      @Override
-      public void accept(Visitor v)
-      {
-        v.visit(this);
-      }
-    }
-
-    public static class Imul extends T
-    {
-      public Imul()
-      {
+        this.left = left;
+        this.l = l;
       }
 
       @Override
@@ -255,48 +223,6 @@ public class Ast
       }
     }
 
-    public static class Ireturn extends T
-    {
-      public Ireturn()
-      {
-      }
-
-      @Override
-      public void accept(Visitor v)
-      {
-        v.visit(this);
-      }
-    }
-
-    public static class Istore extends T
-    {
-      public int index;
-
-      public Istore(int index)
-      {
-        this.index = index;
-      }
-
-      @Override
-      public void accept(Visitor v)
-      {
-        v.visit(this);
-      }
-    }
-
-    public static class Isub extends T
-    {
-      public Isub()
-      {
-      }
-
-      @Override
-      public void accept(Visitor v)
-      {
-        v.visit(this);
-      }
-    }
-
     public static class LabelJ extends T
     {
       public util.Label l;
@@ -313,13 +239,14 @@ public class Ast
       }
     }
 
-    public static class Ldc extends T
+    public static class Move16 extends T
     {
-      public int i;
+      public String left, right;
 
-      public Ldc(int i)
+      public Move16(String left, String right)
       {
-        this.i = i;
+        this.left = left;
+        this.right = right;
       }
 
       @Override
@@ -329,12 +256,49 @@ public class Ast
       }
     }
 
-    public static class New extends T
+    public static class Moveobject16 extends T
     {
+      public String left, right;
+
+      public Moveobject16(String left, String right)
+      {
+        this.left = left;
+        this.right = right;
+      }
+
+      @Override
+      public void accept(Visitor v)
+      {
+        v.visit(this);
+      }
+    }
+
+    public static class Mulint extends T
+    {
+      public String dst, src1, src2;
+      
+      public Mulint(String dst, String src1, String src2)
+      {
+        this.dst = dst;
+        this.src1 = src1;
+        this.src2 = src2;
+      }
+
+      @Override
+      public void accept(Visitor v)
+      {
+        v.visit(this);
+      }
+    }
+    
+    public static class NewInstance extends T
+    {
+      public String dst;
       public String c;
 
-      public New(String c)
+      public NewInstance(String dst, String c)
       {
+        this.dst = dst;
         this.c = c;
       }
 
@@ -347,8 +311,13 @@ public class Ast
 
     public static class Print extends T
     {
-      public Print()
+      public String stream;
+      public String src;
+      
+      public Print(String stream, String src)
       {
+        this.stream = stream;
+        this.src = src;
       }
 
       @Override
@@ -358,13 +327,62 @@ public class Ast
       }
     }
 
+    public static class Return extends T
+    {
+      String src;
+      
+      public Return(String src)
+      {
+        this.src = src;
+      }
+
+      @Override
+      public void accept(Visitor v)
+      {
+        v.visit(this);
+      }
+    }
+
+    public static class ReturnObject extends T
+    {
+      public String src;
+      
+      public ReturnObject(String src)
+      {
+        this.src = src;
+      }
+
+      @Override
+      public void accept(Visitor v)
+      {
+        v.visit(this);
+      }
+    }
+
+    public static class Subint extends T
+    {
+      public String dst, src1, src2;
+      
+      public Subint(String dst, String src1, String src2)
+      {
+        this.dst = dst;
+        this.src1 = src1;
+        this.src2 = src2;
+      }
+
+      @Override
+      public void accept(Visitor v)
+      {
+        v.visit(this);
+      }
+    }    
   }// end of statement
 
   // ////////////////////////////////////////////////
   // method
   public static class Method
   {
-    public static abstract class T implements codegen.bytecode.Acceptable
+    public static abstract class T implements codegen.dalvik.Acceptable
     {
     }
 
@@ -406,7 +424,7 @@ public class Ast
   // class
   public static class Class
   {
-    public static abstract class T implements codegen.bytecode.Acceptable
+    public static abstract class T implements codegen.dalvik.Acceptable
     {
     }
 
@@ -417,8 +435,7 @@ public class Ast
       public LinkedList<Dec.T> decs;
       public LinkedList<Method.T> methods;
 
-      public ClassSingle(String id, String extendss,
-          LinkedList<Dec.T> decs,
+      public ClassSingle(String id, String extendss, LinkedList<Dec.T> decs,
           LinkedList<Method.T> methods)
       {
         this.id = id;
@@ -440,7 +457,7 @@ public class Ast
   // main class
   public static class MainClass
   {
-    public static abstract class T implements codegen.bytecode.Acceptable
+    public static abstract class T implements codegen.dalvik.Acceptable
     {
     }
 
@@ -450,8 +467,7 @@ public class Ast
       public String arg;
       public LinkedList<Stm.T> stms;
 
-      public MainClassSingle(String id, String arg,
-          LinkedList<Stm.T> stms)
+      public MainClassSingle(String id, String arg, LinkedList<Stm.T> stms)
       {
         this.id = id;
         this.arg = arg;
@@ -473,7 +489,7 @@ public class Ast
   // program
   public static class Program
   {
-    public static abstract class T implements codegen.bytecode.Acceptable
+    public static abstract class T implements codegen.dalvik.Acceptable
     {
     }
 
