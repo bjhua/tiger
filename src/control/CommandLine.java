@@ -187,7 +187,7 @@ public class CommandLine
     System.out.println("Available options:");
     for (Arg<Object> a : this.args) {
       int current = a.name.length();
-      System.out.print("-" + a.name + " ");
+      System.out.print("   -" + a.name + " ");
       if (a.option != null) {
         current += a.option.length();
         System.out.print(a.option);
