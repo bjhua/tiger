@@ -84,7 +84,7 @@ public class Tiger
       control.CompilerPass genCfgCodePass = new control.CompilerPass(
           "Control-flow graph generation", cAst, transCfg);
       genCfgCodePass.doit();
-      cfg.program.T cfgAst = transCfg.program;
+      cfg.Cfg.Program.T cfgAst = transCfg.program;
 
       // visualize the control-flow graph, if necessary
       if (control.Control.visualize != Control.Visualize_Kind_t.None) {

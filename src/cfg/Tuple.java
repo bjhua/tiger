@@ -1,12 +1,14 @@
 package cfg;
 
+import cfg.Cfg.Type;
+
 public class Tuple
 {
   public String classs; // name of the class
-  public cfg.type.T type; // type of the field
+  public Type.T type; // type of the field
   public String id; // name of the field or method
 
-  public Tuple(String classs, cfg.type.T type, String id)
+  public Tuple(String classs, Type.T type, String id)
   {
     this.classs = classs;
     this.type = type;

@@ -1,10 +1,12 @@
 package cfg.optimizations;
 
+import cfg.Cfg.Program;
+
 public class Main
 {
-  public cfg.program.T program;
+  public Program.T program;
 
-  public void accept(cfg.program.T cfg)
+  public void accept(Program.T cfg)
   {
     // liveness analysis
     LivenessVisitor liveness = new LivenessVisitor();

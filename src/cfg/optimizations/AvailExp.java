@@ -1,5 +1,29 @@
 package cfg.optimizations;
 
+import cfg.Cfg.Block.BlockSingle;
+import cfg.Cfg.Class.ClassSingle;
+import cfg.Cfg.Dec.DecSingle;
+import cfg.Cfg.MainMethod.MainMethodSingle;
+import cfg.Cfg.Method.MethodSingle;
+import cfg.Cfg.Operand.Int;
+import cfg.Cfg.Operand.Var;
+import cfg.Cfg.Program.ProgramSingle;
+import cfg.Cfg.Stm.Add;
+import cfg.Cfg.Stm.InvokeVirtual;
+import cfg.Cfg.Stm.Lt;
+import cfg.Cfg.Stm.Move;
+import cfg.Cfg.Stm.NewObject;
+import cfg.Cfg.Stm.Print;
+import cfg.Cfg.Stm.Sub;
+import cfg.Cfg.Stm.Times;
+import cfg.Cfg.Transfer.Goto;
+import cfg.Cfg.Transfer.If;
+import cfg.Cfg.Transfer.Return;
+import cfg.Cfg.Type.ClassType;
+import cfg.Cfg.Type.IntArrayType;
+import cfg.Cfg.Type.IntType;
+import cfg.Cfg.Vtable.VtableSingle;
+
 public class AvailExp implements cfg.Visitor
 {
   
@@ -11,127 +35,128 @@ public class AvailExp implements cfg.Visitor
   // /////////////////////////////////////////////////////
   // operand
   @Override
-  public void visit(cfg.operand.Int operand)
+  public void visit(Int operand)
   {
   }
 
   @Override
-  public void visit(cfg.operand.Var operand)
+  public void visit(Var operand)
   {
   }
 
   // statements
   @Override
-  public void visit(cfg.stm.Add s)
+  public void visit(Add s)
   {
   }
 
   @Override
-  public void visit(cfg.stm.InvokeVirtual s)
+  public void visit(InvokeVirtual s)
   {
   }
 
   @Override
-  public void visit(cfg.stm.Lt s)
+  public void visit(Lt s)
   {
   }
 
   @Override
-  public void visit(cfg.stm.Move s)
+  public void visit(Move s)
   {
   }
 
   @Override
-  public void visit(cfg.stm.NewObject s)
+  public void visit(NewObject s)
   {
   }
 
   @Override
-  public void visit(cfg.stm.Print s)
+  public void visit(Print s)
   {
   }
 
   @Override
-  public void visit(cfg.stm.Sub s)
+  public void visit(Sub s)
   {
   }
 
   @Override
-  public void visit(cfg.stm.Times s)
+  public void visit(Times s)
   {
   }
 
   // transfer
   @Override
-  public void visit(cfg.transfer.If s)
+  public void visit(If s)
   {
   }
 
   @Override
-  public void visit(cfg.transfer.Goto s)
+  public void visit(Goto s)
   {
     return;
   }
 
   @Override
-  public void visit(cfg.transfer.Return s)
+  public void visit(Return s)
   {
   }
 
+  //////////////////////////////////////////////////
   // type
   @Override
-  public void visit(cfg.type.Class t)
+  public void visit(ClassType t)
   {
   }
 
   @Override
-  public void visit(cfg.type.Int t)
+  public void visit(IntType t)
   {
   }
 
   @Override
-  public void visit(cfg.type.IntArray t)
+  public void visit(IntArrayType t)
   {
   }
 
   // dec
   @Override
-  public void visit(cfg.dec.Dec d)
+  public void visit(DecSingle d)
   {
   }
 
   // block
   @Override
-  public void visit(cfg.block.Block b)
+  public void visit(BlockSingle b)
   {
   }
 
   // method
   @Override
-  public void visit(cfg.method.Method m)
+  public void visit(MethodSingle m)
   {
   }
 
   @Override
-  public void visit(cfg.mainMethod.MainMethod m)
+  public void visit(MainMethodSingle m)
   {
   }
 
   // vtables
   @Override
-  public void visit(cfg.vtable.Vtable v)
+  public void visit(VtableSingle v)
   {
   }
 
   // class
   @Override
-  public void visit(cfg.classs.Class c)
+  public void visit(ClassSingle c)
   {
   }
 
   // program
   @Override
-  public void visit(cfg.program.Program p)
+  public void visit(ProgramSingle p)
   {
   }
 

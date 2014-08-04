@@ -1,64 +1,94 @@
 package cfg.optimizations;
 
+import java.util.HashMap;
+import java.util.HashSet;
+
+import cfg.Cfg.Block;
+import cfg.Cfg.Block.BlockSingle;
+import cfg.Cfg.Class.ClassSingle;
+import cfg.Cfg.Dec.DecSingle;
+import cfg.Cfg.MainMethod.MainMethodSingle;
+import cfg.Cfg.Method.MethodSingle;
+import cfg.Cfg.Operand.Int;
+import cfg.Cfg.Operand.Var;
+import cfg.Cfg.Program.ProgramSingle;
+import cfg.Cfg.Stm;
+import cfg.Cfg.Stm.Add;
+import cfg.Cfg.Stm.InvokeVirtual;
+import cfg.Cfg.Stm.Lt;
+import cfg.Cfg.Stm.Move;
+import cfg.Cfg.Stm.NewObject;
+import cfg.Cfg.Stm.Print;
+import cfg.Cfg.Stm.Sub;
+import cfg.Cfg.Stm.Times;
+import cfg.Cfg.Transfer;
+import cfg.Cfg.Transfer.Goto;
+import cfg.Cfg.Transfer.If;
+import cfg.Cfg.Transfer.Return;
+import cfg.Cfg.Type.ClassType;
+import cfg.Cfg.Type.IntArrayType;
+import cfg.Cfg.Type.IntType;
+import cfg.Cfg.Vtable.VtableSingle;
+
 public class ReachingDefinition implements cfg.Visitor
 {
   // gen, kill for one statement
-  private java.util.HashSet<cfg.stm.T> oneStmGen;
-  private java.util.HashSet<cfg.stm.T> oneStmKill;
+  private HashSet<Stm.T> oneStmGen;
+  private HashSet<Stm.T> oneStmKill;
 
   // gen, kill for one transfer
-  private java.util.HashSet<cfg.stm.T> oneTransferGen;
-  private java.util.HashSet<cfg.stm.T> oneTransferKill;
+  private HashSet<Stm.T> oneTransferGen;
+  private HashSet<Stm.T> oneTransferKill;
 
   // gen, kill for statements
-  private java.util.HashMap<cfg.stm.T, java.util.HashSet<cfg.stm.T>> stmGen;
-  private java.util.HashMap<cfg.stm.T, java.util.HashSet<cfg.stm.T>> stmKill;
+  private HashMap<Stm.T, HashSet<Stm.T>> stmGen;
+  private HashMap<Stm.T, HashSet<Stm.T>> stmKill;
 
   // gen, kill for transfers
-  private java.util.HashMap<cfg.transfer.T, java.util.HashSet<cfg.stm.T>> transferGen;
-  private java.util.HashMap<cfg.transfer.T, java.util.HashSet<cfg.stm.T>> transferKill;
+  private HashMap<Transfer.T, HashSet<Stm.T>> transferGen;
+  private HashMap<Transfer.T, HashSet<Stm.T>> transferKill;
 
   // gen, kill for blocks
-  private java.util.HashMap<cfg.block.T, java.util.HashSet<cfg.stm.T>> blockGen;
-  private java.util.HashMap<cfg.block.T, java.util.HashSet<cfg.stm.T>> blockKill;
+  private HashMap<Block.T, HashSet<Stm.T>> blockGen;
+  private HashMap<Block.T, HashSet<Stm.T>> blockKill;
 
   // in, out for blocks
-  private java.util.HashMap<cfg.block.T, java.util.HashSet<cfg.stm.T>> blockIn;
-  private java.util.HashMap<cfg.block.T, java.util.HashSet<cfg.stm.T>> blockOut;
+  private HashMap<Block.T, HashSet<Stm.T>> blockIn;
+  private HashMap<Block.T, HashSet<Stm.T>> blockOut;
 
   // in, out for statements
-  public java.util.HashMap<cfg.stm.T, java.util.HashSet<cfg.stm.T>> stmIn;
-  public java.util.HashMap<cfg.stm.T, java.util.HashSet<cfg.stm.T>> stmOut;
+  public HashMap<Stm.T, HashSet<Stm.T>> stmIn;
+  public HashMap<Stm.T, HashSet<Stm.T>> stmOut;
 
   // liveIn, liveOut for transfer
-  public java.util.HashMap<cfg.transfer.T, java.util.HashSet<cfg.stm.T>> transferIn;
-  public java.util.HashMap<cfg.transfer.T, java.util.HashSet<cfg.stm.T>> transferOut;
+  public HashMap<Transfer.T, HashSet<Stm.T>> transferIn;
+  public HashMap<Transfer.T, HashSet<Stm.T>> transferOut;
 
   public ReachingDefinition()
   {
-    this.oneStmGen = new java.util.HashSet<>();
-    this.oneStmKill = new java.util.HashSet<>();
+    this.oneStmGen = new HashSet<>();
+    this.oneStmKill = new HashSet<>();
 
-    this.oneTransferGen = new java.util.HashSet<>();
-    this.oneTransferKill = new java.util.HashSet<>();
+    this.oneTransferGen = new HashSet<>();
+    this.oneTransferKill = new HashSet<>();
 
-    this.stmGen = new java.util.HashMap<>();
-    this.stmKill = new java.util.HashMap<>();
+    this.stmGen = new HashMap<>();
+    this.stmKill = new HashMap<>();
 
-    this.transferGen = new java.util.HashMap<>();
-    this.transferKill = new java.util.HashMap<>();
+    this.transferGen = new HashMap<>();
+    this.transferKill = new HashMap<>();
 
-    this.blockGen = new java.util.HashMap<>();
-    this.blockKill = new java.util.HashMap<>();
+    this.blockGen = new HashMap<>();
+    this.blockKill = new HashMap<>();
 
-    this.blockIn = new java.util.HashMap<>();
-    this.blockOut = new java.util.HashMap<>();
+    this.blockIn = new HashMap<>();
+    this.blockOut = new HashMap<>();
 
-    this.stmIn = new java.util.HashMap<>();
-    this.stmOut = new java.util.HashMap<>();
+    this.stmIn = new HashMap<>();
+    this.stmOut = new HashMap<>();
 
-    this.transferIn = new java.util.HashMap<>();
-    this.transferOut = new java.util.HashMap<>();
+    this.transferIn = new HashMap<>();
+    this.transferOut = new HashMap<>();
   }
 
   // /////////////////////////////////////////////////////
@@ -67,104 +97,104 @@ public class ReachingDefinition implements cfg.Visitor
   // /////////////////////////////////////////////////////
   // operand
   @Override
-  public void visit(cfg.operand.Int operand)
+  public void visit(Int operand)
   {
   }
 
   @Override
-  public void visit(cfg.operand.Var operand)
+  public void visit(Var operand)
   {
   }
 
   // statements
   @Override
-  public void visit(cfg.stm.Add s)
+  public void visit(Add s)
   {
   }
 
   @Override
-  public void visit(cfg.stm.InvokeVirtual s)
+  public void visit(InvokeVirtual s)
   {
   }
 
   @Override
-  public void visit(cfg.stm.Lt s)
+  public void visit(Lt s)
   {
   }
 
   @Override
-  public void visit(cfg.stm.Move s)
+  public void visit(Move s)
   {
   }
 
   @Override
-  public void visit(cfg.stm.NewObject s)
+  public void visit(NewObject s)
   {
   }
 
   @Override
-  public void visit(cfg.stm.Print s)
+  public void visit(Print s)
   {
   }
 
   @Override
-  public void visit(cfg.stm.Sub s)
+  public void visit(Sub s)
   {
   }
 
   @Override
-  public void visit(cfg.stm.Times s)
+  public void visit(Times s)
   {
   }
 
   // transfer
   @Override
-  public void visit(cfg.transfer.If s)
+  public void visit(If s)
   {
   }
 
   @Override
-  public void visit(cfg.transfer.Goto s)
+  public void visit(Goto s)
   {
     return;
   }
 
   @Override
-  public void visit(cfg.transfer.Return s)
+  public void visit(Return s)
   {
   }
 
   // type
   @Override
-  public void visit(cfg.type.Class t)
+  public void visit(ClassType t)
   {
   }
 
   @Override
-  public void visit(cfg.type.Int t)
+  public void visit(IntType t)
   {
   }
 
   @Override
-  public void visit(cfg.type.IntArray t)
+  public void visit(IntArrayType t)
   {
   }
 
   // dec
   @Override
-  public void visit(cfg.dec.Dec d)
+  public void visit(DecSingle d)
   {
   }
 
   // block
   @Override
-  public void visit(cfg.block.Block b)
+  public void visit(BlockSingle b)
   {
   }
 
   // method
   @Override
-  public void visit(cfg.method.Method m)
+  public void visit(MethodSingle m)
   {
     // Five steps:
     // Step 0: for each argument or local variable "x" in the
@@ -193,7 +223,7 @@ public class ReachingDefinition implements cfg.Visitor
   }
 
   @Override
-  public void visit(cfg.mainMethod.MainMethod m)
+  public void visit(MainMethodSingle m)
   {
     // Five steps:
     // Step 0: for each argument or local variable "x" in the
@@ -222,19 +252,19 @@ public class ReachingDefinition implements cfg.Visitor
 
   // vtables
   @Override
-  public void visit(cfg.vtable.Vtable v)
+  public void visit(VtableSingle v)
   {
   }
 
   // class
   @Override
-  public void visit(cfg.classs.Class c)
+  public void visit(ClassSingle c)
   {
   }
 
   // program
   @Override
-  public void visit(cfg.program.Program p)
+  public void visit(ProgramSingle p)
   {
   }
 
