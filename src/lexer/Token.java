@@ -12,9 +12,11 @@ public class Token
   public enum Kind {
     TOKEN_ADD, // "+"
     TOKEN_AND, // "&&"
+    TOKEN_ANNO, // annotation
     TOKEN_ASSIGN, // "="
     TOKEN_BOOLEAN, // "boolean"
     TOKEN_CLASS, // "class"
+    TOKEN_CLASSID, // "classid"
     TOKEN_COMMER, // ","
     TOKEN_DOT, // "."
     TOKEN_ELSE, // "else"
@@ -44,6 +46,7 @@ public class Token
     TOKEN_RBRACK, // "]"
     TOKEN_RETURN, // "return"
     TOKEN_RPAREN, // ")"
+    TOKEN_RT, // ">"
     TOKEN_SEMI, // ";"
     TOKEN_STATIC, // "static"
     TOKEN_STRING, // "String"
@@ -52,6 +55,7 @@ public class Token
     TOKEN_THIS, // "this"
     TOKEN_TIMES, // "*"
     TOKEN_TRUE, // "true"
+    TOKEN_UNKNOWN,//"unknown"
     TOKEN_VOID, // "void"
     TOKEN_WHILE, // "while"
   }
@@ -81,10 +85,21 @@ public class Token
 
     // to check that the "lineNum" field has been properly set.
     if (this.lineNum == null)
-      new util.Todo();
-
-    s = ": " + ((this.lexeme == null) ? "<NONE>" : this.lexeme) + " : at line "
+    {
+    	this.kind = Kind.TOKEN_EOF;
+    	this.lexeme = "";
+        
+    }
+    
+    if(this.kind==Kind.TOKEN_ANNO)
+    {
+    	return "";
+    }
+    else
+    {
+    	s = ": " + ((this.lexeme == null) ? "<NONE>" : this.lexeme) + " : at line "
         + this.lineNum.toString();
+    }
     return this.kind.toString() + s;
   }
 }
