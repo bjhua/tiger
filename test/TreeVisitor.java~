@@ -1,6 +1,10 @@
-class BinaryTree{
+// The classes are basically the same as the BinaryTree 
+// file except the visitor classes and the accept method
+// in the Tree class
+
+class TreeVisitor{
     public static void main(String[] a){
-	System.out.println(new BT().Start());
+	System.out.println(new TV().Start());
     }
 }
 
@@ -12,15 +16,13 @@ class Tree{
     boolean has_right ;
     Tree my_null ;
 
-
-    // Insert a new element in the tree
     public boolean Insert(int v_key){
 	Tree new_node ;
 	boolean ntb ;
+	Tree current_node ;
 	boolean cont ;
 	int key_aux ;
-
-	
+        
 	new_node = new Tree();
 	ntb = new_node.Init(v_key) ;
 	current_node = this ;
@@ -49,4 +51,3 @@ class Tree{
 	return true ;
     }
 }
-   

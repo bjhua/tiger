@@ -1,0 +1,29 @@
+class LinkedList{
+    public static void main(String[] a){
+	System.out.println(new LL().Start());
+    }
+}
+
+class Element {
+    int Age ;          
+    int Salary ;
+    boolean Married ;
+
+    public boolean Equal(Element other){
+
+	if (!this.Compare(aux01,Age)) ret_val = false ;
+	else { 
+	    aux02 = other.GetSalary();
+	    if(a+1)
+		a = 6;
+	    else 
+		a = 5;
+	}
+
+	return ret_val ;
+    }
+
+   
+
+}
+
