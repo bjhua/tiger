@@ -15,10 +15,14 @@ class BS{
 	count01 = 0 ;
 	count02 = 0 ;
 	aux03 = num - 1 ;
-	while (count02 < aux03) {
-	    count01 = count01 + 1 ;
-	    count02 = count02 + 2 ;
+	if(a<b)
+	{
+	 a = 0;
 	}
+	else
+	{
+	 a =1;
+	}	
 	return count01 ;	
     }
 

@@ -71,7 +71,9 @@ public class Tiger
       theAst = parser.parse();
 
       fstream.close();
-    } catch (Exception e) {
+    } 
+    catch (Exception e) 
+    {
       e.printStackTrace();
       System.exit(1);
     }
@@ -82,8 +84,8 @@ public class Tiger
       theAst.accept(pp);
     }
     
-    // elaborate the AST, report all possible errors.
-    elaborator.ElaboratorVisitor elab = new elaborator.ElaboratorVisitor();
+    //elaborate the AST, report all possible errors.
+    elaborator.ElaboratorVisitor elab = new elaborator.ElaboratorVisitor();//implement visitor interface
     theAst.accept(elab);
     
     return;

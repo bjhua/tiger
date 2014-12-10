@@ -19,8 +19,7 @@ class Tree{
 	boolean ntb ;
 	boolean cont ;
 	int key_aux ;
-	Tree current_node ;
-	int b;
+
 	
 	new_node = new Tree();
 	ntb = new_node.Init(v_key) ;
@@ -43,7 +42,7 @@ class Tree{
 		else {
 		    cont = false ;
 		    ntb = current_node.SetHas_Right(true);
-		    ntb = current_node.SetRight(new_node);
+		    
 		}
 	    }
 	}

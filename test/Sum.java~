@@ -1,6 +1,6 @@
 class Sum { 
 	public static void main(String[] a) {
-        System.out.println(new Doit().doit(101));
+        System.out.println(new Doit().doit(true));
     }
 }
 
@@ -8,6 +8,6 @@ class Doit {
     public int doit(int n) {
         int sum;
         int i;
-        return sum
+        return sum ;
     }
 }

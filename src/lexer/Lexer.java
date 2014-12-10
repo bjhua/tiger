@@ -228,7 +228,6 @@ public class Lexer
         			}
         			line++;
         			return new Token(Kind.TOKEN_ANNO,line-1);
-        		//	return null;
         		}
         	else
         		this.fstream.reset();
@@ -334,10 +333,10 @@ public class Lexer
 		  return 0;
   }
   
+  
   public Token nextToken()
   {
     Token t = null;
-
     try {
       t = this.nextTokenInternal();
     } catch (Exception e) {
