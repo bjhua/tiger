@@ -1,5 +1,4 @@
 package slp;
-
 import java.util.LinkedList;
 
 public class Slp
@@ -11,6 +10,7 @@ public class Slp
     // base class
     public static abstract class T
     {
+       
     }
 
     // id
@@ -40,7 +40,7 @@ public class Slp
     {
       ADD, SUB, TIMES, DIVIDE
     };
-
+    
     public static class Op extends T
     {
       OP_T op;

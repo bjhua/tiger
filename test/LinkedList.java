@@ -70,7 +70,6 @@ class Element {
     }
 
 }
-
 class List{
     Element elem ;
     List next ;
@@ -276,3 +275,4 @@ class LL{
     }
     
 }
+
