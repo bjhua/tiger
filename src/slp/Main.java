@@ -117,25 +117,15 @@ public class Main
         emit("\timul\t%edx\n");
         break;
       case DIVIDE:
-    	if(interpExp(right)!=0)
-    	{
-	      compileExp(left);
-	      emit("\tpushl\t%eax\n");
-	      compileExp(right);
-	      emit("\tpopl\t%edx\n");
-	      emit("\tmovl\t%eax, %ecx\n");
-	      emit("\tmovl\t%edx, %eax\n");
-	      emit("\tcltd\n");
-	      emit("\tdiv\t%ecx\n");
-	      break;
-    	}
-    	else
-    	{
-    	  emit("\tpushl\t$exception\n");
-    	  emit("\tcall\tprintf\n");
-    	  emit("\taddl\t$4, %esp\n");
-    	  break;
-    	}
+        compileExp(left);
+        emit("\tpushl\t%eax\n");
+        compileExp(right);
+        emit("\tpopl\t%edx\n");
+        emit("\tmovl\t%eax, %ecx\n");
+        emit("\tmovl\t%edx, %eax\n");
+        emit("\tcltd\n");
+        emit("\tdiv\t%ecx\n");
+        break;
       default:
         new Bug();
       }
@@ -150,53 +140,32 @@ public class Main
       new Bug();
   }
 
-  private int compileExpList(ExpList.T explist)
+  private void compileExpList(ExpList.T explist)
   {
     if (explist instanceof ExpList.Pair) {
       ExpList.Pair pair = (ExpList.Pair) explist;
       Exp.T exp = pair.exp;
       ExpList.T list = pair.list;
-      
+
       compileExp(exp);
-    //判断是否会出现被除数为0
-      if(pair.exp instanceof Exp.Op)
-      {
-    	  Exp.Op r = (Exp.Op)pair.exp;
-    	  if(r.op==Exp.OP_T.DIVIDE && interpExp(r.right)==0)
-    	  {
-    		  return 0;
-    	  }
-      }
       emit("\tpushl\t%eax\n");
       emit("\tpushl\t$slp_format\n");
       emit("\tcall\tprintf\n");
       emit("\taddl\t$4, %esp\n");
       compileExpList(list);
-      return 1;
     } else if (explist instanceof ExpList.Last) {
       ExpList.Last last = (ExpList.Last) explist;
       Exp.T exp = last.exp;
-    //判断是否会出现被除数为0
+
       compileExp(exp);
-      if(last.exp instanceof Exp.Op)
-      {
-    	  Exp.Op r = (Exp.Op)last.exp;
-    	  if(r.op==Exp.OP_T.DIVIDE && interpExp(r.right)==0)
-    	  {
-    		  return 0;
-    	  }
-      }
       emit("\tpushl\t%eax\n");
       emit("\tpushl\t$slp_format\n");
       emit("\tcall\tprintf\n");
       emit("\taddl\t$4, %esp\n");
-      return 1;
     } else
-    {
       new Bug();
-      return 1;
-    }
   }
+  
   private void compileStm(Stm.T prog)
   {
     if (prog instanceof Stm.Compound) {

@@ -73,10 +73,8 @@ class BBS{
     
     // Initialize array of integers
     public int Init(int sz){
-int j ;
-	size = sz ;
 	number = new int[sz] ;
-	
+	size = sz ;
 	number[0] = 20 ;
 	number[1] = 7  ; 
 	number[2] = 12 ;
@@ -87,7 +85,6 @@ int j ;
 	number[7] = 9  ; 
 	number[8] = 19 ; 
 	number[9] = 5  ;
-	
 	return 0 ;	
     }
 

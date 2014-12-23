@@ -1,6 +1,6 @@
 class Sum { 
 	public static void main(String[] a) {
-        System.out.println(new Doit().doit(true));
+        System.out.println(new Doit().doit(101));
     }
 }
 

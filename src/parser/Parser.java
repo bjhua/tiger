@@ -572,10 +572,11 @@ public class Parser
   {
 	  anno();
 	  LinkedList<Class.T> Listclass = new LinkedList<Class.T>();
-	  while (current.kind == Kind.TOKEN_CLASS) {
+	  while (current.kind == Kind.TOKEN_CLASS) 
+	  {
          Class.T clas = parseClassDecl();
          Listclass.add(clas);
-    }
+	  }
 	  return Listclass;
   }
 
@@ -604,10 +605,10 @@ public class Parser
 	String args = eatToken(Kind.TOKEN_ID);
 	eatToken(Kind.TOKEN_RPAREN);
 	eatToken(Kind.TOKEN_LBRACE);
-	LinkedList<Stm.T> mainstm = parseStatements();
+	Stm.T mainstm = parseStatement();
 	eatToken(Kind.TOKEN_RBRACE);
 	eatToken(Kind.TOKEN_RBRACE);
-	return new MainClass.MainClassSingle(classid,args,new Block(mainstm));
+	return new MainClass.MainClassSingle(classid,args,mainstm);
   }
 
   // Program -> MainClass ClassDecl*
@@ -621,7 +622,6 @@ public class Parser
 
   public ast.Ast.Program.T parse()
   {
-    
     return parseProgram();
   }
 }

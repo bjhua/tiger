@@ -151,9 +151,13 @@ public class ElaboratorVisitor implements ast.Visitor
     	error();
     }
     MethodType mty = this.classTable.getm(ty.id, e.id);
-
-    java.util.LinkedList<Type.T> declaredArgTypes
-    = new java.util.LinkedList<Type.T>();
+    if(mty==null)
+    {   
+    	System.out.println("Error: The method "+ e.id +" is undefined for the Class "+ty.id +" at Line "+e.linenum+".");
+        this.type = new Error();
+        return ;
+    }
+    LinkedList<Type.T> declaredArgTypes = new LinkedList<Type.T>();
     for (Dec.T dec: mty.argsType){
       declaredArgTypes.add(((Dec.DecSingle)dec).type);
     }
@@ -172,18 +176,7 @@ public class ElaboratorVisitor implements ast.Visitor
     // to a method expecting a type "B", whenever type "A" is
     // a sub-class of type "B".
     // Modify the following code accordingly:
-    if(mty==null)
-    {   
-    	System.out.println("Error: The method "+ e.id +" is undefined for the Class "+ty.id +" at Line "+e.linenum+".");
-        this.type = new Error();
-        return ;
-    }
-    java.util.LinkedList<Type.T> argsty = new LinkedList<Type.T>();
-    for (Exp.T a : e.args) 
-    {
-      a.accept(this);
-      argsty.addLast(this.type);
-    }
+    //java.util.LinkedList<Type.T> argsty = new LinkedList<Type.T>();
     if (mty.argsType.size() != argsty.size())
     {
       System.out.println("Error: The method "+ e.id +"() is not applicable for the arguments at Line "+e.linenum+".");
@@ -230,9 +223,11 @@ public class ElaboratorVisitor implements ast.Visitor
     // if search failed, then s.id must be a class field.
     if (type == null) {
       type = this.classTable.get(this.currentClass, e.id);
-      // mark this id as a field id, this fact will be
-      // useful in later phase.
       e.isField = true;
+    }
+    else
+    {
+      e.isField = false;
     }
     if (type == null)
     {                                   
@@ -253,11 +248,7 @@ public class ElaboratorVisitor implements ast.Visitor
   public void visit(Length e)
   {
 	 e.array.accept(this);
-	 if(!(this.type instanceof Type.Int))
-	 {
-		 System.out.println("Error: length error at Line "+e.linenum+".");
-		 this.type = new Type.Int();
-	 }
+	 this.type = new Type.Int();
   }
 
   @Override

@@ -48,8 +48,7 @@ public class Fac
 
 
   // // class "Fac"
-  static ast.Ast.Class.T fac = new ast.Ast.Class.ClassSingle("F", null,
-
+  static ast.Ast.Class.T fac = new ast.Ast.Class.ClassSingle("Fac", null,
       new util.Flist<Dec.T>().list(),
       new util.Flist<Method.T>().list(new Method.MethodSingle(
           new Type.Int(), "ComputeFac", new util.Flist<Dec.T>()
@@ -88,7 +87,4 @@ public class Fac
 
   public static Program.T Summ = new ProgramSingle(sum,
                                  new util.Flist<ast.Ast.Class.T>().list(doit));
-  
-  //public static Stm.Block kk = new Stm.Block(
-  //		  new LinkedList<Stm.T>().(new Stm.Print(new Exp.Num(5))));
 }

@@ -5,15 +5,13 @@
 // "new" a new object, do necessary initializations, and
 // return the pointer (reference).
 /*    -----------------------------------------
-      | vptr | v0 | v1 | ...      | v_{size-1}|                           
+      | vptr | v0 | v1 | ...      | v_{size-1}|                         
       -----------------------------------------
       ^      \                                /
       |       \<------------- size --------->/
       |
       p (returned address)
-*/
-void *Tiger_new (void *vtable, int size)
-{
+*/ 
   // You should write 4 statements for this function.
   // #1: "malloc" a chunk of memory (be careful of the size) :
   
@@ -22,7 +20,11 @@ void *Tiger_new (void *vtable, int size)
   // #3: set up the "vptr" pointer to the value of "vtable":
   
   // #4: return the pointer 
-  
+void *Tiger_new (void *vtable, int size)
+{
+   void** vptr = (void **)malloc(size+sizeof(vtable));
+   *vptr = vtable;
+   return vptr;
 }
 
 // "new" an array of size "length", do necessary
@@ -38,9 +40,12 @@ void *Tiger_new (void *vtable, int size)
                |
                p (returned address)
 */
-void *Tiger_new_array (int length)
+int *Tiger_new_array (int length)
 {
   // You can use the C "malloc" facilities, as above.
   // Your code here:
-  
+  int* var = (int *)malloc(sizeof(int)*length);
+  var--;
+  *var = length;
+  return var;
 }

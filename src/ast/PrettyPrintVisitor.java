@@ -406,9 +406,9 @@ public class PrettyPrintVisitor implements Visitor
     this.sayln("class " + c.id);
     this.sayln("{");
     this.sayln("  public static void main (String [] " + c.arg + ")");
-    //this.sayln("  {");
+    this.sayln("  {");
     c.stm.accept(this);
-    //this.sayln("  }");
+    this.sayln("  }");
     this.sayln("}");
     return;
   }

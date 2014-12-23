@@ -42,7 +42,7 @@ class Tree{
 		else {
 		    cont = false ;
 		    ntb = current_node.SetHas_Right(true);
-		    
+		    ntb = current_node.SetRight(new_node);
 		}
 	    }
 	}

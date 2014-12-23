@@ -1,6 +1,10 @@
 package ast;
 
+import java.util.Hashtable;
 import java.util.LinkedList;
+
+import codegen.C.Ast.Dec;
+import codegen.C.Ast.Type;
 
 public class Ast
 {
@@ -130,10 +134,11 @@ public class Ast
     // int[]
     public static class IntArray extends T
     {
+      int length;
       public IntArray()
       {
       }
-
+      
       @Override
       public String toString()
       {
@@ -702,7 +707,6 @@ public class Ast
       public String extendss; // null for non-existing "extends"
       public java.util.LinkedList<Dec.T> decs;
       public java.util.LinkedList<ast.Ast.Method.T> methods;
-
       public ClassSingle(String id, String extendss,
           java.util.LinkedList<Dec.T> decs,
           java.util.LinkedList<ast.Ast.Method.T> methods)
@@ -748,7 +752,6 @@ public class Ast
         return;
       }
     }
-
   }
 
   // whole program
@@ -762,7 +765,6 @@ public class Ast
     {
       public MainClass.T mainClass;
       public LinkedList<Class.T> classes;
-
       public ProgramSingle(MainClass.T mainClass, LinkedList<Class.T> classes)
       {
         this.mainClass = mainClass;
