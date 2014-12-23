@@ -1,7 +1,10 @@
 package codegen.C;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.LinkedList;
+
+import ast.Ast.Dec;
 
 public class Ast
 {
@@ -56,6 +59,7 @@ public class Ast
 
     public static class IntArray extends T
     {
+      int length;
       public IntArray()
       {
       }
@@ -88,11 +92,12 @@ public class Ast
     {
       public Type.T type;
       public String id;
-
+      boolean flag;
       public DecSingle(Type.T type, String id)
       {
         this.type = type;
         this.id = id;
+        flag = false;
       }
 
       @Override
@@ -212,7 +217,7 @@ public class Ast
     public static class Length extends T
     {
       public T array;
-
+      public int length;
       public Length(T array)
       {
         this.array = array;
@@ -503,7 +508,6 @@ public class Ast
     {
       public String id;
       public LinkedList<codegen.C.Tuple> decs;
-
       public ClassSingle(String id, LinkedList<codegen.C.Tuple> decs)
       {
         this.id = id;
@@ -563,12 +567,14 @@ public class Ast
       public String id;
       public LinkedList<Dec.T> formals;
       public LinkedList<Dec.T> locals;
+      public LinkedList<Dec.T> classvar;
       public LinkedList<Stm.T> stms;
       public Exp.T retExp;
-
+     // public Hashtable<String,Type.T> tab;
       public MethodSingle(Type.T retType, String classId, String id,
           LinkedList<Dec.T> formals, LinkedList<Dec.T> locals,
-          LinkedList<Stm.T> stms, Exp.T retExp)
+          LinkedList<Stm.T> stms,
+          Exp.T retExp)
       {
         this.retType = retType;
         this.classId = classId;
@@ -601,7 +607,7 @@ public class Ast
     {
       public LinkedList<Dec.T> locals;
       public Stm.T stm;
-
+      public LinkedList<Dec.T> classvar;
       public MainMethodSingle(LinkedList<Dec.T> locals, Stm.T stm)
       {
         this.locals = locals;
@@ -630,7 +636,7 @@ public class Ast
       public LinkedList<Vtable.T> vtables;
       public LinkedList<Method.T> methods;
       public MainMethod.T mainMethod;
-
+      public LinkedList<Dec.T> classvar;
       public ProgramSingle(LinkedList<Class.T> classes,
           LinkedList<Vtable.T> vtables, LinkedList<Method.T> methods,
           MainMethod.T mainMethod)

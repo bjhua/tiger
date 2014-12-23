@@ -2,7 +2,9 @@ import static control.Control.ConAst.dumpAst;
 import static control.Control.ConAst.testFac;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import ast.Ast.Program;
@@ -14,7 +16,7 @@ import control.Control;
 
 public class Tiger
 {
-  public static void main(String[] args)
+  public static void main(String[] args) throws IOException, InterruptedException
   {
     InputStream fstream;
     Parser parser;
@@ -150,12 +152,10 @@ public class Tiger
       break;
     }
 
-    // Lab3, exercise 6: add some glue code to
-    // call gcc to compile the generated C or x86
-    // file, or call java to run the bytecode file,
-    // or dalvik to run the dalvik bytecode.
     // Your code here:
-
+    // --------------------------------------------
+    // I had already generate a file a.out in the file of tiger. 
+    Runtime.getRuntime().exec("gcc "+args[0]+".c ./runtime/runtime.c");
     return;
   }
 }

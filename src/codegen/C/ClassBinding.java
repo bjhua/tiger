@@ -62,7 +62,6 @@ public class ClassBinding
     System.out.println(fields.toString());
     System.out.println("\nmethods:\n  ");
     System.out.println(methods.toString());
-
     return "";
   }
 
