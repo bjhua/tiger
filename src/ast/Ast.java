@@ -673,7 +673,8 @@ public class Ast
       public LinkedList<Dec.T> locals;
       public LinkedList<Stm.T> stms;
       public Exp.T retExp;
-
+      public Hashtable<String,Integer> classvar = new Hashtable<String,Integer>();
+      
       public MethodSingle(Type.T retType, String id,
           LinkedList<Dec.T> formals, LinkedList<Dec.T> locals,
           LinkedList<Stm.T> stms, Exp.T retExp)

@@ -17,6 +17,7 @@ int main (int argc, char **argv)
   // You can use the offered function in file "control.c"
   // and "command-line.c"  
   // Your code here:
+  CommandLine_doarg(argc, argv);
   
   // initialize the Java heap
   Tiger_heap_init (Control_heapSize);

@@ -45,13 +45,13 @@ public class TranslateVisitor implements ast.Visitor
   private Exp.T exp;
   private Method.T method;
   private LinkedList<Dec.T> tmpVars;
-  private LinkedList<Dec.T> classvar = new LinkedList<Dec.T>();
   private LinkedList<Class.T> classes;
   private LinkedList<Vtable.T> vtables;
   private LinkedList<Method.T> methods;
   private MainMethod.T mainMethod;
   public Program.T program;
-
+  int varnum = 0;
+  
   public TranslateVisitor()
   {
     this.table = new ClassTable();
@@ -128,8 +128,8 @@ public class TranslateVisitor implements ast.Visitor
   @Override
   public void visit(ast.Ast.Exp.False e)
   {
-	  this.exp = new codegen.C.Ast.Exp.Num(0);
-	  return;
+	this.exp = new codegen.C.Ast.Exp.Num(0);
+	return;
   }
 
   @Override
@@ -171,7 +171,9 @@ public class TranslateVisitor implements ast.Visitor
   @Override
   public void visit(ast.Ast.Exp.NewObject e)
   {
-    this.exp = new NewObject(e.id);
+	String name = "var_"+varnum;
+	varnum++;
+    this.exp = new NewObject(e.id,name);
     return;
   }
 
@@ -321,10 +323,16 @@ public class TranslateVisitor implements ast.Visitor
 
   // ////////////////////////////////////////////////
   // dec
+  int numm = 1;
   @Override
   public void visit(ast.Ast.Dec.DecSingle d)
   {
     d.type.accept(this);
+    if(d.id.equals("prev"))
+    {
+    	d.id = "prev_"+numm;
+    	numm++;
+    }
     this.dec = new codegen.C.Ast.Dec.DecSingle(this.type, d.id);
     return;
   }
@@ -333,21 +341,26 @@ public class TranslateVisitor implements ast.Visitor
   @Override
   public void visit(ast.Ast.Method.MethodSingle m)
   {
-	ClassBinding cb = this.table.get(this.classId);
-	LinkedList<Dec.T> newFormals = new LinkedList<Dec.T>(); 
+	LinkedList<Dec.T> newFormals = new LinkedList<Dec.T>();
+	Hashtable<String,Integer> var = new Hashtable<String,Integer>();
     this.tmpVars = new LinkedList<Dec.T>();
     m.retType.accept(this);
     Type.T newRetType = this.type;
     
     newFormals.add(new Dec.DecSingle(new ClassType(this.classId), "this"));
     for (ast.Ast.Dec.T d : m.formals) {
+      ast.Ast.Dec.DecSingle dec = (ast.Ast.Dec.DecSingle)d;
       d.accept(this);
       newFormals.add(this.dec);
+      var.put(dec.id,1);
     }
     LinkedList<Dec.T> locals = new LinkedList<Dec.T>();
     for (ast.Ast.Dec.T d : m.locals) {
+      ast.Ast.Dec.DecSingle dec = (ast.Ast.Dec.DecSingle)d;
       d.accept(this);
       locals.add(this.dec);
+      if(dec.type.getNum()<=0)
+          var.put(dec.id,1);      
     }
     LinkedList<Stm.T> newStm = new LinkedList<Stm.T>();
     for (ast.Ast.Stm.T s : m.stms) {
@@ -358,12 +371,10 @@ public class TranslateVisitor implements ast.Visitor
     Exp.T retExp = this.exp;
     for (Dec.T dec : this.tmpVars) {
       Dec.DecSingle decc = (Dec.DecSingle)dec;
-      decc.flag = true;
       locals.add(decc);
     }
     MethodSingle m1 = new MethodSingle(newRetType, this.classId, m.id,
-        newFormals, locals, newStm, retExp);
-    m1.classvar = this.classvar;
+        newFormals, locals, newStm, retExp,var,m.classvar);
     this.method = m1;
     return;
   }
@@ -372,20 +383,34 @@ public class TranslateVisitor implements ast.Visitor
   @Override
   public void visit(ast.Ast.Class.ClassSingle c)
   {
+	Hashtable<String,Integer> classvar = new Hashtable<String,Integer>();
+	String res = new String();
     ClassBinding cb = this.table.get(c.id);
 	LinkedList<Tuple> m1 = cb.fields;
-    this.classes.add(new ClassSingle(c.id, cb.fields));
-    this.vtables.add(new VtableSingle(c.id, cb.methods));
+	for(Tuple m2:m1)
+	{   
+        classvar.put(m2.id, 1);
+        if(m2.type instanceof Type.Int)
+        {
+        	res = res+"0";
+        }
+        else
+        {
+        	res = res+"1";
+        }
+	}
+    this.classes.add(new ClassSingle(c.id, cb.fields,classvar));
+    this.vtables.add(new VtableSingle(c.id, cb.methods,res));
     this.classId = c.id;
+    
     for (ast.Ast.Method.T m : c.methods)
     {
-      m.accept(this);
+      ast.Ast.Method.MethodSingle mm = (ast.Ast.Method.MethodSingle)m;
+      mm.classvar = classvar;
+      mm.accept(this);
       this.methods.add(this.method);
     }
-    for(Tuple m2:m1)
-	{   
-       this.classvar.add(new codegen.C.Ast.Dec.DecSingle(m2.type,m2.id));
-	}
+    
     return;
   }
 
@@ -393,10 +418,11 @@ public class TranslateVisitor implements ast.Visitor
   @Override
   public void visit(ast.Ast.MainClass.MainClassSingle c)
   {
+	Hashtable<String,Integer> classvar = new Hashtable<String,Integer>();
     ClassBinding cb = this.table.get(c.id);
-    Class.T newc = new ClassSingle(c.id, cb.fields);
+    Class.T newc = new ClassSingle(c.id, cb.fields,classvar);
     this.classes.add(newc);
-    this.vtables.add(new VtableSingle(c.id, cb.methods));
+    this.vtables.add(new VtableSingle(c.id, cb.methods,""));
 
     this.tmpVars = new LinkedList<Dec.T>();
 
@@ -488,7 +514,6 @@ public class TranslateVisitor implements ast.Visitor
     }
     ProgramSingle prog = new ProgramSingle(this.classes, this.vtables,
         this.methods, this.mainMethod);
-    prog.classvar = this.classvar;
     this.program = prog;
     return;
   }

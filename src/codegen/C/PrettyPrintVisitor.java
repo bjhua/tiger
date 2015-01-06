@@ -44,9 +44,8 @@ import elaborator.ClassBinding;
 
 public class PrettyPrintVisitor implements Visitor
 { 
-  Hashtable<String,String> classvar = new Hashtable<String,String>();
-  Hashtable<String,String> array = new Hashtable<String,String>();
-  LinkedList<Dec.T> clasvar;
+  Hashtable<String,Integer> classvar = new Hashtable<String,Integer>();
+  public Hashtable<String,Integer> var = new Hashtable<String,Integer>();
   private int indentLevel;
   private java.io.BufferedWriter writer;
   int flag = 0;
@@ -130,10 +129,20 @@ public class PrettyPrintVisitor implements Visitor
   @Override 
   public void visit(Call e)
   {
-	  this.say("(" + e.assign + "=");
+	  this.say("(");
+	  if(flag==1)
+	  {
+		  this.say("frame.");
+	  }
+	  this.say(e.assign + "=");
 	  e.exp.accept(this);
 	  this.say(", ");
-	  this.say(e.assign + "->vptr->" + e.id + "(" + e.assign);
+	  if(flag==1)
+		  this.say("frame.");
+	  this.say(e.assign+"->vptr->"+e.id+"(");
+	  if(flag==1)
+		  this.say("frame.");
+	  this.say(e.assign);
 	  int size = e.args.size();
 	  if (size == 0) {
 	    this.say("))");
@@ -150,16 +159,12 @@ public class PrettyPrintVisitor implements Visitor
   @Override
   public void visit(Id e)
   {
-	for(Dec.T d:clasvar)
-	{
-	   Dec.DecSingle dec = (Dec.DecSingle)d;
-	   if(dec.id.equals(e.id))
-	   {
-		   this.say("this->"+e.id);
-		   return;
-	   }
-	}
-    this.say(e.id);
+	if(classvar.get(e.id)!=null)
+		this.say("this->"+e.id);
+	else if(var.get(e.id)==null)
+       this.say("frame."+e.id);
+	else 
+	   this.say(e.id);
     return;
   }
 
@@ -168,7 +173,7 @@ public class PrettyPrintVisitor implements Visitor
   {
 	  this.say("*(");
 	  e.array.accept(this);
-	  this.say("-4)");
+	  this.say("+2)");
 	  return;
   }
 
@@ -241,33 +246,30 @@ public class PrettyPrintVisitor implements Visitor
     this.printSpaces();
     if(s.exp instanceof NewIntArray)
     {
-       for(Dec.T d:clasvar)
+   	   if(classvar.get(s.id)!=null)
    	   {
-   	     Dec.DecSingle dec = (Dec.DecSingle)d;
-   	     if(dec.id.equals(s.id))
-   	     {
    		   this.say("this->"+s.id+" = (int *)Tiger_new_array (");
-   		   s.exp.accept(this);
-   		   this.say(");");
-   		   return;
-   	     }
+		   s.exp.accept(this);
+		   this.say(");");
+		   return;
    	   }
+   	   
+       if(var.get(s.id)==null)
+           this.say("frame.");
        this.say(s.id + " = (int *)Tiger_new_array (");
 	   s.exp.accept(this);
 	   this.say(");");
        return;
     }
-    for(Dec.T d:clasvar)
+    if(classvar.get(s.id)!=null)
 	{
-	   Dec.DecSingle dec = (Dec.DecSingle)d;
-	   if(dec.id.equals(s.id))
-	   {
-	      this.say("this->"+s.id+" = ");
-	      s.exp.accept(this);
-	      this.say(";");
-	      return;
-	   }
-	 }
+       this.say("this->"+s.id+" = ");
+	   s.exp.accept(this);
+	   this.say(";");
+	   return;
+	}
+    if(var.get(s.id)==null)
+    	this.say("frame.");
     this.say(s.id+" = ");
     s.exp.accept(this);
     this.say(";");
@@ -278,18 +280,14 @@ public class PrettyPrintVisitor implements Visitor
   public void visit(AssignArray s)
   {
 	  this.printSpaces();
-	  for(Dec.T d:clasvar)
-	  {
-	    Dec.DecSingle dec = (Dec.DecSingle)d;
-	    if(dec.id.equals(s.id))
-	    {
+	  if(classvar.get(s.id)!=null)
+      {
 		  this.say("this->"+s.id+"[");
 		  s.exp.accept(this);
 		  this.say("] = ");
 		  s.index.accept(this);
 		  this.say(";");
 		  return;
-	    }
 	  }
 	  this.say(s.id + "[");
 	  s.exp.accept(this);
@@ -355,7 +353,6 @@ public class PrettyPrintVisitor implements Visitor
 	  this.indent();
 	  s.body.accept(this);
       this.unIndent();
-	  //this.sayln("");
 	  return;
   }
 
@@ -386,9 +383,52 @@ public class PrettyPrintVisitor implements Visitor
 	  this.sayln(" "+d.id+";");
   }
 
+  public void GC_map_frame(MethodSingle m)
+  {
+	 this.sayln("struct "+m.classId+"_"+m.id+"_gc_frame{");
+	 this.sayln("  void *prev;");
+	 this.sayln("  char *arguments_gc_map;");
+	 this.sayln("  int *arguments_base_address;");
+	 this.sayln("  int local_count;");
+	 for (Dec.T d : m.locals) 
+	 {
+       DecSingle dec = (DecSingle) d;
+       if(!(dec.type instanceof Type.Int))
+    	   this.sayln("  struct "+dec.type+" *"+dec.id+";");
+	 }
+     this.sayln("};");
+     return;
+  }
+  
   @Override
   public void visit(MethodSingle m)
   {
+	classvar = m.classvar;
+	var = m.var;
+	flag = 1;
+	int num = 0;
+	this.say("char *"+m.classId+"_"+m.id+"_arguments_gc_map = \"");
+    for(Dec.T d : m.formals)
+    {
+      DecSingle dec = (DecSingle) d;
+      if(dec.type instanceof Type.Int)
+    	  this.say("0");
+      else
+    	  this.say("1");
+    }
+    this.sayln("\";");
+    
+    //this.say("char *"+m.classId+"_"+m.id+"_locals_gc_map = \"");
+    for (Dec.T d : m.locals) 
+    {
+      DecSingle dec = (DecSingle) d;
+      if(!(dec.type instanceof Type.Int))
+    	  num++;
+    }
+    
+    this.sayln("// Local_frame");
+    GC_map_frame(m);
+    this.sayln("");
     m.retType.accept(this);
     this.say(" " + m.classId + "_" + m.id + "(");
     int size = m.formals.size();
@@ -405,18 +445,25 @@ public class PrettyPrintVisitor implements Visitor
     this.sayln(")");
     this.sayln("{");
 
-    for (Dec.T d : m.locals) {
+    this.sayln("  struct "+m.classId+"_"+m.id+"_gc_frame frame;");
+    this.sayln("  frame.prev = prev;");
+    this.sayln("  prev = &frame;");
+    this.sayln("  frame.arguments_gc_map = "+m.classId+"_"+m.id+"_arguments_gc_map;");
+    this.sayln("  frame.arguments_base_address = (int *)&this;");
+    this.sayln("  frame.local_count = "+num +";");
+
+    for (Dec.T d : m.locals) 
+    {
       DecSingle dec = (DecSingle) d;
-      this.say("  ");
-      dec.type.accept(this);					//print the type the variable
-      this.say(" " + dec.id+";\n");
+      if(dec.type instanceof Type.Int)
+    	  this.sayln("  int "+dec.id+";");
     }
-    this.sayln("");
     for (Stm.T s : m.stms)
     {
       s.accept(this);
       this.sayln("");
     }
+    this.sayln("  prev = frame.prev;");
     this.say("  return ");
     m.retExp.accept(this);
     this.sayln(";");
@@ -427,6 +474,7 @@ public class PrettyPrintVisitor implements Visitor
   @Override
   public void visit(MainMethodSingle m)
   {
+	  flag = 0;
 	  this.sayln("int Tiger_main ()");
 	  this.sayln("{");
 	  for (Dec.T dec : m.locals) {
@@ -447,6 +495,7 @@ public class PrettyPrintVisitor implements Visitor
   {
     this.sayln("struct " + v.id + "_vtable");
     this.sayln("{");
+    this.sayln("  char *"+v.id+"_gc_map;"); 
     for (codegen.C.Ftuple t : v.ms) {
       this.say("  ");
       t.ret.accept(this);
@@ -461,6 +510,7 @@ public class PrettyPrintVisitor implements Visitor
     this.sayln("struct " + v.id + "_vtable " + v.id + "_vtable_ = ");
     this.sayln("{");
     int num = v.ms.size();
+    this.sayln("  \""+v.gc_map+"\",");
     for (codegen.C.Ftuple t : v.ms) {
       this.say("  ");
       this.say(t.classs + "_" + t.id);
@@ -482,9 +532,13 @@ public class PrettyPrintVisitor implements Visitor
   @Override
   public void visit(ClassSingle c)
   {
+	classvar = c.classvar;	
     this.sayln("struct " + c.id);
     this.sayln("{");
     this.sayln("  struct " + c.id + "_vtable *vptr;");
+    this.sayln("  int isObjOrArray;");
+    this.sayln("  unsigned length;");
+    this.sayln("  void *forwarding;");
     for (codegen.C.Tuple t : c.decs) {
       this.say("  ");
       t.type.accept(this);
@@ -558,14 +612,14 @@ public class PrettyPrintVisitor implements Visitor
        decVtable((VtableSingle) v);
     }
     this.sayln("");
-    clasvar = p.classvar;
-    this.sayln("// methods");
     
+    this.sayln("// methods");
+    this.sayln("void *prev = 0;");
     for (Method.T m : p.methods) {
       m.accept(this);
     }
     this.sayln("");
-
+    
     this.sayln("// vtables");
     for (Vtable.T v : p.vtables) {
       outputVtable((VtableSingle) v);

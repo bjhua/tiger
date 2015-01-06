@@ -92,12 +92,10 @@ public class Ast
     {
       public Type.T type;
       public String id;
-      boolean flag;
       public DecSingle(Type.T type, String id)
       {
         this.type = type;
         this.id = id;
-        flag = false;
       }
 
       @Override
@@ -277,9 +275,10 @@ public class Ast
       // is used to name the allocation.
       public String name;
 
-      public NewObject(String id)
+      public NewObject(String id,String name)
       {
         this.id = id;
+        this.name = name;
       }
 
       @Override
@@ -508,10 +507,13 @@ public class Ast
     {
       public String id;
       public LinkedList<codegen.C.Tuple> decs;
-      public ClassSingle(String id, LinkedList<codegen.C.Tuple> decs)
+      public Hashtable<String,Integer> classvar = new Hashtable<String,Integer>();
+      public ClassSingle(String id, LinkedList<codegen.C.Tuple> decs,
+    		  Hashtable<String,Integer> classvar)
       {
         this.id = id;
         this.decs = decs;
+        this.classvar = classvar;
       }
 
       @Override
@@ -536,13 +538,14 @@ public class Ast
     {
       public String id; // name of the class
       public java.util.ArrayList<codegen.C.Ftuple> ms; // all methods
-
-      public VtableSingle(String id, ArrayList<codegen.C.Ftuple> ms)
+      public String gc_map;
+      public VtableSingle(String id, ArrayList<codegen.C.Ftuple> ms,String gc_map)
       {
         this.id = id;
         this.ms = ms;
+        this.gc_map = gc_map;
       }
-
+      
       @Override
       public void accept(Visitor v)
       {
@@ -567,14 +570,15 @@ public class Ast
       public String id;
       public LinkedList<Dec.T> formals;
       public LinkedList<Dec.T> locals;
-      public LinkedList<Dec.T> classvar;
       public LinkedList<Stm.T> stms;
       public Exp.T retExp;
-     // public Hashtable<String,Type.T> tab;
+      public Hashtable<String,Integer> var = new Hashtable<String,Integer>();
+      public Hashtable<String,Integer> classvar = new Hashtable<String,Integer>();
       public MethodSingle(Type.T retType, String classId, String id,
           LinkedList<Dec.T> formals, LinkedList<Dec.T> locals,
           LinkedList<Stm.T> stms,
-          Exp.T retExp)
+          Exp.T retExp,Hashtable<String,Integer> var,
+          Hashtable<String,Integer> classvar)
       {
         this.retType = retType;
         this.classId = classId;
@@ -583,6 +587,8 @@ public class Ast
         this.locals = locals;
         this.stms = stms;
         this.retExp = retExp;
+        this.var = var;
+        this.classvar =  classvar;
       }
 
       @Override
@@ -636,7 +642,6 @@ public class Ast
       public LinkedList<Vtable.T> vtables;
       public LinkedList<Method.T> methods;
       public MainMethod.T mainMethod;
-      public LinkedList<Dec.T> classvar;
       public ProgramSingle(LinkedList<Class.T> classes,
           LinkedList<Vtable.T> vtables, LinkedList<Method.T> methods,
           MainMethod.T mainMethod)

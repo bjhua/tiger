@@ -23,7 +23,6 @@ static void Arg_setHeapSize(int heapSize)
   Control_heapSize = heapSize;
   return;
 }
-
 /* Typically, a commandline argument take the form of:
  *   -name arg        desc
 
