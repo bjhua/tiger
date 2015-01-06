@@ -1,3 +1,4 @@
+
 package slp;
 
 import java.io.FileWriter;
@@ -164,7 +165,7 @@ public class Main
     } else
       new Bug();
   }
-
+  
   private void compileStm(Stm.T prog)
   {
     if (prog instanceof Stm.Compound) {
@@ -248,3 +249,4 @@ public class Main
     }
   }
 }
+

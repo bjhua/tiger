@@ -18,8 +18,7 @@ public class ClassTable
     return;
   }
 
-  public void initDecs(String current,
-      java.util.LinkedList<Dec.T> decs)
+  public void initDecs(String current,java.util.LinkedList<Dec.T> decs)
   {
     ClassBinding cb = this.table.get(current);
     for (Dec.T dec : decs) {
