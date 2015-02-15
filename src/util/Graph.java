@@ -147,14 +147,19 @@ public class Graph<X>
 
     fname = this.gname;
 
-    for (Node node : this.graph) {
+    for (Node node : this.graph) 
+    {
       for (Edge edge : node.edges)
         dot.insert(edge.from.toString(), edge.to.toString());
+    
     }
 
-    try {
+    try 
+    {
       dot.visualize(fname);
-    } catch (Exception e) {
+    } 
+    catch (Exception e) 
+    {
       e.printStackTrace();
       new util.Bug();
     }

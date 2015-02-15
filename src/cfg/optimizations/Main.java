@@ -8,24 +8,42 @@ public class Main
 
   public void accept(Program.T cfg)
   {
+	java.util.HashMap<cfg.Cfg.Stm.T, java.util.HashSet<String>> stmLiveIn = new java.util.HashMap<cfg.Cfg.Stm.T, java.util.HashSet<String>>();
+	java.util.HashMap<cfg.Cfg.Stm.T, java.util.HashSet<String>> stmLiveOut = new java.util.HashMap<cfg.Cfg.Stm.T, java.util.HashSet<String>>();
+
+	// liveIn, liveOut for transfer
+	java.util.HashMap<cfg.Cfg.Transfer.T, java.util.HashSet<String>> transferLiveIn = new java.util.HashMap<cfg.Cfg.Transfer.T, java.util.HashSet<String>>();
+	java.util.HashMap<cfg.Cfg.Transfer.T, java.util.HashSet<String>> transferLiveOut = new java.util.HashMap<cfg.Cfg.Transfer.T, java.util.HashSet<String>>();
+
     // liveness analysis
     LivenessVisitor liveness = new LivenessVisitor();
     control.CompilerPass livenessPass = new control.CompilerPass(
         "Liveness analysis", cfg, liveness);
     if (control.Control.skipPass("cfg.Linvess")) {
-    } else {
+    } 
+    else 
+    {
       livenessPass.doit();
-      // Export necessary data structures from the
-      // liveness analysis.
-      // Your code here:
+      stmLiveIn = liveness.stmLiveIn;
+      stmLiveOut = liveness.stmLiveOut;
+      transferLiveIn = liveness.transferLiveIn;
+      transferLiveIn = liveness.transferLiveOut;
     }
 
     // dead-code elimination
     DeadCode deadCode = new DeadCode();
     control.CompilerPass deadCodePass = new control.CompilerPass(
         "Dead-code elimination", cfg, deadCode);
-    if (control.Control.skipPass("cfg.deadCode")) {
-    } else {
+    if (control.Control.skipPass("cfg.deadCode")) 
+    {
+    	System.out.println("Never be here! There is a bug!");
+    } 
+    else 
+    {
+	  deadCode.stmLiveIn = stmLiveIn;
+	  deadCode.stmLiveOut = stmLiveOut;
+	  deadCode.transferLiveIn = transferLiveIn;
+	  deadCode.transferLiveOut = transferLiveOut;
       deadCodePass.doit();
       cfg = deadCode.program;
     }
@@ -39,14 +57,18 @@ public class Main
       reachingDefPass.doit();
       // Export necessary data structures
       // Your code here:
+      
     }
 
     // constant propagation
     ConstProp constProp = new ConstProp();
     control.CompilerPass constPropPass = new control.CompilerPass(
         "Constant propagation", cfg, constProp);
-    if (control.Control.skipPass("cfg.constProp")) {
-    } else {
+    if (control.Control.skipPass("cfg.constProp")) 
+    {
+    } 
+    else 
+    {
       constPropPass.doit();
       cfg = constProp.program;
     }

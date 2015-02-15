@@ -3,6 +3,7 @@ package codegen.bytecode;
 import java.util.Hashtable;
 import java.util.LinkedList;
 
+import ast.Ast.Type.Error;
 import codegen.bytecode.Ast.Class;
 import codegen.bytecode.Ast.Class.ClassSingle;
 import codegen.bytecode.Ast.Dec;
@@ -352,5 +353,11 @@ public class TranslateVisitor implements ast.Visitor
     }
     this.program = new ProgramSingle(this.mainClass, newClasses);
     return;
+  }
+
+  @Override
+  public void visit(Error t) {
+	// TODO Auto-generated method stub
+	
   }
 }

@@ -1,5 +1,7 @@
 package cfg;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 public class Cfg
@@ -118,8 +120,13 @@ public class Cfg
       {
         this.i = i;
       }
-
+      
       @Override
+	  public String toString() {
+		return Integer.toString(this.i);
+	  }
+
+	  @Override
       public void accept(Visitor v)
       {
         v.visit(this);
@@ -136,6 +143,11 @@ public class Cfg
       }
 
       @Override
+	  public String toString() {
+		return this.id;
+	  }
+      
+      @Override
       public void accept(Visitor v)
       {
         v.visit(this);
@@ -150,11 +162,14 @@ public class Cfg
   {
     public static abstract class T implements cfg.Acceptable
     {
+    	public String dst;
+    	public HashSet<String> stmLiveIn = new HashSet<String>();
+    	public HashSet<String> stmLiveOut = new HashSet<String>();
     }
 
     public static class Add extends T
     {
-      public String dst;
+      //public String dst;
       // type of the destination variable
       public Type.T ty;
       public Operand.T left;
@@ -169,6 +184,12 @@ public class Cfg
       }
 
       @Override
+	  public String toString() {
+      // TODO Auto-generated method stub
+    	  return dst + " = "+ left.toString() +" + "+ right.toString() +";";
+	  }
+      
+      @Override
       public void accept(Visitor v)
       {
         v.visit(this);
@@ -177,7 +198,7 @@ public class Cfg
 
     public static class InvokeVirtual extends T
     {
-      public String dst;
+      //public String dst;
       public String obj;
       public String f;
       // type of the destination variable
@@ -193,6 +214,19 @@ public class Cfg
       }
 
       @Override
+      public String toString()
+      {
+    	  String str = dst+" = "+this.obj.toString()+"."+this.f+"(";
+    	  for(Operand.T arg:args)
+    	  {
+    		  str = str + arg.toString();
+    		  if(args.size()>1)
+    			  str = str+",";
+    	  }
+    	  str = str+");";
+    	  return str;
+      }
+      @Override
       public void accept(Visitor v)
       {
         v.visit(this);
@@ -201,7 +235,7 @@ public class Cfg
 
     public static class Lt extends T
     {
-      public String dst;
+      //public String dst;
       // type of the destination variable
       public Type.T ty;
       public Operand.T left;
@@ -216,6 +250,12 @@ public class Cfg
       }
 
       @Override
+	  public String toString() {
+      // TODO Auto-generated method stub
+    	  return dst + " = "+ left.toString() +"<"+ right.toString() +";";
+	  }
+      
+      @Override
       public void accept(Visitor v)
       {
         v.visit(this);
@@ -224,7 +264,7 @@ public class Cfg
 
     public static class Move extends T
     {
-      public String dst;
+      //public String dst;
       // type of the destination variable
       public Type.T ty;
       public Operand.T src;
@@ -237,6 +277,12 @@ public class Cfg
       }
 
       @Override
+	  public String toString() {
+      // TODO Auto-generated method stub
+    	  return dst+" = "+src.toString()+";";
+	  }
+      
+      @Override
       public void accept(Visitor v)
       {
         v.visit(this);
@@ -245,7 +291,7 @@ public class Cfg
 
     public static class NewObject extends T
     {
-      public String dst;
+      //public String dst;
       // type of the destination variable
       public String c;
 
@@ -256,21 +302,56 @@ public class Cfg
       }
 
       @Override
+	  public String toString() {
+      // TODO Auto-generated method stub
+    	  return dst + " = new "+ c +"()"+";";
+	  }
+      
+      @Override
       public void accept(Visitor v)
       {
         v.visit(this);
       }
     }
 
+    public static class NewIntArray extends T{
+    	//public String dst;
+    	public cfg.Cfg.Operand.T exp;
+    	
+    	public NewIntArray(String ast,Cfg.Operand.T exp)
+    	{
+    		this.dst = dst;
+    		this.exp = exp;
+    	}
+    	
+    	public String toString()
+    	{
+    		return this.dst+" = new int["+exp.toString()+"]";
+    	}
+    	
+		@Override
+		public void accept(Visitor v) {
+			v.visit(this);
+		}
+    	
+    }
+    
     public static class Print extends T
     {
       public Operand.T arg;
-
+      
       public Print(Operand.T arg)
       {
         this.arg = arg;
+        this.dst = new String("");
       }
 
+      @Override
+	  public String toString() {
+      // TODO Auto-generated method stub
+    	  return "print "+ arg.toString() +";";
+	  }
+      
       @Override
       public void accept(Visitor v)
       {
@@ -280,13 +361,19 @@ public class Cfg
 
     public static class Sub extends T
     {
-      public String dst;
+      //public String dst;
       // type of the destination variable
       public Type.T ty;
       public Operand.T left;
       public Operand.T right;
 
-      public Sub(String dst, Type.T ty, Operand.T left, Operand.T right)
+      @Override
+	  public String toString() {
+      // TODO Auto-generated method stub
+    	  return dst + " = "+ left.toString() +" - "+ right.toString() +";";
+	  }
+
+	  public Sub(String dst, Type.T ty, Operand.T left, Operand.T right)
       {
         this.dst = dst;
         this.ty = ty;
@@ -303,7 +390,7 @@ public class Cfg
 
     public static class Times extends T
     {
-      public String dst;
+      //public String dst;
       // type of the destination variable
       public Type.T ty;
       public Operand.T left;
@@ -317,6 +404,11 @@ public class Cfg
         this.right = right;
       }
 
+      public String toString()
+  	  {
+  		return dst + " = "+ left.toString() +" * "+ right.toString() +";";
+  	  }
+      
       @Override
       public void accept(Visitor v)
       {
@@ -324,6 +416,124 @@ public class Cfg
       }
     }
 
+    public static class Not extends T{
+
+    	//public String dst;
+    	public cfg.Cfg.Operand.T exp;
+    	public Not(String dst,cfg.Cfg.Operand.T exp)
+    	{
+    		this.dst = dst;
+    		this.exp = exp;
+    	}
+    	
+    	public String toString()
+    	{
+    		return dst + " = "+" !("+exp.toString()+")";
+    	}
+		@Override
+		public void accept(Visitor v) {
+			v.visit(this);
+		}
+    	
+    }
+  
+    public static class Length extends T{
+
+    	//String dst;
+    	Operand.T array;
+    	
+    	Length(String dst,Operand.T array)
+    	{
+    		this.dst = dst;
+    		this.array = array;
+    	}
+    	
+    	public String toString()
+    	{
+    		return dst+" = "+array.toString()+".length";
+    	}
+		@Override
+		public void accept(Visitor v) {
+			// TODO Auto-generated method stub
+			v.visit(this);
+		}
+    	
+    }
+  
+    public static class ArraySelect extends T{
+    	
+    	Operand.T array;
+    	Operand.T index;
+    	//String dst;
+    	ArraySelect(String dst,Operand.T array,Operand.T index)
+    	{
+    		this.dst = dst;
+    		this.array = array;
+    		this.index = index;
+    	}
+
+    	public String toString()
+    	{
+    		return dst+" = "+array.toString()+"["+index.toString()+"]";
+    	}
+    	
+		@Override
+		public void accept(Visitor v) {
+			// TODO Auto-generated method stub
+			v.visit(this);
+		}
+    	
+    }
+    
+    public static class And extends T{
+
+    	//String dst;
+    	Operand.T left;
+    	Operand.T right;
+    	
+    	And(String dst,Operand.T left,Operand.T right)
+    	{
+    		this.dst = dst;
+    		this.left = left;
+    		this.right = right;
+    	}
+    	
+    	public String toString()
+    	{
+    		return dst+" = "+left.toString()+" && "+right.toString();
+    	}
+    	
+		@Override
+		public void accept(Visitor v) {
+			v.visit(this);
+		}
+    	
+    }
+  
+    public static class AssignArray extends T{
+    	String id;
+    	Operand.T index;
+    	Operand.T exp;
+    	AssignArray(String dst,String id,Operand.T index,Operand.T exp)
+    	{
+    		this.id = id;
+    		this.index = index;
+    		this.exp = exp;
+    		this.dst = dst;
+    	}
+    	
+    	@Override
+    	public String toString(){
+    		return dst+" = "+id+"["+index.toString()+"]"+exp.toString();
+    	}
+    	
+		@Override
+		public void accept(Visitor v) {
+			// TODO Auto-generated method stub
+			v.visit(this);
+		}
+    	
+    }
   }// end of statement
 
   // //////////////////////////////////////////////////
@@ -385,6 +595,8 @@ public class Cfg
         v.visit(this);
       }
     }
+    
+
 
   }// end of transfer
 
@@ -401,13 +613,20 @@ public class Cfg
       public util.Label label;
       public LinkedList<Stm.T> stms;
       public Transfer.T transfer;
-
+      public LinkedList<util.Label> labels;
+      public LinkedList<util.Label> forward;
+      public LinkedList<String> exceptions;
+      public int visited;
       public BlockSingle(util.Label label, LinkedList<Stm.T> stms,
-          Transfer.T transfer)
+          Transfer.T transfer,LinkedList<util.Label> labels)
       {
         this.label = label;
         this.stms = stms;
         this.transfer = transfer;
+        this.labels = labels;
+        this.visited = 0;
+        this.forward = new LinkedList<util.Label>();
+        this.exceptions = new LinkedList<String>();
       }
 
       @Override
@@ -428,9 +647,30 @@ public class Cfg
       {
         StringBuffer strb = new StringBuffer();
         strb.append(this.label.toString() + ":\\n");
-        // Lab5. Your code here:
-        strb.append("Your code here:\\n");
-
+        for(cfg.Cfg.Stm.T stm:this.stms)
+        {
+        	strb.append(stm);
+        	strb.append("\\n");
+        }
+        if(this.transfer instanceof cfg.Cfg.Transfer.Goto)
+        {
+        	strb.append("Goto ");
+        	strb.append(((cfg.Cfg.Transfer.Goto)transfer).label);
+        }
+        else if(this.transfer instanceof cfg.Cfg.Transfer.Return)
+        {
+        	strb.append("Return ");
+        	strb.append(((cfg.Cfg.Transfer.Return)transfer).operand);
+        }
+        else if(this.transfer instanceof cfg.Cfg.Transfer.If)
+        {
+        	strb.append("if ");
+        	strb.append(((cfg.Cfg.Transfer.If)transfer).operand);
+        	strb.append(" goto ");
+        	strb.append(((cfg.Cfg.Transfer.If)transfer).truee); 
+        	strb.append(" else goto ");
+        	strb.append(((cfg.Cfg.Transfer.If)transfer).falsee); 
+        }
         return strb.toString();
       }
 
@@ -589,7 +829,7 @@ public class Cfg
       public LinkedList<Vtable.T> vtables;
       public LinkedList<Method.T> methods;
       public MainMethod.T mainMethod;
-
+      
       public ProgramSingle(LinkedList<Class.T> classes,
           LinkedList<Vtable.T> vtables, LinkedList<Method.T> methods,
           MainMethod.T mainMethod)

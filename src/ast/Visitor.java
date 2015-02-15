@@ -30,7 +30,7 @@ import ast.Ast.Type.Boolean;
 import ast.Ast.Type.ClassType;
 import ast.Ast.Type.Int;
 import ast.Ast.Type.IntArray;
-
+import ast.Ast.Type.Error;
 public interface Visitor
 {
   // expressions
@@ -88,6 +88,7 @@ public interface Visitor
 
   public void visit(IntArray t);
 
+  public void visit(Error t);
   // dec
   public void visit(Dec.DecSingle d);
 
@@ -102,4 +103,6 @@ public interface Visitor
 
   // program
   public void visit(ast.Ast.Program.ProgramSingle p);
+
+
 }

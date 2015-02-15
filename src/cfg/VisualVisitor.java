@@ -2,6 +2,7 @@ package cfg;
 
 import java.util.HashMap;
 
+import ast.Ast.Stm.AssignArray;
 import cfg.Cfg.Block;
 import cfg.Cfg.Block.BlockSingle;
 import cfg.Cfg.Class.ClassSingle;
@@ -13,10 +14,15 @@ import cfg.Cfg.Operand.Int;
 import cfg.Cfg.Operand.Var;
 import cfg.Cfg.Program.ProgramSingle;
 import cfg.Cfg.Stm.Add;
+import cfg.Cfg.Stm.And;
+import cfg.Cfg.Stm.ArraySelect;
 import cfg.Cfg.Stm.InvokeVirtual;
+import cfg.Cfg.Stm.Length;
 import cfg.Cfg.Stm.Lt;
 import cfg.Cfg.Stm.Move;
+import cfg.Cfg.Stm.NewIntArray;
 import cfg.Cfg.Stm.NewObject;
+import cfg.Cfg.Stm.Not;
 import cfg.Cfg.Stm.Print;
 import cfg.Cfg.Stm.Sub;
 import cfg.Cfg.Stm.Times;
@@ -207,7 +213,8 @@ public class VisualVisitor implements Visitor
   public void visit(MethodSingle m)
   {
     java.util.HashMap<util.Label, Block.T> map = new HashMap<util.Label, Block.T>();
-    for (Block.T block : m.blocks) {
+    for (Block.T block : m.blocks) 
+    {
       BlockSingle b = (BlockSingle) block;
       util.Label label = b.label;
       map.put(label, b);
@@ -216,17 +223,22 @@ public class VisualVisitor implements Visitor
     util.Graph<Block.T> graph = new util.Graph<Block.T>(m.classId + "_"
         + m.id);
 
-    for (Block.T block : m.blocks) {
+    for (Block.T block : m.blocks) 
+    {
       graph.addNode(block);
     }
-    for (Block.T block : m.blocks) {
+    for (Block.T block : m.blocks) 
+    {
       BlockSingle b = (BlockSingle) block;
       Transfer.T transfer = b.transfer;
-      if (transfer instanceof Transfer.Goto) {
+      if (transfer instanceof Transfer.Goto) 
+      {
         Transfer.Goto gotoo = (Transfer.Goto) transfer;
         Block.T to = map.get(gotoo.label);
         graph.addEdge(block, to);
-      } else if (transfer instanceof Transfer.If) {
+      } 
+      else if (transfer instanceof Transfer.If) 
+      {
         Transfer.If iff = (If) transfer;
         Block.T truee = map.get(iff.truee);
         graph.addEdge(block, truee);
@@ -242,25 +254,31 @@ public class VisualVisitor implements Visitor
   public void visit(MainMethodSingle m)
   {
     java.util.HashMap<util.Label, Block.T> map = new HashMap<util.Label, Block.T>();
-    for (Block.T block : m.blocks) {
+    for (Block.T block : m.blocks) 
+    {
       Block.BlockSingle b = (Block.BlockSingle) block;
       util.Label label = b.label;
       map.put(label, b);
     }
-
+    
     util.Graph<Block.T> graph = new util.Graph<>("Tiger_main");
 
-    for (Block.T block : m.blocks) {
+    for (Block.T block : m.blocks) 
+    {
       graph.addNode(block);
     }
-    for (Block.T block : m.blocks) {
+    for (Block.T block : m.blocks) 
+    {
       BlockSingle b = (BlockSingle) block;
       Transfer.T transfer = b.transfer;
-      if (transfer instanceof Goto) {
+      if (transfer instanceof Goto) 
+      {
         Transfer.Goto gotoo = (Transfer.Goto) transfer;
         Block.T to = map.get(gotoo.label);
         graph.addEdge(block, to);
-      } else if (transfer instanceof Transfer.If) {
+      } 
+      else if (transfer instanceof Transfer.If) 
+      {
         Transfer.If iff = (Transfer.If) transfer;
         Block.T truee = map.get(iff.truee);
         graph.addEdge(block, truee);
@@ -291,10 +309,50 @@ public class VisualVisitor implements Visitor
   public void visit(ProgramSingle p)
   {
     // we'd like to output to a file, rather than the "stdout".
-    for (cfg.Cfg.Method.T m : p.methods) {
+    for (cfg.Cfg.Method.T m : p.methods) 
+    {
       m.accept(this);
     }
     p.mainMethod.accept(this);
   }
+
+@Override
+public void visit(NewIntArray newIntArray) {
+	// TODO Auto-generated method stub
+	
+}
+
+@Override
+public void visit(Not not) {
+	// TODO Auto-generated method stub
+	
+}
+
+@Override
+public void visit(Length length) {
+	// TODO Auto-generated method stub
+	
+}
+
+@Override
+public void visit(And and) {
+	// TODO Auto-generated method stub
+	
+}
+
+@Override
+public void visit(ArraySelect arr) {
+	// TODO Auto-generated method stub
+	
+}
+
+@Override
+public void visit(cfg.Cfg.Stm.AssignArray assignArray) {
+	// TODO Auto-generated method stub
+	
+}
+
+
+
 
 }

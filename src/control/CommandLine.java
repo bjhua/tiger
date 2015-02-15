@@ -200,20 +200,28 @@ public class CommandLine
   {
     String filename = null;
 
-    for (int i = 0; i < cargs.length; i++) {
-      if (!cargs[i].startsWith("-")) {
-        if (filename == null) {
+    for (int i = 0; i < cargs.length; i++) 
+    {
+      if (!cargs[i].startsWith("-")) 
+      {
+        if (filename == null) 
+        {
           filename = cargs[i];
           continue;
-        } else {
+        } 
+        else 
+        {
           System.out.println("Error: can only compile one Java file a time");
           System.exit(1);
         }
-      } else {
+      } 
+      else 
+      {
       }
 
       boolean found = false;
-      for (Arg<Object> arg : this.args) {
+      for (Arg<Object> arg : this.args)
+      {
         if (!arg.name.equals(cargs[i].substring(1)))
           continue;
 
@@ -224,7 +232,8 @@ public class CommandLine
           arg.action.f(null);
           break;
         default:
-          if (i >= cargs.length - 1) {
+          if (i >= cargs.length - 1) 
+          {
             System.out.println("Error: " + cargs[i] + ": requires an argument");
             this.output();
             System.exit(1);

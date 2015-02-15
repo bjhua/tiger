@@ -20,6 +20,9 @@ import ast.Ast.Stm.Assign;
 import ast.Ast.Stm.If;
 import ast.Ast.Stm.Print;
 import ast.Ast.Type;
+import ast.Ast.Exp.*;
+
+import java.util.*;
 
 public class Fac
 {
@@ -40,25 +43,24 @@ public class Fac
   // // main class: "Factorial"
   static MainClass.T factorial = new MainClassSingle(
       "Factorial", "a", new Print(new Call(
-          new NewObject("Fac"), "ComputeFac",
-          new util.Flist<Exp.T>().list(new Num(10)))));
+          new NewObject("Fac",3), "ComputeFac",
+          new util.Flist<Exp.T>().list(new Num(10)),3),3));
+
 
   // // class "Fac"
-  static ast.Ast.Class.T fac = new ast.Ast.Class.ClassSingle("F", null,
+  static ast.Ast.Class.T fac = new ast.Ast.Class.ClassSingle("Fac", null,
       new util.Flist<Dec.T>().list(),
       new util.Flist<Method.T>().list(new Method.MethodSingle(
           new Type.Int(), "ComputeFac", new util.Flist<Dec.T>()
-              .list(new Dec.DecSingle(new Type.Int(), "num")),
-          new util.Flist<Dec.T>().list(new Dec.DecSingle(
-              new Type.Int(), "num_aux")), new util.Flist<Stm.T>()
-              .list(new If(new Lt(new Id("num"),
-                  new Num(1)), new Assign("num_aux",
-                  new Num(1)), new Assign("num_aux",
-                  new Times(new Id("num"), new Call(
-                      new This(), "ComputeFac",
-                      new util.Flist<Exp.T>().list(new Sub(
-                          new Id("num"), new Num(1)))))))),
-          new Id("num_aux"))));
+              .list(new Dec.DecSingle(new Type.Int(), "num",7)),
+          new util.Flist<Dec.T>().list(new Dec.DecSingle(new Type.Int(), "num_aux",8)), 
+          new util.Flist<Stm.T>().list(
+            	  new If(new Lt(new Id("num",9),new Num(1),9), 
+            	  new Assign("num_aux",new Num(1),10),
+            	  new Assign("num_aux",new Times(new Id("num",12),
+            			  			   new Call(new This(),"ComputeFac",
+            			  					    new util.Flist<Exp.T>().list(new Sub(new Id("num",12), new Num(1),12)),12),12),12),8)),
+          new Id("num_aux",13))));
 
   // program
   public static Program.T prog = new ProgramSingle(factorial,
@@ -67,6 +69,22 @@ public class Fac
   // Lab2, exercise 2: you should write some code to
   // represent the program "test/Sum.java".
   // Your code here:
-  
-  
+  static MainClass.T sum = new MainClassSingle(
+	      "Sum", "a", new Print(new Call(
+	          new NewObject("Doit",3), "doit",
+	          new util.Flist<Exp.T>().list(new Num(101)),3),3));
+
+  static ast.Ast.Class.T doit = new ast.Ast.Class.ClassSingle("Doit", null,
+		  new util.Flist<Dec.T>().list(),
+	      new util.Flist<Method.T>().list(new Method.MethodSingle(
+	          new Type.Int(), 
+	          "doit", 
+	          new util.Flist<Dec.T>().list(new Dec.DecSingle(new Type.Int(), "n",8)),
+	          new util.Flist<Dec.T>().list(new Dec.DecSingle(new Type.Int(), "sum",9),
+	        		                       new Dec.DecSingle(new Type.Int(), "i",10)),
+	          new util.Flist<Stm.T>().list(),              
+	          new Id("sum",11))));
+
+  public static Program.T Summ = new ProgramSingle(sum,
+                                 new util.Flist<ast.Ast.Class.T>().list(doit));
 }

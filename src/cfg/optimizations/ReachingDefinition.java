@@ -3,6 +3,8 @@ package cfg.optimizations;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import ast.Ast.Method;
+import cfg.Cfg.Stm.AssignArray;
 import cfg.Cfg.Block;
 import cfg.Cfg.Block.BlockSingle;
 import cfg.Cfg.Class.ClassSingle;
@@ -14,10 +16,15 @@ import cfg.Cfg.Operand.Var;
 import cfg.Cfg.Program.ProgramSingle;
 import cfg.Cfg.Stm;
 import cfg.Cfg.Stm.Add;
+import cfg.Cfg.Stm.And;
+import cfg.Cfg.Stm.ArraySelect;
 import cfg.Cfg.Stm.InvokeVirtual;
+import cfg.Cfg.Stm.Length;
 import cfg.Cfg.Stm.Lt;
 import cfg.Cfg.Stm.Move;
+import cfg.Cfg.Stm.NewIntArray;
 import cfg.Cfg.Stm.NewObject;
+import cfg.Cfg.Stm.Not;
 import cfg.Cfg.Stm.Print;
 import cfg.Cfg.Stm.Sub;
 import cfg.Cfg.Stm.Times;
@@ -63,7 +70,12 @@ public class ReachingDefinition implements cfg.Visitor
   // liveIn, liveOut for transfer
   public HashMap<Transfer.T, HashSet<Stm.T>> transferIn;
   public HashMap<Transfer.T, HashSet<Stm.T>> transferOut;
-
+  private Reaching_Definition kind = Reaching_Definition.None;
+  enum Reaching_Definition
+  {
+    None, ArgDef,BlockGenKill,StmGenKill,StmInOut,BlockInOut,
+  }
+  
   public ReachingDefinition()
   {
     this.oneStmGen = new HashSet<>();
@@ -190,8 +202,51 @@ public class ReachingDefinition implements cfg.Visitor
   @Override
   public void visit(BlockSingle b)
   {
+    switch (this.kind) 
+    {
+    	case ArgDef:
+    		calculateVarDef(b);
+    		break;
+    	case StmGenKill:
+    		calculateStmGenKill(b);
+    		break;
+    	case BlockGenKill:
+    		calculateBlockGenKill(b);
+    		break;
+    	case StmInOut:
+    		calculateStmInOut(b);
+    		break;
+    	case BlockInOut:
+    		calculateBlockInOut(b);
+    	default:
+    	return;
+    }
   }
-
+  
+  public void calculateVarDef(BlockSingle b)
+  {
+	 
+  }
+  
+  public void calculateStmGenKill(BlockSingle b)
+  {
+	  
+  }
+  
+  public void calculateBlockGenKill(BlockSingle b)
+  {
+	  
+  }
+  
+  public void calculateBlockInOut(BlockSingle b)
+  {
+	  
+  }
+  
+  public void calculateStmInOut(BlockSingle b)
+  {
+	  
+  }
   // method
   @Override
   public void visit(MethodSingle m)
@@ -200,26 +255,46 @@ public class ReachingDefinition implements cfg.Visitor
     // Step 0: for each argument or local variable "x" in the
     // method m, calculate x's definition site set def(x).
     // Your code here:
-
+    this.kind = Reaching_Definition.ArgDef;
+    for (Block.T block : m.blocks) 
+    {
+      block.accept(this);
+    }
     // Step 1: calculate the "gen" and "kill" sets for each
     // statement and transfer
-
+    this.kind = Reaching_Definition.StmGenKill;
+    for (Block.T block : m.blocks) 
+    {
+      block.accept(this);
+    }
     // Step 2: calculate the "gen" and "kill" sets for each block.
     // For this, you should visit statements and transfers in a
     // block sequentially.
     // Your code here:
-
+    this.kind = Reaching_Definition.BlockGenKill;
+    for (Block.T block : m.blocks) 
+    {
+      block.accept(this);
+    }
     // Step 3: calculate the "in" and "out" sets for each block
     // Note that to speed up the calculation, you should use
     // a topo-sort order of the CFG blocks, and
     // crawl through the blocks in that order.
     // And also you should loop until a fix-point is reached.
     // Your code here:
-
+    this.kind = Reaching_Definition.BlockInOut;
+    for (Block.T block : m.blocks) 
+    {
+      block.accept(this);
+    }
     // Step 4: calculate the "in" and "out" sets for each
     // statement and transfer
     // Your code here:
-
+    this.kind = Reaching_Definition.StmInOut;
+    for (Block.T block : m.blocks) 
+    {
+      block.accept(this);
+    }
   }
 
   @Override
@@ -266,6 +341,48 @@ public class ReachingDefinition implements cfg.Visitor
   @Override
   public void visit(ProgramSingle p)
   {
+	  p.mainMethod.accept(this);
+	  for(cfg.Cfg.Method.T mth:p.methods)
+	  {
+		  mth.accept(this);
+	  }
+	  return;
   }
+
+@Override
+public void visit(NewIntArray newIntArray) {
+	// TODO Auto-generated method stub
+	
+}
+
+@Override
+public void visit(Not not) {
+	// TODO Auto-generated method stub
+	
+}
+
+@Override
+public void visit(Length length) {
+	// TODO Auto-generated method stub
+	
+}
+
+@Override
+public void visit(And and) {
+	// TODO Auto-generated method stub
+	
+}
+
+@Override
+public void visit(ArraySelect arr) {
+	// TODO Auto-generated method stub
+	
+}
+
+@Override
+public void visit(AssignArray assignArray) {
+	// TODO Auto-generated method stub
+	
+}
 
 }

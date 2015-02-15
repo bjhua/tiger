@@ -1,7 +1,10 @@
 package codegen.C;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.LinkedList;
+
+import ast.Ast.Dec;
 
 public class Ast
 {
@@ -56,6 +59,7 @@ public class Ast
 
     public static class IntArray extends T
     {
+      int length;
       public IntArray()
       {
       }
@@ -88,7 +92,6 @@ public class Ast
     {
       public Type.T type;
       public String id;
-
       public DecSingle(Type.T type, String id)
       {
         this.type = type;
@@ -177,12 +180,14 @@ public class Ast
       public LinkedList<T> args;
       public Type.T retType;
 
-      public Call(String assign, T exp, String id, java.util.LinkedList<T> args)
+      public Call(String assign, T exp, String id, 
+    		 java.util.LinkedList<T> args,Type.T retType)
       {
         this.assign = assign;
         this.exp = exp;
         this.id = id;
         this.args = args;
+        this.retType = retType;
       }
 
       @Override
@@ -213,7 +218,7 @@ public class Ast
     public static class Length extends T
     {
       public T array;
-
+      public int length;
       public Length(T array)
       {
         this.array = array;
@@ -273,9 +278,10 @@ public class Ast
       // is used to name the allocation.
       public String name;
 
-      public NewObject(String id)
+      public NewObject(String id,String name)
       {
         this.id = id;
+        this.name = name;
       }
 
       @Override
@@ -504,11 +510,13 @@ public class Ast
     {
       public String id;
       public LinkedList<codegen.C.Tuple> decs;
-
-      public ClassSingle(String id, LinkedList<codegen.C.Tuple> decs)
+      public Hashtable<String,Integer> classvar = new Hashtable<String,Integer>();
+      public ClassSingle(String id, LinkedList<codegen.C.Tuple> decs,
+    		  Hashtable<String,Integer> classvar)
       {
         this.id = id;
         this.decs = decs;
+        this.classvar = classvar;
       }
 
       @Override
@@ -533,13 +541,14 @@ public class Ast
     {
       public String id; // name of the class
       public java.util.ArrayList<codegen.C.Ftuple> ms; // all methods
-
-      public VtableSingle(String id, ArrayList<codegen.C.Ftuple> ms)
+      public String gc_map;
+      public VtableSingle(String id, ArrayList<codegen.C.Ftuple> ms,String gc_map)
       {
         this.id = id;
         this.ms = ms;
+        this.gc_map = gc_map;
       }
-
+      
       @Override
       public void accept(Visitor v)
       {
@@ -566,10 +575,13 @@ public class Ast
       public LinkedList<Dec.T> locals;
       public LinkedList<Stm.T> stms;
       public Exp.T retExp;
-
+      public Hashtable<String,Integer> var = new Hashtable<String,Integer>();
+      public Hashtable<String,Integer> classvar = new Hashtable<String,Integer>();
       public MethodSingle(Type.T retType, String classId, String id,
           LinkedList<Dec.T> formals, LinkedList<Dec.T> locals,
-          LinkedList<Stm.T> stms, Exp.T retExp)
+          LinkedList<Stm.T> stms,
+          Exp.T retExp,Hashtable<String,Integer> var,
+          Hashtable<String,Integer> classvar)
       {
         this.retType = retType;
         this.classId = classId;
@@ -578,6 +590,8 @@ public class Ast
         this.locals = locals;
         this.stms = stms;
         this.retExp = retExp;
+        this.var = var;
+        this.classvar =  classvar;
       }
 
       @Override
@@ -602,7 +616,7 @@ public class Ast
     {
       public LinkedList<Dec.T> locals;
       public Stm.T stm;
-
+      public LinkedList<Dec.T> classvar;
       public MainMethodSingle(LinkedList<Dec.T> locals, Stm.T stm)
       {
         this.locals = locals;
@@ -631,7 +645,6 @@ public class Ast
       public LinkedList<Vtable.T> vtables;
       public LinkedList<Method.T> methods;
       public MainMethod.T mainMethod;
-
       public ProgramSingle(LinkedList<Class.T> classes,
           LinkedList<Vtable.T> vtables, LinkedList<Method.T> methods,
           MainMethod.T mainMethod)
