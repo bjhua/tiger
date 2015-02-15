@@ -59,8 +59,7 @@ public class Control
   public static Verbose_t verbose = Verbose_t.Silent;
   
   // trace
-  public static java.util.LinkedList<String> trace =
-      new java.util.LinkedList<String>();
+  public static java.util.LinkedList<String> trace = new java.util.LinkedList<String>();
   public static void addTrace (String name)
   {
     trace.add(name);
@@ -88,7 +87,8 @@ public class Control
   
   public static boolean skipPass (String name)
   {
-    for (String s: skippedPasses){
+    for (String s: skippedPasses)
+    {
       if (s.equals(name))
         return true;
     }

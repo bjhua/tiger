@@ -1,5 +1,6 @@
 package cfg;
 
+import cfg.Cfg.Stm.AssignArray;
 import cfg.Cfg.Block.BlockSingle;
 import cfg.Cfg.Class.ClassSingle;
 import cfg.Cfg.Dec.DecSingle;
@@ -9,10 +10,15 @@ import cfg.Cfg.Operand.Int;
 import cfg.Cfg.Operand.Var;
 import cfg.Cfg.Program.ProgramSingle;
 import cfg.Cfg.Stm.Add;
+import cfg.Cfg.Stm.And;
+import cfg.Cfg.Stm.ArraySelect;
 import cfg.Cfg.Stm.InvokeVirtual;
+import cfg.Cfg.Stm.Length;
 import cfg.Cfg.Stm.Lt;
 import cfg.Cfg.Stm.Move;
+import cfg.Cfg.Stm.NewIntArray;
 import cfg.Cfg.Stm.NewObject;
+import cfg.Cfg.Stm.Not;
 import cfg.Cfg.Stm.Print;
 import cfg.Cfg.Stm.Sub;
 import cfg.Cfg.Stm.Times;
@@ -82,4 +88,16 @@ public interface Visitor
 
   // program
   public void visit(ProgramSingle p);
+
+  public void visit(NewIntArray newIntArray);
+  
+  public void visit(Not not);
+
+  public void visit(Length length);
+  
+  public void visit(And and);
+  
+  public void visit(ArraySelect arr);
+
+  public void visit(AssignArray assignArray);
 }

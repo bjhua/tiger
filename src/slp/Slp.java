@@ -1,9 +1,7 @@
 package slp;
-<<<<<<< HEAD
 
-=======
 import java.util.LinkedList;
->>>>>>> Lab4
+
 
 public class Slp
 {

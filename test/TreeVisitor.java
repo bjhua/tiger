@@ -369,6 +369,6 @@ class MyVisitor extends Visitor {
 	else nti = 0 ;
 
 	return 0;
-    
-}
+    }
+
 }

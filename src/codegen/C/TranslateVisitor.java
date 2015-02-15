@@ -123,7 +123,7 @@ public class TranslateVisitor implements ast.Visitor
     }
     e.rt.accept(this);
     Type.T retType = this.type;
-    this.exp = new Call(newid, exp, e.id, args);
+    this.exp = new Call(newid, exp, e.id, args,retType);
     return;
   }
 

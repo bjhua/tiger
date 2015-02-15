@@ -34,25 +34,33 @@ public class CompilerPass
 
   public void doit()
   {
-    if (Control.verbose != Control.Verbose_t.Silent) {
+    if (Control.verbose != Control.Verbose_t.Silent) 
+    {
       printSpaces();
       indent += nest;
       System.out.println(this.name + " starting");
-      if (Control.verbose == Control.Verbose_t.Detailed) {
+      if (Control.verbose == Control.Verbose_t.Detailed) 
+      {
         this.startTime = System.nanoTime();
       }
     }
 
     // a dirty hack, it's NOT type safe!
     int i;
-    try {
+    try 
+    {
       java.lang.reflect.Method[] methods = this.obj.getClass().getMethods();
-      for (i = 0; i < methods.length; i++) {
-        if (methods[i].getName().equals("accept"))
-          break;
+      for(i = 0; i < methods.length; i++) 
+      {
+        if(methods[i].getName().equals("accept"))
+        {
+            break;
+        }
       }
       methods[i].invoke(this.obj, this.x);
-    } catch (Throwable o) {
+    } 
+    catch (Throwable o) 
+    {
       System.out.println("compiler bug");
       o.printStackTrace();
       System.exit(1);
@@ -74,35 +82,42 @@ public class CompilerPass
   
   public void doitName(String name)
   {
-    if (Control.verbose != Control.Verbose_t.Silent) {
+    if(Control.verbose != Control.Verbose_t.Silent) 
+    {
       printSpaces();
       indent += nest;
       System.out.println(this.name + " starting");
-      if (Control.verbose == Control.Verbose_t.Detailed) {
+      if (Control.verbose == Control.Verbose_t.Detailed) 
+      {
         this.startTime = System.nanoTime();
       }
     }
 
     // a dirty hack, it's NOT type safe!
     int i;
-    try {
+    try 
+    {
       java.lang.reflect.Method[] methods = this.obj.getClass().getMethods();
-      for (i = 0; i < methods.length; i++) {
+      for (i = 0; i < methods.length; i++) 
+      {
         if (methods[i].getName().equals(name))
-          break;
+        	break;
       }
       methods[i].invoke(this.obj, this.x);
-    } catch (Throwable o) {
+    } catch (Throwable o) 
+    {
       System.out.println("compiler bug");
       o.printStackTrace();
       System.exit(1);
     }
 
-    if (Control.verbose != Control.Verbose_t.Silent){
+    if (Control.verbose != Control.Verbose_t.Silent)
+    {
       indent -= nest;
       printSpaces();
       System.out.print(this.name + " finished");
-      if (Control.verbose == Control.Verbose_t.Detailed) {
+      if (Control.verbose == Control.Verbose_t.Detailed) 
+      {
         this.endTime = System.nanoTime();
         System.out.print(": @ " + (this.endTime - this.startTime) / 1000
         + "ms");

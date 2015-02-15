@@ -1,5 +1,6 @@
 package cfg;
 
+import cfg.Cfg.Stm.AssignArray;
 import cfg.Cfg.Block;
 import cfg.Cfg.Block.BlockSingle;
 import cfg.Cfg.Class;
@@ -15,10 +16,15 @@ import cfg.Cfg.Operand.Var;
 import cfg.Cfg.Program.ProgramSingle;
 import cfg.Cfg.Stm;
 import cfg.Cfg.Stm.Add;
+import cfg.Cfg.Stm.And;
+import cfg.Cfg.Stm.ArraySelect;
 import cfg.Cfg.Stm.InvokeVirtual;
+import cfg.Cfg.Stm.Length;
 import cfg.Cfg.Stm.Lt;
 import cfg.Cfg.Stm.Move;
+import cfg.Cfg.Stm.NewIntArray;
 import cfg.Cfg.Stm.NewObject;
+import cfg.Cfg.Stm.Not;
 import cfg.Cfg.Stm.Print;
 import cfg.Cfg.Stm.Sub;
 import cfg.Cfg.Stm.Times;
@@ -55,6 +61,7 @@ public class PrettyPrintVisitor implements Visitor
   private void say(String s)
   {
     try {
+      if(s!=null)
       this.writer.write(s);
     } catch (Exception e) {
       e.printStackTrace();
@@ -219,6 +226,7 @@ public class PrettyPrintVisitor implements Visitor
   @Override
   public void visit(IntArrayType t)
   {
+	this.say("int[]");
   }
 
   // dec
@@ -235,11 +243,13 @@ public class PrettyPrintVisitor implements Visitor
   public void visit(BlockSingle b)
   {
     this.say(b.label.toString()+":\n");
-    for (Stm.T s: b.stms){
+    for (Stm.T s: b.stms)
+    {
       s.accept(this);
       this.say("\n");
     }
-    b.transfer.accept(this);
+    if(b.transfer!=null)
+      b.transfer.accept(this);
     return;
   }
 
@@ -351,7 +361,7 @@ public class PrettyPrintVisitor implements Visitor
       if (Control.ConCodeGen.outputName != null)
         outputName = Control.ConCodeGen.outputName;
       else if (Control.ConCodeGen.fileName != null)
-        outputName = Control.ConCodeGen.fileName + ".c";
+        outputName = Control.ConCodeGen.fileName + "_cfg.c";
       else
         outputName = "a.c";
 
@@ -384,7 +394,8 @@ public class PrettyPrintVisitor implements Visitor
     this.sayln("");
 
     this.sayln("// vtables");
-    for (Vtable.T v : p.vtables) {
+    for (Vtable.T v : p.vtables) 
+    {
       outputVtable((VtableSingle) v);
     }
     this.sayln("");
@@ -403,5 +414,64 @@ public class PrettyPrintVisitor implements Visitor
     }
 
   }
+
+@Override
+public void visit(NewIntArray newIntArray) {
+	this.printSpaces();
+	this.say(newIntArray.dst+" = new int[");
+	newIntArray.exp.accept(this);
+	this.say("];");
+}
+
+@Override
+public void visit(Not not) {
+	this.printSpaces();
+	this.say(not.dst+" = !(");
+	not.exp.accept(this);
+	this.say(");");
+	return;
+}
+
+@Override
+public void visit(Length length) {
+	this.printSpaces();
+	this.say(length.dst+" = ");
+	length.array.accept(this);
+	this.say(".length;");
+	return;
+}
+
+@Override
+public void visit(And and) {
+	this.printSpaces();
+	this.say(and.dst+" = ");
+	and.left.accept(this);
+	this.say(" && ");
+	and.right.accept(this);
+	this.say(";");
+	return;
+}
+
+@Override
+public void visit(ArraySelect arr) {
+	this.printSpaces();
+	this.say(arr.dst+" = ");
+	arr.array.accept(this);
+	this.say("[");
+	arr.index.accept(this);
+	this.say("];");
+	return;
+}
+
+@Override
+public void visit(AssignArray assignArray) {
+	this.printSpaces();
+	this.say(assignArray.id+"[");
+	assignArray.index.accept(this);
+	this.say("] =  ");
+	assignArray.exp.accept(this);
+	this.say(";");
+	return;
+}
 
 }

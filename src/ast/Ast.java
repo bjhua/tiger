@@ -738,14 +738,25 @@ public class Ast
       public String id;
       public String arg;
       public Stm.T stm;
-
+      
       public MainClassSingle(String id, String arg, Stm.T stm)
       {
         this.id = id;
         this.arg = arg;
         this.stm = stm;
       }
-
+      
+      @Override
+  	  public boolean equals(Object obj) 
+      {
+    	MainClass.MainClassSingle obj1 = (MainClass.MainClassSingle)obj;
+      	if(this.id.equals(obj1.id)&&this.arg.equals(obj1.arg)&&this.stm.equals(obj1.stm))
+      		return true;
+      	else 
+      		return false;
+  	  }
+      
+      
       @Override
       public void accept(Visitor v)
       {
@@ -756,13 +767,23 @@ public class Ast
   }
 
   // whole program
-  public static class Program
+  public static class Program 
   {
-    public static abstract class T implements ast.Acceptable
-    {
-    }
+	 
+      public static abstract class T implements ast.Acceptable,Cloneable
+      {
+    	 public Object clone() {  
+	    	Program.T o = null;  
+	        try {  
+	            o = (Program.T) super.clone();  
+	        } catch (CloneNotSupportedException e) {  
+	            e.printStackTrace();  
+	        }  
+	        return o;  
+    	} 
+      }
 
-    public static class ProgramSingle extends T
+	public static class ProgramSingle extends T
     {
       public MainClass.T mainClass;
       public LinkedList<Class.T> classes;

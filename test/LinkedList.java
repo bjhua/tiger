@@ -37,7 +37,7 @@ class Element {
 	int aux02 ;
 	int nt ;
 	ret_val = true ;
-	
+
 	aux01 = other.GetAge();
 	if (!this.Compare(aux01,Age)) ret_val = false ;
 	else { 
@@ -70,6 +70,7 @@ class Element {
     }
 
 }
+
 class List{
     Element elem ;
     List next ;
@@ -275,4 +276,3 @@ class LL{
     }
     
 }
-
