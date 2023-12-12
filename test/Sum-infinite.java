@@ -1,10 +1,10 @@
-class Sum { 
+class Sumx {
 	public static void main(String[] a) {
         System.out.println(new Doit().doit(101));
     }
 }
 
-class Doit {
+class Doitx {
     public int doit(int n) {
         int sum;
         int i;
