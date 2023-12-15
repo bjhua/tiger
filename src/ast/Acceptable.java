@@ -1,6 +1,5 @@
 package ast;
 
-public interface Acceptable
-{
-  public void accept(Visitor v);
+public interface Acceptable {
+    void accept(Visitor v);
 }

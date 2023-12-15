@@ -41,7 +41,7 @@ class BT {
 
 }
 
-class Tree{
+class Treex{
     Tree left ;
     Tree right;
     int key ;
