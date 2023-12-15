@@ -1,11 +1,9 @@
 package control;
 
 import control.Control.ConSlp;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
 import util.Bug;
 
 public class CommandLine {
@@ -45,22 +43,22 @@ public class CommandLine {
                 new Arg<Object>("help", null, "show this help information",
                         Kind.Empty,
                         (s) -> {
-                            usage();
-                            System.exit(1);
-                            return;
+            usage();
+            System.exit(1);
+            return;
                         }),
                 new Arg<Object>("lex", null, "dump the result of lexical analysis",
                         Kind.Empty,
                         (s) -> {
-                            Control.ConLexer.dump = true;
-                            return;
+            Control.ConLexer.dump = true;
+            return;
                         }),
                 new Arg<Object>("slp", "{args|interp|compile}",
                         "run the SLP interpreter", Kind.String,
                         (ss) -> {
-                            String s = (String) ss;
+            String s = (String)ss;
 
-                            switch (s) {
+            switch (s) {
                                 case "args" -> ConSlp.action = ConSlp.T.ARGS;
                                 case "interp" -> ConSlp.action = ConSlp.T.INTERP;
                                 case "compile" -> ConSlp.action = ConSlp.T.COMPILE;
@@ -100,110 +98,108 @@ public class CommandLine {
 
             boolean found = false;
             for (Arg<Object> arg : this.args) {
-                if (!arg.name.equals(
-                        cargs[i].substring(1)))
-                    continue;
+                                        if (!arg.name.equals(
+                                                cargs[i].substring(1)))
+                                            continue;
 
-                found = true;
-                if (Objects.requireNonNull(
-                        arg.kind) == Kind.Empty) {
-                    arg.action.f(null);
-                } else {
-                    if (i >= cargs.length - 1) {
-                        System.out.println(
-                                "Error: " + cargs[i] +
-                                        ": requires an argument");
-                        this.output();
-                        System.exit(1);
-                    }
-                    i++;
-                }
+                                        found = true;
+                                        if (Objects.requireNonNull(arg.kind) ==
+                                            Kind.Empty) {
+                                            arg.action.f(null);
+                                        } else {
+                                            if (i >= cargs.length - 1) {
+                                                System.out.println(
+                                                    "Error: " + cargs[i] +
+                                                    ": requires an argument");
+                                                this.output();
+                                                System.exit(1);
+                                            }
+                                            i++;
+                                        }
 
-                String theArg = cargs[i];
-                switch (arg.kind) {
-                    case Bool:
-                        if (theArg.equals("true"))
-                            arg.action.f((true));
-                        else if (theArg.equals("false"))
-                            arg.action.f((false));
-                        else {
-                            System.out.println(
-                                    "Error: " + arg.name +
-                                            ": requires a boolean");
-                            this.output();
-                            System.exit(1);
-                        }
-                        break;
-                    case Int:
-                        int num = 0;
-                        try {
-                            num = Integer.parseInt(
-                                    theArg);
-                        } catch (
-                                java.lang
-                                        .NumberFormatException
-                                        e) {
-                            System.out.println(
-                                    "Error: " + arg.name +
-                                            ": requires an integer");
-                            this.output();
-                            System.exit(1);
-                        }
-                        arg.action.f(num);
-                        break;
-                    case String:
-                        arg.action.f(theArg);
-                        break;
-                    case StringList:
-                        String[] strArray =
-                                theArg.split(",");
-                        arg.action.f(strArray);
-                        break;
-                    default:
-                        break;
-                }
-                break;
-            }
-            if (!found) {
-                System.out.println(
-                        "invalid option: " + cargs[i]);
-                this.output();
-                System.exit(1);
-            }
-        }
-        return filename;
+                                        String theArg = cargs[i];
+                                        switch (arg.kind) {
+                                        case Bool:
+                                            if (theArg.equals("true"))
+                                                arg.action.f((true));
+                                            else if (theArg.equals("false"))
+                                                arg.action.f((false));
+                                            else {
+                                                System.out.println(
+                                                    "Error: " + arg.name +
+                                                    ": requires a boolean");
+                                                this.output();
+                                                System.exit(1);
+                                            }
+                                            break;
+                                        case Int:
+                                            int num = 0;
+                                            try {
+                                                num = Integer.parseInt(theArg);
+                                            } catch (
+                                                java.lang
+                                                    .NumberFormatException e) {
+                                                System.out.println(
+                                                    "Error: " + arg.name +
+                                                    ": requires an integer");
+                                                this.output();
+                                                System.exit(1);
+                                            }
+                                            arg.action.f(num);
+                                            break;
+                                        case String:
+                                            arg.action.f(theArg);
+                                            break;
+                                        case StringList:
+                                            String[] strArray =
+                                                theArg.split(",");
+                                            arg.action.f(strArray);
+                                            break;
+                                        default:
+                                            break;
+                                        }
+                                        break;
+                                    }
+                                    if (!found) {
+                                        System.out.println("invalid option: " +
+                                                           cargs[i]);
+                                        this.output();
+                                        System.exit(1);
+                                    }
+                                }
+                                return filename;
     }
 
     private void outputSpace(int n) {
-        if (n < 0)
-            new Bug();
+            if (n < 0)
+                new Bug();
 
-        while (n-- != 0)
-            System.out.print(" ");
-        return;
+            while (n-- != 0)
+                System.out.print(" ");
+            return;
     }
 
     public void output() {
-        int max = 0;
-        for (Arg<Object> a : this.args) {
-            int current = a.name.length();
-            if (a.option != null)
-                current += a.option.length();
-            if (current > max)
-                max = current;
-        }
-        System.out.println("Available options:");
-        for (Arg<Object> a : this.args) {
-            int current = a.name.length();
-            System.out.print("   -" + a.name + " ");
-            if (a.option != null) {
-                current += a.option.length();
-                System.out.print(a.option);
+            int max = 0;
+            for (Arg<Object> a : this.args) {
+                int current = a.name.length();
+                if (a.option != null)
+                    current += a.option.length();
+                if (current > max)
+                    max = current;
             }
-            outputSpace(max - current + 1);
-            System.out.println(a.desription);
-        }
-        return;
+            System.out.println("Available options:");
+            for (Arg<Object> a : this.args) {
+                int current = a.name.length();
+                System.out.print("   -" + a.name + " ");
+                if (a.option != null) {
+                    current += a.option.length();
+                    System.out.print(a.option);
+                }
+                outputSpace(max - current + 1);
+                System.out.println(a.desription);
+            }
+            return;
     }
 
     public void usage() {
@@ -215,4 +211,4 @@ public class CommandLine {
         output();
         //        return;
     }
-}
+    }

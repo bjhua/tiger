@@ -1,12 +1,11 @@
 import control.CommandLine;
 import control.Control;
-import lexer.Lexer;
-import lexer.Token;
-import parser.Parser;
-
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import lexer.Lexer;
+import lexer.Token;
+import parser.Parser;
 
 // the straight-line interpreter (and compiler)
 public class Tiger {
