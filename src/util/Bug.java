@@ -1,5 +1,7 @@
 package util;
 
-public class Bug {
-  public Bug() { throw new java.lang.Error("Compiler bug"); }
+public class Bug extends Exception {
+    public Bug() {
+        System.out.println("Compiler bug");
+    }
 }

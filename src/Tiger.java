@@ -1,5 +1,6 @@
 import control.CommandLine;
 import control.Control;
+
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -8,48 +9,33 @@ import lexer.Lexer;
 import lexer.Token;
 import parser.Parser;
 
-
-// the straight-line interpreter (and compiler)
+// the Tiger compiler main class.
 public class Tiger {
-    public static void main(String[] args) {
-        InputStream fstream;
+    public static void main(String[] args) throws Exception {
+        InputStream fileStream;
         Parser parser;
 
         // ///////////////////////////////////////////////////////
         // handle command line arguments
         CommandLine cmd = new CommandLine();
-        String fname = cmd.scan(args);
-
-        if (Control.ConLexer.test) {
-            System.out.println("Testing the lexer. All tokens:");
-            try {
-                fstream = new BufferedInputStream(new FileInputStream(fname));
-                Lexer lexer = new Lexer(fname, fstream);
-                Token token = lexer.nextToken();
-                while (!token.kind.equals("EOF")) {
-                    System.out.println(token.toString());
-                    token = lexer.nextToken();
-                }
-                fstream.close();
-            } catch (Exception e) {
-                System.out.printf(e.toString());
-            }
-            System.exit(1);
+        // the file to be compiled:
+        String fileName = cmd.scan(args);
+        if(fileName == null){
+            // no file is given, then exit silently.
+            return;
         }
 
         // /////////////////////////////////////////////////////////
-        // normal compilation phases.
-        try {
-            fstream = new BufferedInputStream(new FileInputStream(fname));
-            parser = new Parser(fname, fstream);
-
-            parser.parse();
-
-            fstream.close();
-        } catch (Exception e) {
-            System.out.printf(e.toString());
-            System.exit(1);
-        }
-        return;
+        // otherwise, we continue to process normal compilation phases.
+        // first, create a new stream from the input file:
+        fileStream = new BufferedInputStream(new FileInputStream(fileName));
+        // then create a parser:
+        parser = new Parser(fileName, fileStream);
+        // parse the file:
+        parser.parse();
+        // close the stream before exiting.
+        fileStream.close();
     }
 }
+
+

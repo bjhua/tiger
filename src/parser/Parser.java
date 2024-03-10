@@ -2,21 +2,22 @@ package parser;
 
 import lexer.Lexer;
 import lexer.Token;
+import util.Todo;
 
 public class Parser {
     Lexer lexer;
     Token current;
 
-    public Parser(String fname, java.io.InputStream fstream) {
-        lexer = new Lexer(fname, fstream);
+    public Parser(String fileName, java.io.InputStream fileStream) {
+        lexer = new Lexer(fileName, fileStream);
         current = lexer.nextToken();
     }
 
     // /////////////////////////////////////////////
-    // utility methods to connect the lexer
-    // and the parser.
-
-    private void advance() { current = lexer.nextToken(); }
+    // utility methods to connect the lexer and the parser.
+    private void advance() {
+        current = lexer.nextToken();
+    }
 
     private void eatToken(String kind) {
         if (kind.equals(current.kind)) {
@@ -31,7 +32,6 @@ public class Parser {
     private void error() {
         System.out.println("Syntax error: compilation aborting...\n");
         System.exit(1);
-        return;
     }
 
     // ////////////////////////////////////////////////////////////
@@ -64,36 +64,36 @@ public class Parser {
     // -> new id ()
     private void parseAtomExp() {
         switch (current.kind) {
-        case "(":
-            advance();
-            parseExp();
-            eatToken(")");
-            return;
-        case "Num", "this", "Id", "true":
-            advance();
-            return;
-        case "new": {
-            advance();
-            switch (current.kind) {
-            case "int":
+            case "(":
                 advance();
-                eatToken("[");
                 parseExp();
-                eatToken("]");
-                return;
-            case "Id":
-                advance();
-                eatToken("(");
                 eatToken(")");
                 return;
+            case "Num", "this", "Id", "true":
+                advance();
+                return;
+            case "new": {
+                advance();
+                switch (current.kind) {
+                    case "int":
+                        advance();
+                        eatToken("[");
+                        parseExp();
+                        eatToken("]");
+                        return;
+                    case "Id":
+                        advance();
+                        eatToken("(");
+                        eatToken(")");
+                        return;
+                    default:
+                        error();
+                        return;
+                }
+            }
             default:
                 error();
                 return;
-            }
-        }
-        default:
-            error();
-            return;
         }
     }
 
@@ -104,7 +104,7 @@ public class Parser {
     private void parseNotExp() {
         parseAtomExp();
         while (current.kind.equals(".") ||
-               current.kind.equals("[")) {
+                current.kind.equals("[")) {
             if (current.kind.equals(".")) {
                 advance();
                 if (current.kind.equals("length")) {
@@ -151,7 +151,7 @@ public class Parser {
     private void parseLtExp() {
         parseAddSubExp();
         while (current.kind.equals("+") ||
-               current.kind.equals("-")) {
+                current.kind.equals("-")) {
             advance();
             parseAddSubExp();
         }
@@ -186,20 +186,20 @@ public class Parser {
     // -> System.out.println ( Exp ) ;
     // -> id = Exp ;
     // -> id [ Exp ]= Exp ;
-    private void parseStatement() {
+    private void parseStatement() throws Exception{
         // Lab1. Exercise 4: Fill in the missing code
         // to parse a statement.
-        new util.Todo();
+        throw new Todo();
     }
 
     // Statements -> Statement Statements
     // ->
-    private void parseStatements() {
+    private void parseStatements() throws Exception{
         while (current.kind.equals("{") ||
-               current.kind.equals("if") ||
-               current.kind.equals("while") ||
-               current.kind.equals("System") ||
-               current.kind.equals("Id")) {
+                current.kind.equals("if") ||
+                current.kind.equals("while") ||
+                current.kind.equals("System") ||
+                current.kind.equals("Id")) {
             parseStatement();
         }
         return;
@@ -209,15 +209,15 @@ public class Parser {
     // -> boolean
     // -> int
     // -> id
-    private void parseType() {
+    private void parseType() throws Exception{
         // Lab1. Exercise 4: Fill in the missing code
         // to parse a type.
-        new util.Todo();
+        throw new util.Todo();
     }
 
     // VarDecl -> Type id ;
-    private void parseVarDecl() {
-        // to parse the "Type" nonterminal in this method, instead of writing
+    private void parseVarDecl() throws Exception{
+        // to parse the "Type" non-terminal in this method, instead of writing
         // a fresh one.
         parseType();
         eatToken("Id");
@@ -227,10 +227,10 @@ public class Parser {
 
     // VarDecls -> VarDecl VarDecls
     // ->
-    private void parseVarDecls() {
+    private void parseVarDecls() throws Exception{
         while (current.kind.equals("int") ||
-               current.kind.equals("boolean") ||
-               current.kind.equals("Id")) {
+                current.kind.equals("boolean") ||
+                current.kind.equals("Id")) {
             parseVarDecl();
         }
         //        return;
@@ -239,10 +239,10 @@ public class Parser {
     // FormalList -> Type id FormalRest*
     // ->
     // FormalRest -> , Type id
-    private void parseFormalList() {
+    private void parseFormalList() throws Exception{
         if (current.kind.equals("int") ||
-            current.kind.equals("boolean") ||
-            current.kind.equals("Id")) {
+                current.kind.equals("boolean") ||
+                current.kind.equals("Id")) {
             parseType();
             eatToken("Id");
             while (current.kind.equals(",")) {
@@ -256,16 +256,15 @@ public class Parser {
 
     // Method -> public Type id ( FormalList )
     // { VarDecl* Statement* return Exp ;}
-    private void parseMethod() {
+    private void parseMethod() throws Exception{
         // Lab1. Exercise 4: Fill in the missing code
         // to parse a method.
-        new util.Todo();
-        return;
+        throw new Todo();
     }
 
     // MethodDecls -> MethodDecl MethodDecls
     // ->
-    private void parseMethodDecls() {
+    private void parseMethodDecls() throws Exception{
         while (current.kind.equals("public")) {
             parseMethod();
         }
@@ -274,7 +273,7 @@ public class Parser {
 
     // ClassDecl -> class id { VarDecl* MethodDecl* }
     // -> class id extends id { VarDecl* MethodDecl* }
-    private void parseClassDecl() {
+    private void parseClassDecl() throws Exception{
         eatToken("class");
         eatToken("Id");
         if (current.kind.equals("extends")) {
@@ -290,36 +289,34 @@ public class Parser {
 
     // ClassDecls -> ClassDecl ClassDecls
     // ->
-    private void parseClassDecls() {
+    private void parseClassDecls() throws Exception{
         while (current.kind.equals("class")) {
             parseClassDecl();
         }
         return;
     }
 
-    // MainClass -> class id
-    // {
-    // public static void main ( String [] id )
-    // {
-    // Statement
+    // MainClass -> class id {
+    //   public static void main ( String [] id ) {
+    //     Statement
+    //   }
     // }
-    // }
-    private void parseMainClass() {
+    private void parseMainClass() throws Exception{
         // Lab1. Exercise 4: Fill in the missing code
         // to parse a main class as described by the
         // grammar above.
-        new util.Todo();
+        throw new Todo();
     }
 
     // Program -> MainClass ClassDecl*
-    private void parseProgram() {
+    private void parseProgram() throws Exception{
         parseMainClass();
         parseClassDecls();
         eatToken("EOF");
         return;
     }
 
-    public void parse() {
+    public void parse() throws Exception{
         parseProgram();
         return;
     }
