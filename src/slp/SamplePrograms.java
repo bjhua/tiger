@@ -1,5 +1,8 @@
 package slp;
 
+import java.util.Arrays;
+import java.util.List;
+
 import slp.Slp.Exp.Eseq;
 import slp.Slp.Exp.Id;
 import slp.Slp.Exp.Num;
@@ -9,11 +12,8 @@ import slp.Slp.Stm.Assign;
 import slp.Slp.Stm.Compound;
 import slp.Slp.Stm.Print;
 
-import java.util.Arrays;
-import java.util.List;
-
-
-public class Samples {
+// two sample programs.
+public class SamplePrograms {
     public static Stm.T prog = new Compound(
             new Assign("a", new Op(new Num(3), "+", new Num(5))),
             new Compound(

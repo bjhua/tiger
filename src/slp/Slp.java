@@ -2,21 +2,27 @@ package slp;
 
 import java.util.List;
 
+// this class defines the abstract syntax trees for the SLP language.
 public class Slp {
     // ////////////////////////////////////////////////
     // expression
     public static class Exp {
-        // base class
-        public interface T {}
+        // an interface serving as the base class
+        public interface T {
+        }
 
-        // derived
-        public record Id(String id) implements T {}
+        // derived records
+        public record Id(String id) implements T {
+        }
 
-        public record Num(int num) implements T {}
+        public record Num(int num) implements T {
+        }
 
-        public record Op(T left, String op, T right) implements T {}
+        public record Op(T left, String op, T right) implements T {
+        }
 
-        public record Eseq(Stm.T stm, T exp) implements T {} // eseq
+        public record Eseq(Stm.T stm, T exp) implements T {
+        } // eseq
     }
     // end of expression
 
@@ -24,15 +30,20 @@ public class Slp {
     // statement
     public static class Stm {
         // the type
-        public interface T {}
+        public interface T {
+        }
 
-        // Compound (s1, s2)
-        public record Compound(T s1, T s2) implements T {}
+        // s1; s2
+        public record Compound(T s1, T s2) implements T {
+        }
 
         // x := e
-        public record Assign(String id, Exp.T exp) implements T {}
+        public record Assign(String id, Exp.T exp) implements T {
+        }
 
-        // print (explist)
-        public record Print(List<Exp.T> exps) implements T {}
-    } // end of statement
+        // print(explist)
+        public record Print(List<Exp.T> exps) implements T {
+        }
+    }
+    // end of statement
 }

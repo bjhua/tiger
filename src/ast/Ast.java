@@ -6,7 +6,7 @@ public class Ast {
     //  ///////////////////////////////////////////////////////////
     //  type
     public static class Type {
-        public static interface T extends ast.Acceptable {
+        public interface T extends ast.Acceptable {
             // boolean: -1
             // int: 0
             // int[]: 1
