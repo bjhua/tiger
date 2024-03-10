@@ -5,7 +5,8 @@ import java.util.Hashtable;
 import java.util.Objects;
 
 public class ClassBinding {
-    public String extendss; // null for non-existing extends
+    // null for non-existing extends
+    public String extendss;
     public java.util.Hashtable<String, Type.T> fields;
     public java.util.Hashtable<String, MethodType> methods;
 

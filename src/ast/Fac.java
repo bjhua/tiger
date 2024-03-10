@@ -7,12 +7,14 @@ import ast.Ast.Program.ProgramSingle;
 import ast.Ast.Stm.Assign;
 import ast.Ast.Stm.If;
 import ast.Ast.Stm.Print;
+import util.Todo;
+
 import java.util.List;
 
 public class Fac {
     // Lab2, exercise 2: read the following code and make
     // sure you understand how the sample program "test/Fac.java" is
-    // represented.
+    // encoded.
 
     // /////////////////////////////////////////////////////
     // To represent the "Fac.java" program in memory manually
@@ -68,6 +70,7 @@ public class Fac {
     public static Program.T prog = new ProgramSingle(factorial, List.of(fac));
 
     // Lab2, exercise 2: you should write some code to
-    // represent the program "test/Sum.java".
+    // encode the program "test/Sum.java".
     // Your code here:
+
 }
