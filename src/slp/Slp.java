@@ -7,22 +7,25 @@ public class Slp {
     // ////////////////////////////////////////////////
     // expression
     public static class Exp {
-        // an interface serving as the base class
+        // the type
         public interface T {
         }
 
-        // derived records
+        // x
         public record Id(String id) implements T {
         }
 
+        // n
         public record Num(int num) implements T {
         }
 
+        // e bop e
         public record Op(T left, String op, T right) implements T {
         }
 
+        // s, e
         public record Eseq(Stm.T stm, T exp) implements T {
-        } // eseq
+        }
     }
     // end of expression
 

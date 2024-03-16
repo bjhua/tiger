@@ -1,9 +1,9 @@
 package control;
 
+import util.Bug;
+
 import java.util.List;
 import java.util.Objects;
-
-import util.Bug;
 
 public class CommandLine {
     interface F<X> {
@@ -53,7 +53,7 @@ public class CommandLine {
 
     // scan the command line arguments, return the file name
     // in it. The file name should be unique.
-    public String scan(String[] cargs)  {
+    public String scan(String[] cargs) {
         String filename = null;
 
         for (int i = 0; i < cargs.length; i++) {
@@ -143,7 +143,7 @@ public class CommandLine {
         return filename;
     }
 
-    private void outputSpace(int n) throws Exception{
+    private void outputSpace(int n) throws Exception {
         if (n < 0)
             throw new Bug();
 
@@ -168,9 +168,9 @@ public class CommandLine {
                 current += a.option.length();
                 System.out.print(a.option);
             }
-            try{
+            try {
                 outputSpace(max - current + 1);
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             System.out.println(a.description);
@@ -178,11 +178,10 @@ public class CommandLine {
     }
 
     public void usage() {
-        System.out.println(
-                """
-                        The Tiger compiler. Copyright (C) 2013-, SSE of USTC.
-                        Usage: java Tiger [options] <filename>
-                        """);
+        System.out.println("""
+                The Tiger compiler. Copyright (C) 2013-, SSE of USTC.
+                Usage: java Tiger [options] <filename>
+                """);
         try {
             output();
         } catch (Exception e) {
@@ -191,3 +190,4 @@ public class CommandLine {
         //        return;
     }
 }
+
