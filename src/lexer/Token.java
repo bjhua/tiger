@@ -1,29 +1,57 @@
 package lexer;
 
-// Lab 1, exercise 1: read the MiniJava specification
-// carefully, and answer these two questions:
-//   1. should we add other token kinds?
-//   2. which tokens come with an extra "lexeme", and
-//      which do not?
+// Lab 1, exercise 8: read the MiniJava specification
+// carefully, and fill in other possible tokens.
 public class Token {
+    // alphabetically ordered
+    public enum Kind {
+        ADD,
+        CLASS,
+        COMMA,
+        DOT,
+        EOF,
+        ID,
+        INT,
+        LBRACKET,
+        LENGTH,
+        LPAREN,
+        NEW,
+        RBRACKET,
+        RPAREN,
+        SEMICOLON,
+    }
+
     // kind of the token
-    public String kind;
+    public Kind kind;
     // extra lexeme for this token, if any
     public String lexeme;
-    // on which line of the source file this token appears
-    public Integer lineNum;
+    // position of the token in the source file
+    public Integer rowNum;
+    public Integer colNum;
 
-    public Token(String kind, Integer lineNum) {
+
+    public Token(Kind kind, Integer rowNum, Integer colNum) {
         this.kind = kind;
-        this.lineNum = lineNum;
+        this.rowNum = rowNum;
+        this.colNum = colNum;
+    }
+
+    public Token(Kind kind, String lexeme, Integer rowNum, Integer colNum) {
+        this.kind = kind;
+        this.lexeme = lexeme;
+        this.rowNum = rowNum;
+        this.colNum = colNum;
     }
 
     @Override
     public String toString() {
         String s;
 
-        s = ": " + ((this.lexeme == null) ? "<NONE>" : this.lexeme)
-                + " : at line " + (this.lineNum == null ? "<null>" : lineNum.toString());
+        s = ": " + ((this.lexeme == null) ? "<NONE>" : this.lexeme) +
+                " : at row " +
+                (this.rowNum == null ? "<null>" : rowNum.toString()) +
+                " : at column " +
+                (this.colNum == null ? "<null>" : colNum.toString());
         return this.kind + s;
     }
 }

@@ -1,12 +1,9 @@
 import control.CommandLine;
-import control.Control;
+import parser.Parser;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import lexer.Lexer;
-import lexer.Token;
-import parser.Parser;
 
 // the Tiger compiler main class.
 public class Tiger {
@@ -19,18 +16,18 @@ public class Tiger {
         CommandLine cmd = new CommandLine();
         // the file to be compiled:
         String fileName = cmd.scan(args);
-        if(fileName == null){
+        if (fileName == null) {
             // no file is given, then exit silently.
             return;
         }
 
         // /////////////////////////////////////////////////////////
-        // otherwise, we continue to process normal compilation phases.
+        // otherwise, we continue the normal compilation phases.
         // first, create a new stream from the input file:
         fileStream = new BufferedInputStream(new FileInputStream(fileName));
         // then create a parser:
         parser = new Parser(fileName, fileStream);
-        // parse the file:
+        // parse the file using the parser:
         parser.parse();
         // close the stream before exiting.
         fileStream.close();
