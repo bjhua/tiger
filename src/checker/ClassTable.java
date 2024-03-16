@@ -1,10 +1,10 @@
-package elaborator;
+package checker;
 
 import ast.Ast.Type;
 import util.Todo;
 
 public class ClassTable {
-    // map each class name (a string), to the class bindings.
+    // map a class name (a string), to its corresponding class binding.
     private final java.util.Hashtable<String, ClassBinding> table;
 
     public ClassTable() {
@@ -44,15 +44,15 @@ public class ClassTable {
 
     // get type of some field
     // return null for non-existing field.
-    public Type.T get(String className, String xid) {
+    public Type.T get(String className, String fieldId) {
         ClassBinding cb = this.table.get(className);
-        Type.T type = cb.fields.get(xid);
+        Type.T type = cb.fields.get(fieldId);
         while (type == null) { // search all parent classes until found or fail
-            if (cb.extendss == null)
+            if (cb.extends_ == null)
                 return type;
 
-            cb = this.table.get(cb.extendss);
-            type = cb.fields.get(xid);
+            cb = this.table.get(cb.extends_);
+            type = cb.fields.get(fieldId);
         }
         return type;
     }
@@ -63,16 +63,19 @@ public class ClassTable {
         ClassBinding cb = this.table.get(className);
         MethodType type = cb.methods.get(mid);
         while (type == null) { // search all parent classes until found or fail
-            if (cb.extendss == null)
+            if (cb.extends_ == null)
                 return type;
 
-            cb = this.table.get(cb.extendss);
+            cb = this.table.get(cb.extends_);
             type = cb.methods.get(mid);
         }
         return type;
     }
 
-    public void dump() { new Todo(); }
+    // lab 2, exercise 7:
+    public void dump() {
+        new Todo();
+    }
 
     @Override
     public String toString() {

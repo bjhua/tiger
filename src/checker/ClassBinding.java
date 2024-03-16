@@ -1,25 +1,27 @@
-package elaborator;
+package checker;
 
 import ast.Ast.Type;
+
 import java.util.Hashtable;
 import java.util.Objects;
 
+// the binding for a class
 public class ClassBinding {
-    // null for non-existing extends
-    public String extendss;
+    // null for empty extends
+    public String extends_;
     public java.util.Hashtable<String, Type.T> fields;
     public java.util.Hashtable<String, MethodType> methods;
 
-    public ClassBinding(String extendss) {
-        this.extendss = extendss;
+    public ClassBinding(String extends_) {
+        this.extends_ = extends_;
         this.fields = new Hashtable<String, Type.T>();
         this.methods = new Hashtable<String, MethodType>();
     }
 
-//    public ClassBinding(String extendss,
+//    public ClassBinding(String extends_,
 //                        java.util.Hashtable<String, Type.T> fields,
 //                        java.util.Hashtable<String, MethodType> methods) {
-//        this.extendss = extendss;
+//        this.extends_ = extends_;
 //        this.fields = fields;
 //        this.methods = methods;
 //    }
@@ -43,7 +45,7 @@ public class ClassBinding {
     @Override
     public String toString() {
         System.out.print("extends: ");
-        System.out.println(Objects.requireNonNullElse(this.extendss, "<>"));
+        System.out.println(Objects.requireNonNullElse(this.extends_, "<>"));
         System.out.println("\nfields:\n  ");
         System.out.println(fields.toString());
         System.out.println("\nmethods:\n  ");

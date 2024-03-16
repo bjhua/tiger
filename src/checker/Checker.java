@@ -1,27 +1,24 @@
-package elaborator;
+package checker;
 
-import ast.Ast.*;
 import ast.Ast.Class;
 import ast.Ast.Class.ClassSingle;
+import ast.Ast.*;
 import ast.Ast.Method.MethodSingle;
 import ast.Ast.Program.ProgramSingle;
 import util.Todo;
 
-public class Elaborator {
-    // symbol table for class
+public class Checker {
+    // symbol table for all classes
     public ClassTable classTable;
     // symbol table for each method
     public MethodTable methodTable;
-    // the class name being elaborated
+    // the class name being checked
     public String currentClass;
-    // type of the expression being elaborated
-    public Type.T type;
 
-    public Elaborator() {
+    public Checker() {
         this.classTable = new ClassTable();
         this.methodTable = new MethodTable();
         this.currentClass = null;
-        this.type = null;
     }
 
     private void error() {
@@ -31,21 +28,23 @@ public class Elaborator {
 
     // /////////////////////////////////////////////////////
     // expressions
-    public void elabExp(Exp.T e) throws Exception{
+    public void elabExp(Exp.T e) throws Exception {
         throw new Todo();
     }
 
     // statements
-    public void elabStm(Stm.T s) throws Exception{
+    public void elabStm(Stm.T s) throws Exception {
         throw new Todo();
     }
 
     // type
-    public void elabType(Type.T t) {}
+    public void elabType(Type.T t) {
+    }
 
 
     // dec
-    public void elabDec(Dec.T d) {}
+    public void elabDec(Dec.T d) {
+    }
 
     // method
     public void elabMethod(Method.MethodSingle m) {
@@ -76,28 +75,26 @@ public class Elaborator {
     private void buildClass(ClassSingle c) {
         this.classTable.put(c.id(), new ClassBinding(c.extendss()));
         for (Dec.T dec : c.decs()) {
-            Dec.DecSingle d = (Dec.DecSingle)dec;
+            Dec.DecSingle d = (Dec.DecSingle) dec;
             this.classTable.put(c.id(), d.id(), d.type());
         }
         for (Method.T method : c.methods()) {
-            MethodSingle m = (MethodSingle)method;
+            MethodSingle m = (MethodSingle) method;
             this.classTable.put(c.id(), m.id(),
-                                new MethodType(m.retType(), m.formals()));
+                    new MethodType(m.retType(), m.formals()));
         }
     }
 
-    // step 1: end
-    // ///////////////////////////////////////////////////
 
-    // program
-    public void elabProgramSingle(ProgramSingle p) {
+    // to check a program
+    public void checkProgramSingle(ProgramSingle p) {
         // ////////////////////////////////////////////////
         // step 1: build a symbol table for class (the class table)
         // a class table is a mapping from class names to class bindings
         // classTable: className -> ClassBinding{extends, fields, methods}
-        buildMainClass((MainClass.MainClassSingle)p.mainClass());
+        buildMainClass((MainClass.MainClassSingle) p.mainClass());
         for (Class.T c : p.classes()) {
-            buildClass((ClassSingle)c);
+            buildClass((ClassSingle) c);
         }
 
         // we can double-check that the class table is OK!

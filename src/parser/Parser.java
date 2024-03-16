@@ -1,5 +1,6 @@
 package parser;
 
+import ast.Ast;
 import lexer.Lexer;
 import lexer.Token;
 import util.Todo;
@@ -253,14 +254,16 @@ public class Parser {
     }
 
     // Program -> MainClass ClassDecl*
-    private void parseProgram() throws Exception {
+    private Ast.Program.T parseProgram() throws Exception {
         parseMainClass();
         parseClassDecls();
         eatToken(Token.Kind.EOF);
-        return;
+        return null;
     }
 
-    public void parse() throws Exception {
-        parseProgram();
+    public Ast.Program.T parse() throws Exception {
+        // generate and return an AST from the parser:
+        Ast.Program.T ast = parseProgram();
+        return ast;
     }
 }

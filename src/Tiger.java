@@ -1,3 +1,5 @@
+import ast.Ast;
+import ast.PrettyPrinter;
 import control.CommandLine;
 import parser.Parser;
 
@@ -28,9 +30,13 @@ public class Tiger {
         // then create a parser:
         parser = new Parser(fileName, fileStream);
         // parse the file using the parser:
-        parser.parse();
+        Ast.Program.T ast = parser.parse();
         // close the stream before exiting.
         fileStream.close();
+
+        // pretty printing:
+        PrettyPrinter pp = new PrettyPrinter();
+        pp.ppProgram(ast);
     }
 }
 

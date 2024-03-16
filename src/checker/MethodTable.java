@@ -1,10 +1,12 @@
-package elaborator;
+package checker;
 
 import ast.Ast.Dec;
 import ast.Ast.Type;
-import java.util.List;
 import util.Todo;
 
+import java.util.List;
+
+// map each argument and local in a method, to its corresponding type.
 public class MethodTable {
     private final java.util.Hashtable<String, Type.T> table;
 
@@ -15,7 +17,7 @@ public class MethodTable {
     // Duplication is not allowed
     public void put(List<Dec.T> formals, List<Dec.T> locals) {
         for (Dec.T dec : formals) {
-            Dec.DecSingle decc = (Dec.DecSingle)dec;
+            Dec.DecSingle decc = (Dec.DecSingle) dec;
             if (this.table.get(decc.id()) != null) {
                 System.out.println("duplicated parameter: " + decc.id());
                 System.exit(1);
@@ -24,7 +26,7 @@ public class MethodTable {
         }
 
         for (Dec.T dec : locals) {
-            Dec.DecSingle decc = (Dec.DecSingle)dec;
+            Dec.DecSingle decc = (Dec.DecSingle) dec;
             if (this.table.get(decc.id()) != null) {
                 System.out.println("duplicated variable: " + decc.id());
                 System.exit(1);
@@ -34,9 +36,14 @@ public class MethodTable {
     }
 
     // return null for non-existing keys
-    public Type.T get(String id) { return this.table.get(id); }
+    public Type.T get(String id) {
+        return this.table.get(id);
+    }
 
-    public void dump() { new Todo(); }
+    // lab 2, exercise 7:
+    public void dump() {
+        new Todo();
+    }
 
     @Override
     public String toString() {

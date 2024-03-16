@@ -51,7 +51,8 @@ public class Ast {
     // ///////////////////////////////////////////////////
     // declaration
     public static class Dec {
-        public interface T {}
+        public interface T {
+        }
 
         public record DecSingle(Type.T type, String id) implements T {
         }
@@ -60,26 +61,34 @@ public class Ast {
     // /////////////////////////////////////////////////////////
     // expression
     public static class Exp {
-        public interface T{}
+        public interface T {
+        }
 
-        // +
+        // binary operations
         public record Bop(T left, String op, T right) implements T {
         }
-        // and
+
+        // and, op is a boolean operator
         public record BopBool(T left, String op, T right) implements T {
         }
+
         // ArraySelect
         public record ArraySelect(T array, T index) implements T {
         }
 
         // Call
-        public record Call(T exp, String id, List<T> args,
+        public record Call(T exp,
+                           String id,
+                           List<T> args,
                            String type,     // type of first field "exp"
                            List<Type.T> at, // arg's type
                            Type.T rt) implements T {
         }
+
         // False
-        public record False() implements T {}
+        public record False() implements T {
+        }
+
         // Id
         public record Id(String id, Type.T type, boolean isField) implements T {
         }
@@ -118,55 +127,79 @@ public class Ast {
     // /////////////////////////////////////////////////////////
     // statement
     public static class Stm {
-        public interface T{}
+        public interface T {
+        }
 
         // assign
-        public record Assign(String id, Exp.T exp, Type.T type) implements T {}
+        public record Assign(String id, Exp.T exp, Type.T type) implements T {
+        }
+
         // assign-array
-        public record AssignArray(String id, Exp.T index, Exp.T exp) implements T {}
+        public record AssignArray(String id, Exp.T index, Exp.T exp) implements T {
+        }
+
         // block
-        public record Block(List<T> stms) implements T {}
+        public record Block(List<T> stms) implements T {
+        }
+
         // if
-        public record If(Exp.T cond, T thenn, T elsee) implements T {}
+        public record If(Exp.T cond, T thenn, T elsee) implements T {
+        }
+
         // Print
-        public record Print(Exp.T exp) implements T {}
+        public record Print(Exp.T exp) implements T {
+        }
+
         // while
-        public record While(Exp.T cond, T body) implements T {}
+        public record While(Exp.T cond, T body) implements T {
+        }
     }
     // end of statement
 
     // /////////////////////////////////////////////////////////
     // method
     public static class Method {
-        public interface T{}
+        public interface T {
+        }
 
-        public record MethodSingle(Type.T retType, String id,
-                                   List<Dec.T> formals, List<Dec.T> locals,
-                                   List<Stm.T> stms, Exp.T retExp) implements T {}
+        public record MethodSingle(Type.T retType,
+                                   String id,
+                                   List<Dec.T> formals,
+                                   List<Dec.T> locals,
+                                   List<Stm.T> stms,
+                                   Exp.T retExp) implements T {
+        }
     }
 
     // class
     public static class Class {
-        public interface T {}
+        public interface T {
+        }
 
         public record ClassSingle(String id,
-                    String extendss, // null for non-existing "extends"
-                    List<Dec.T> decs, List<ast.Ast.Method.T> methods) implements T {}
+                                  String extendss, // null for non-existing "extends"
+                                  List<Dec.T> decs,
+                                  List<ast.Ast.Method.T> methods) implements T {
+        }
     }
 
     // main class
     public static class MainClass {
-        public interface T{}
+        public interface T {
+        }
 
         public record MainClassSingle(String id, String arg, Stm.T stm)
-            implements T {}
+                implements T {
+        }
     }
 
     // whole program
     public static class Program {
-        public interface T{}
+        public interface T {
+        }
 
         public record ProgramSingle(MainClass.T mainClass,
-                                    List<Class.T> classes) implements T { }
+                                    List<Class.T> classes) implements T {
+        }
     }
 }
