@@ -1,8 +1,8 @@
-package ast;
+package cfg;
 
 import java.util.List;
 
-public class Ast {
+public class Cfg {
     //  ///////////////////////////////////////////////////////////
     //  type
     public static class Type {
@@ -179,7 +179,7 @@ public class Ast {
         public record ClassSingle(String id,
                                   String extendss, // null for non-existing "extends"
                                   List<Dec.T> decs,
-                                  List<ast.Ast.Method.T> methods) implements T {
+                                  List<Cfg.Method.T> methods) implements T {
         }
     }
 
