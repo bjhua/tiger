@@ -1,5 +1,8 @@
 package ast;
 
+import com.sun.jdi.ClassType;
+import util.Todo;
+
 import java.util.List;
 
 public class Ast {
@@ -46,6 +49,27 @@ public class Ast {
                 return 1;
             }
         }
+
+        public static boolean equals(Type.T ty1, Type.T ty2) {
+            if (ty1 == ty2)
+                return true;
+            if (ty1 instanceof ClassType classType1 &&
+                    ty2 instanceof ClassType classType2) {
+                return classType1.id.equals(classType2.id);
+            }
+            return ty1.getClass().equals(ty2.getClass());
+        }
+
+        public static void output(Type.T ty) throws Exception {
+            switch (ty) {
+                case Type.Int() -> {
+                    System.out.print("int");
+                }
+                default -> {
+                    throw new Todo();
+                }
+            }
+        }
     }
 
     // ///////////////////////////////////////////////////
@@ -54,9 +78,11 @@ public class Ast {
         public interface T {
         }
 
-        public record DecSingle(Type.T type, String id) implements T {
+        public record Singleton(Type.T type,
+                                String id) implements T {
         }
     }
+
 
     // /////////////////////////////////////////////////////////
     // expression
@@ -146,7 +172,7 @@ public class Ast {
         public record If(Exp.T cond, T thenn, T elsee) implements T {
         }
 
-        // Print
+        // System.out.println
         public record Print(Exp.T exp) implements T {
         }
 
@@ -162,12 +188,12 @@ public class Ast {
         public interface T {
         }
 
-        public record MethodSingle(Type.T retType,
-                                   String id,
-                                   List<Dec.T> formals,
-                                   List<Dec.T> locals,
-                                   List<Stm.T> stms,
-                                   Exp.T retExp) implements T {
+        public record Singleton(Type.T retType,
+                                String id,
+                                List<Dec.T> formals,
+                                List<Dec.T> locals,
+                                List<Stm.T> stms,
+                                Exp.T retExp) implements T {
         }
     }
 
@@ -176,10 +202,10 @@ public class Ast {
         public interface T {
         }
 
-        public record ClassSingle(String id,
-                                  String extendss, // null for non-existing "extends"
-                                  List<Dec.T> decs,
-                                  List<ast.Ast.Method.T> methods) implements T {
+        public record Singleton(String id,
+                                String extends_, // null for non-existing "extends"
+                                List<Dec.T> decs,
+                                List<ast.Ast.Method.T> methods) implements T {
         }
     }
 
@@ -188,7 +214,9 @@ public class Ast {
         public interface T {
         }
 
-        public record MainClassSingle(String id, String arg, Stm.T stm)
+        public record Singleton(String id,
+                                String arg,
+                                Stm.T stm)
                 implements T {
         }
     }
@@ -198,8 +226,8 @@ public class Ast {
         public interface T {
         }
 
-        public record ProgramSingle(MainClass.T mainClass,
-                                    List<Class.T> classes) implements T {
+        public record Singleton(MainClass.T mainClass,
+                                List<Class.T> classes) implements T {
         }
     }
 }

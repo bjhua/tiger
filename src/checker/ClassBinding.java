@@ -27,7 +27,7 @@ public class ClassBinding {
 //    }
 
     public void put(String xid, Type.T type) {
-        if (this.fields.get(xid) != null) {
+        if(this.fields.get(xid) != null) {
             System.out.println("duplicated class field: " + xid);
             System.exit(1);
         }
@@ -35,7 +35,7 @@ public class ClassBinding {
     }
 
     public void put(String mid, MethodType mt) {
-        if (this.methods.get(mid) != null) {
+        if(this.methods.get(mid) != null) {
             System.out.println("duplicated class method: " + mid);
             System.exit(1);
         }
