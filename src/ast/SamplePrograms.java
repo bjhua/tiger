@@ -2,8 +2,6 @@ package ast;
 
 import ast.Ast.*;
 import ast.Ast.Exp.*;
-import ast.Ast.MainClass.MainClassSingle;
-import ast.Ast.Program.ProgramSingle;
 import ast.Ast.Stm.Assign;
 import ast.Ast.Stm.If;
 import ast.Ast.Stm.Print;
@@ -39,19 +37,19 @@ public class SamplePrograms {
      */
 
     // // main class: "Factorial"
-    static MainClass.T factorial = new MainClassSingle(
+    static MainClass.T factorial = new MainClass.Singleton(
             "Factorial", "a",
             new Print(new Call(new NewObject("Fac"), "ComputeFac",
                     List.of(new Num(10)), null, null, null)));
 
     // // class "Fac"
-    static ast.Ast.Class.T fac = new ast.Ast.Class.ClassSingle(
+    static ast.Ast.Class.T fac = new ast.Ast.Class.Singleton(
             "Fac", null,
             List.of(), // arguments
-            List.of(new Method.MethodSingle(
+            List.of(new Method.Singleton(
                     new Type.Int(), "ComputeFac",
-                    List.of(new Dec.DecSingle(new Type.Int(), "num")),
-                    List.of(new Dec.DecSingle(new Type.Int(), "num_aux")),
+                    List.of(new Dec.Singleton(new Type.Int(), "num")),
+                    List.of(new Dec.Singleton(new Type.Int(), "num_aux")),
                     List.of(new If(
                             new Bop(new Id("num", null, false), "<", new Num(1)),
                             new Assign("num_aux", new Num(1), null),
@@ -66,7 +64,7 @@ public class SamplePrograms {
                     new Id("num_aux", null, false))));
 
     // program
-    public static Program.T progFac = new ProgramSingle(factorial, List.of(fac));
+    public static Program.T progFac = new Program.Singleton(factorial, List.of(fac));
 
 
     // to encode "test/SumRec.java"
@@ -88,21 +86,21 @@ public class SamplePrograms {
 //            return sum;
 //        }
 //    }
-    static MainClass.T sumRec = new MainClassSingle(
+    static MainClass.T sumRec = new MainClass.Singleton(
             "Factorial", "a",
             new Print(new Call(new NewObject("Doit"), "doit",
-                    List.of(new Num(101)), null, null, null)));
+                    List.of(new Num(100)), null, null, null)));
 
     // // class "Fac"
-    static ast.Ast.Class.T doitSumRec = new ast.Ast.Class.ClassSingle(
+    static ast.Ast.Class.T doitSumRec = new ast.Ast.Class.Singleton(
             "Doit",
             null,
             List.of(),
-            List.of(new Method.MethodSingle(
+            List.of(new Method.Singleton(
                     new Type.Int(),
                     "doit",
-                    List.of(new Dec.DecSingle(new Type.Int(), "n")),
-                    List.of(new Dec.DecSingle(new Type.Int(), "sum")),
+                    List.of(new Dec.Singleton(new Type.Int(), "n")),
+                    List.of(new Dec.Singleton(new Type.Int(), "sum")),
                     List.of(new If(
                             new Bop(new Id("n", null, false), "<", new Num(1)),
                             new Assign("sum", new Num(0), null),
@@ -116,7 +114,7 @@ public class SamplePrograms {
                                     null))),
                     new Id("sum", null, false))));
 
-    public static Program.T progSumRec = new ProgramSingle(sumRec, List.of(doitSumRec));
+    public static Program.T progSumRec = new Program.Singleton(sumRec, List.of(doitSumRec));
 
 
     // Lab2, exercise 2: you should write some code to

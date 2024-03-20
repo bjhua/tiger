@@ -12,7 +12,7 @@ public record MethodType(Type.T retType,
     public String toString() {
         String s = "";
         for (Dec.T dec : this.argsType) {
-            Dec.DecSingle decc = (Dec.DecSingle) dec;
+            Dec.Singleton decc = (Dec.Singleton) dec;
             s = decc.type().toString() + "*" + s;
         }
         s = s + " -> " + this.retType.toString();

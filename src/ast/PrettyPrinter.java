@@ -1,7 +1,6 @@
 package ast;
 
 import ast.Ast.*;
-import ast.Ast.Method.MethodSingle;
 import util.Bug;
 import util.Todo;
 
@@ -129,123 +128,86 @@ public class PrettyPrinter {
     }
 
     // dec
-    public void ppDec(Dec.DecSingle d) throws Exception {
+    public void ppDec(Dec.T dec) throws Exception {
+        Dec.Singleton d = (Dec.Singleton) dec;
         ppType(d.type());
         say(" ");
         say(d.id());
     }
 
     // method
-    public void ppMethod(Method.T m) throws Exception {
-        switch (m) {
-            case MethodSingle(
-                    Type.T retType,
-                    String id,
-                    List<Dec.T> formals,
-                    List<Dec.T> locals,
-                    List<Stm.T> stms,
-                    Exp.T retExp
-            ) -> {
-                printSpaces();
-                this.say("public ");
-                ppType(retType);
-                this.say(" " + id + "(");
-                for (Dec.T d : formals) {
-                    Dec.DecSingle dec = (Dec.DecSingle) d;
-                    ppDec(dec);
-                    say(", ");
-                }
-                this.sayln("){");
-                indent();
-                for (Dec.T d : locals) {
-                    Dec.DecSingle dec = (Dec.DecSingle) d;
-                    printSpaces();
-                    ppDec(dec);
-                    this.sayln(";");
-                }
-                this.sayln("");
-                for (Stm.T s : stms)
-                    ppStm(s);
-                printSpaces();
-                this.say("return ");
-                ppExp(retExp);
-                this.sayln(";");
-                unIndent();
-                printSpaces();
-                this.sayln("}");
-            }
-            default -> {
-                throw new Bug();
-            }
+    public void ppMethod(Method.T mtd) throws Exception {
+        Method.Singleton m = (Method.Singleton) mtd;
+        printSpaces();
+        this.say("public ");
+        ppType(m.retType());
+        this.say(" " + m.id() + "(");
+        for (Dec.T d : m.formals()) {
+            ppDec(d);
+            say(", ");
         }
+        this.sayln("){");
+        indent();
+        for (Dec.T d : m.locals()) {
+            printSpaces();
+            ppDec(d);
+            this.sayln(";");
+        }
+        this.sayln("");
+        for (Stm.T s : m.stms())
+            ppStm(s);
+        printSpaces();
+        this.say("return ");
+        ppExp(m.retExp());
+        this.sayln(";");
+        unIndent();
+        printSpaces();
+        this.sayln("}");
     }
 
     // class
-    public void ppOneClass(Ast.Class.T c) throws Exception {
-        switch (c) {
-            case Ast.Class.ClassSingle(
-                    String id,
-                    String extendss, // null for non-existing "extends"
-                    List<Dec.T> decs,
-                    List<ast.Ast.Method.T> methods
-            ) -> {
-                this.say("class " + id);
-                if (extendss != null)
-                    this.say(" extends " + extendss);
-                else
-                    this.say("");
-                this.sayln("{");
-                indent();
-                for (Dec.T d : decs) {
-                    Dec.DecSingle dec = (Dec.DecSingle) d;
-                    ppDec(dec);
-                }
-                for (Method.T mthd : methods)
-                    ppMethod(mthd);
-                this.sayln("}");
-                unIndent();
-            }
-            default -> {
-                throw new Bug();
-            }
+    public void ppOneClass(Ast.Class.T cls) throws Exception {
+        Ast.Class.Singleton c = (Ast.Class.Singleton) cls;
+        this.say("class " + c.id());
+        if (c.extends_() != null)
+            this.say(" extends " + c.extends_());
+        else
+            this.say("");
+        this.sayln("{");
+        indent();
+        for (Dec.T d : c.decs()) {
+            ppDec(d);
         }
+        for (Method.T mthd : c.methods())
+            ppMethod(mthd);
+        this.sayln("}");
+        unIndent();
     }
 
     // main class
     public void ppMainClass(MainClass.T m) throws Exception {
-        switch (m) {
-            case MainClass.MainClassSingle(String id, String arg, Stm.T stm) -> {
-                this.sayln("class " + id + "{");
-                this.sayln("\tpublic static void main(String [] " + arg + "){");
-                indent();
-                indent();
-                ppStm(stm);
-                unIndent();
-                unIndent();
-                this.sayln("\t}");
-                this.sayln("}");
-                return;
-            }
-            default -> {
-                throw new Bug();
-            }
-        }
+        MainClass.Singleton mc = (MainClass.Singleton) m;
+        this.sayln("class " + mc.id() + "{");
+        this.sayln("\tpublic static void main(String [] " + mc.arg() + "){");
+        indent();
+        indent();
+        ppStm(mc.stm());
+        unIndent();
+        unIndent();
+        this.sayln("\t}");
+        this.sayln("}");
+        return;
     }
 
     // program
-    public void ppProgram(Program.T p) throws Exception {
-        switch (p) {
-            case Program.ProgramSingle(MainClass.T m, List<Ast.Class.T> classes) -> {
-                ppMainClass(m);
-                this.sayln("");
-                for (Ast.Class.T oneClass : classes) {
-                    ppOneClass(oneClass);
-                }
-                System.out.println("\n\n");
-            }
-            default -> {
-                throw new Bug();
-            }
+    public void ppProgram(Program.T prog) throws Exception {
+        Program.Singleton p = (Program.Singleton) prog;
+        ppMainClass(p.mainClass());
+        this.sayln("");
+        for (Ast.Class.T cls : p.classes()) {
+            ppOneClass(cls);
         }
+        System.out.println("\n\n");
     }
 }
+
