@@ -1,6 +1,5 @@
 package ast;
 
-import com.sun.jdi.ClassType;
 import util.Todo;
 
 import java.util.List;
@@ -75,11 +74,34 @@ public class Ast {
     // ///////////////////////////////////////////////////
     // declaration
     public static class Dec {
-        public interface T {
+        public sealed interface T permits Singleton {
         }
 
         public record Singleton(Type.T type,
                                 String id) implements T {
+            @Override
+            public boolean equals(Object obj) {
+                return Dec.isEqual(this, (Singleton) obj);
+            }
+        }
+
+        // operations
+        public static boolean isEqual(T x, T y) {
+            switch (x) {
+                case Singleton(
+                        Type.T type1,
+                        String id1
+                ) -> {
+                    switch (y) {
+                        case Singleton(
+                                Type.T type2,
+                                String id2
+                        ) -> {
+                            return id1.equals(id2);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -211,7 +233,7 @@ public class Ast {
 
     // main class
     public static class MainClass {
-        public interface T {
+        public sealed interface T permits Singleton {
         }
 
         public record Singleton(String id,
@@ -219,15 +241,45 @@ public class Ast {
                                 Stm.T stm)
                 implements T {
         }
+
+
     }
 
     // whole program
     public static class Program {
-        public interface T {
+        public sealed interface T permits Singleton {
         }
 
         public record Singleton(MainClass.T mainClass,
                                 List<Class.T> classes) implements T {
+
+            // essentially, we should not do linear search of classes
+            // we should store them in symbol tables
+            public Class.Singleton searchClass(String className) {
+                for (Class.T t : classes) {
+                    if (((Class.Singleton) t).id().equals(className)) {
+                        return (Class.Singleton) t;
+                    }
+                }
+                return null;
+            }
+        }
+
+        // operations on the whole programs
+        public static Class.T searchClass(T prog, String className) {
+            switch (prog) {
+                case Singleton(
+                        MainClass.T mainClass,
+                        List<Class.T> classes
+                ) -> {
+                    for (Class.T t : classes) {
+                        if (((Class.Singleton) t).id().equals(className)) {
+                            return t;
+                        }
+                    }
+                    return null;
+                }
+            }
         }
     }
 }

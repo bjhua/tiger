@@ -1,83 +1,30 @@
 package cfg;
 
+import ast.Ast;
 import util.Label;
 
 import java.util.List;
 
 public class Cfg {
 
-    //  ///////////////////////////////////////////////////////////
-    //  type
-    public static class Type {
-        public interface T {
-            // boolean: -1
-            // int: 0
-            // int[]: 1
-            // class: 2
-            // Such that one can easily tell who is who
-            public abstract int getNum();
-        }
-
-        // boolean
-        public record Boolean() implements T {
-            @Override
-            public int getNum() {
-                return -1;
-            }
-        }
-
-        // class
-        public record ClassType(String id) implements T {
-            @Override
-            public int getNum() {
-                return 2;
-            }
-        }
-
-        // int
-        public record Int() implements T {
-            @Override
-            public int getNum() {
-                return 0;
-            }
-        }
-
-        // int[]
-        public record IntArray() implements T {
-            @Override
-            public int getNum() {
-                return 1;
-            }
-        }
-    }
-
-    // ///////////////////////////////////////////////////
-    // declaration
-    public static class Dec {
-        public interface T {
-        }
-
-        public record DecSingle(Type.T type, String id) implements T {
-        }
-    }
-
     // /////////////////////////////////////////////////////////
     // virtual function table
     public static class Vtable {
-        public record VtableEntry(Type.T retType,
-                                  String funcName,
-                                  List<Dec.T> argTypes) {
+        public record Entry(Ast.Type.T retType,
+                            String funcName,
+                            List<Ast.Dec.T> argTypes) {
         }
 
-        public record T(List<VtableEntry> funcTypes) {
+        public record T(String name,
+                        List<Entry> funcTypes) {
         }
     }
 
     // /////////////////////////////////////////////////////////
     // structures
     public static class Struct {
-        public record T(Vtable.T theVtable,
-                        List<Dec.T> fields) {
+        public record T(String name,
+                        List<Ast.Dec.T> fields) {
         }
     }
 
@@ -92,7 +39,7 @@ public class Cfg {
         }
 
         // variable
-        public record Id(String x, Type.T ty) implements T {
+        public record Id(String x, Ast.Type.T ty) implements T {
         }
     }
     // end of value
@@ -104,7 +51,7 @@ public class Cfg {
         }
 
         // assign
-        public record Assign(String id, Value.T right, Type.T type) implements T {
+        public record Assign(String id, Value.T right, Ast.Type.T type) implements T {
         }
 
         // assign-array
@@ -140,10 +87,10 @@ public class Cfg {
     // /////////////////////////////////////////////////////////
     // function
     public static class Function {
-        public record T(Type.T retType,
+        public record T(Ast.Type.T retType,
                         String id,
-                        List<Dec.T> formals,
-                        List<Dec.T> locals,
+                        List<Ast.Dec.T> formals,
+                        List<Ast.Dec.T> locals,
                         List<Block.T> blocks) {
         }
     }
