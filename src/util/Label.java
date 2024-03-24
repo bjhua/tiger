@@ -10,7 +10,7 @@ public class Label {
 
     @Override
     public String toString() {
-        return "L_" + (Integer.toString(this.i));
+        return "L_" + (this.i);
     }
 }
 

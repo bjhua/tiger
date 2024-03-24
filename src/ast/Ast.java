@@ -8,7 +8,8 @@ public class Ast {
     //  ///////////////////////////////////////////////////////////
     //  type
     public static class Type {
-        public interface T {
+        public sealed interface T
+                permits Boolean, ClassType, Int, IntArray {
             // boolean: -1
             // int: 0
             // int[]: 1
@@ -81,6 +82,10 @@ public class Ast {
                                 String id) implements T {
             @Override
             public boolean equals(Object obj) {
+                if (obj == null)
+                    return false;
+//                if(!instanceof(obj, Singleton))
+//                    return false;
                 return Dec.isEqual(this, (Singleton) obj);
             }
         }
@@ -207,7 +212,7 @@ public class Ast {
     // /////////////////////////////////////////////////////////
     // method
     public static class Method {
-        public interface T {
+        public sealed interface T permits Singleton {
         }
 
         public record Singleton(Type.T retType,
@@ -221,13 +226,21 @@ public class Ast {
 
     // class
     public static class Class {
-        public interface T {
+        public sealed interface T permits Singleton {
         }
 
         public record Singleton(String id,
                                 String extends_, // null for non-existing "extends"
                                 List<Dec.T> decs,
                                 List<ast.Ast.Method.T> methods) implements T {
+        }
+
+        public static String getName(T cls) {
+            switch (cls) {
+                case Singleton(String id, String extends_, List<Dec.T> decs, List<Method.T> methods) -> {
+                    return id;
+                }
+            }
         }
     }
 
@@ -238,8 +251,7 @@ public class Ast {
 
         public record Singleton(String id,
                                 String arg,
-                                Stm.T stm)
-                implements T {
+                                Stm.T stm) implements T {
         }
 
 
@@ -252,32 +264,40 @@ public class Ast {
 
         public record Singleton(MainClass.T mainClass,
                                 List<Class.T> classes) implements T {
-
-            // essentially, we should not do linear search of classes
-            // we should store them in symbol tables
-            public Class.Singleton searchClass(String className) {
-                for (Class.T t : classes) {
-                    if (((Class.Singleton) t).id().equals(className)) {
-                        return (Class.Singleton) t;
-                    }
-                }
-                return null;
-            }
         }
 
         // operations on the whole programs
         public static Class.T searchClass(T prog, String className) {
             switch (prog) {
                 case Singleton(
-                        MainClass.T mainClass,
+                        _,
                         List<Class.T> classes
                 ) -> {
-                    for (Class.T t : classes) {
-                        if (((Class.Singleton) t).id().equals(className)) {
-                            return t;
+                    for (Class.T cls : classes) {
+                        switch (cls) {
+                            case Ast.Class.Singleton(
+                                    String id,
+                                    String extends_,
+                                    List<Dec.T> decs,
+                                    List<Method.T> methods
+                            ) -> {
+                                if (id.equals(className))
+                                    return cls;
+                            }
                         }
                     }
                     return null;
+                }
+            }
+        }
+
+        public static List<Class.T> getClasses(T prog) {
+            switch (prog) {
+                case Singleton(
+                        _,
+                        List<Class.T> classes
+                ) -> {
+                    return classes;
                 }
             }
         }
