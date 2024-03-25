@@ -133,9 +133,10 @@ public class Ast {
         public record Call(T exp,
                            String id,
                            List<T> args,
-                           String type,     // type of first field "exp"
-                           List<Type.T> at, // arg's type
-                           Type.T rt) implements T {
+                           // these fields will
+                           List<Type.T> calleeType_0,     // type of first field "exp"
+                           List<Type.T> argTypes, // arguments type
+                           List<Type.T> retType_0) implements T {
         }
 
         // False
@@ -254,8 +255,6 @@ public class Ast {
                                 String arg,
                                 Stm.T stm) implements T {
         }
-
-
     }
 
     // whole program
@@ -299,6 +298,17 @@ public class Ast {
                         List<Class.T> classes
                 ) -> {
                     return classes;
+                }
+            }
+        }
+
+        public static MainClass.T getMainClass(T prog) {
+            switch (prog) {
+                case Singleton(
+                        MainClass.T mainClass,
+                        _
+                ) -> {
+                    return mainClass;
                 }
             }
         }

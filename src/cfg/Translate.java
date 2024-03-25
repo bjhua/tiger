@@ -18,6 +18,7 @@ public class Translate {
     private Cfg.Function.T currentFunction = null;
     private Cfg.Block.T currentBlock = null;
     private LinkedList<Cfg.Dec.T> newDecs = new LinkedList<>();
+    private boolean shouldCloseMethod = true;
 
     public Translate() {
         this.vtables = new Vector<>();
@@ -86,7 +87,10 @@ public class Translate {
                 return new Cfg.Value.Int(num);
             }
             case Ast.Exp.Call(
-                    Ast.Exp.T exp1, String id, List<Ast.Exp.T> args, String type, List<Ast.Type.T> at, Ast.Type.T rt
+                    Ast.Exp.T exp1, String id, List<Ast.Exp.T> args,
+                    List<Ast.Type.T> calleeType,
+                    List<Ast.Type.T> at,
+                    List<Ast.Type.T> rt
             ) -> {
                 String newVar = Temp.fresh();
                 // a fake type
@@ -95,6 +99,10 @@ public class Translate {
 
                 Cfg.Value.T callee = transExp(exp1);
 
+                String newId = Temp.fresh();
+                Cfg.Type.T newType = new Cfg.Type.Ptr();
+                emitDec(new Cfg.Dec.Singleton(newType, newId));
+                emit(new Cfg.Stm.GetMethod(newId, callee, transType(calleeType.get(0)), id));
 
                 LinkedList<Cfg.Value.T> newArgs = new LinkedList<>();
                 newArgs.add(callee);
@@ -102,7 +110,7 @@ public class Translate {
                     newArgs.add(transExp(arg));
                 }
 
-                emit(new Cfg.Stm.AssignCall(newVar, id, newArgs, newRetType));
+                emit(new Cfg.Stm.AssignCall(newVar, newId, newArgs, newRetType));
                 return new Cfg.Value.Id(newVar, newRetType);
             }
             case Ast.Exp.Bop(Ast.Exp.T left, String op, Ast.Exp.T right) -> {
@@ -137,7 +145,11 @@ public class Translate {
                 return new Cfg.Value.Id("this", new Cfg.Type.ClassType(this.currentClassName));
             }
             case Ast.Exp.NewObject(String id) -> {
-                throw new Todo();
+                String newVar = Temp.fresh();
+                Cfg.Type.T newType = new Cfg.Type.ClassType(id);
+                emitDec(new Cfg.Dec.Singleton(newType, newVar));
+                emit(new Cfg.Stm.AssignNew(newVar, id));
+                return new Cfg.Value.Id(newVar, newType);
             }
             default -> {
                 throw new Todo();
@@ -183,6 +195,10 @@ public class Translate {
                 Cfg.Function.addBlock(currentFunction, mergeBlock);
                 this.currentBlock = mergeBlock;
             }
+            case Ast.Stm.Print(Ast.Exp.T exp) -> {
+                Cfg.Value.T value = transExp(exp);
+                emit(new Cfg.Stm.Print(value));
+            }
             default -> {
                 throw new Todo();
             }
@@ -223,9 +239,11 @@ public class Translate {
                 Cfg.Value.T retValue = transExp(retExp);
                 emitTransfer(new Cfg.Transfer.Ret(retValue));
 
-                // close the method:
-                Cfg.Dec.T newFormal = new Cfg.Dec.Singleton(new Cfg.Type.ClassType(this.currentClassName), "this");
-                Cfg.Function.addFirstFormal(newFunc, newFormal);
+                // close the method, if it is non-static:
+                if (this.shouldCloseMethod) {
+                    Cfg.Dec.T newFormal = new Cfg.Dec.Singleton(new Cfg.Type.ClassType(this.currentClassName), "this");
+                    Cfg.Function.addFirstFormal(newFunc, newFormal);
+                }
                 // add newly generated locals
                 Cfg.Function.addDecs(newFunc, this.newDecs);
 
@@ -264,6 +282,7 @@ public class Translate {
         for (Ast.Method.T localMethod : localMethods) {
             Ast.Method.Singleton lm = (Ast.Method.Singleton) localMethod;
             Cfg.Vtable.Entry newEntry = new Cfg.Vtable.Entry(transType(lm.retType()),
+                    this.currentClassName,
                     lm.id(),
                     transDecList(lm.formals()));
             for (int i = 0; i < functions.size(); i++) {
@@ -299,15 +318,20 @@ public class Translate {
                 new Vector<>(),
                 new Vector<>());
 
-        // main class is special, it does not have vtable or class...
-        Cfg.Function.T main = new Cfg.Function.Singleton(new Cfg.Type.Int(),
-                "tiger_main",
+        // main class is special, it has neither vtable nor class.
+        // we create a temporary method, and translate it.
+        Ast.MainClass.Singleton mainCls = (Ast.MainClass.Singleton) Ast.Program.getMainClass(ast);
+        this.currentClassName = mainCls.id();
+        this.shouldCloseMethod = false;
+        Ast.Method.T mainMethod = new Ast.Method.Singleton(new Ast.Type.Int(),
+                "main",
                 new LinkedList<>(),
                 new LinkedList<>(),
-                new LinkedList<>());
-        this.functions.add(main);
+                List.of(mainCls.stm()),
+                new Ast.Exp.Num(0));
+        this.functions.add(translateMethod(mainMethod));
 
-        return new Cfg.Program.Singleton("tiger_main",
+        return new Cfg.Program.Singleton(mainCls.id() + "_main",
                 this.vtables,
                 this.structs,
                 this.functions);

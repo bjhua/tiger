@@ -6,6 +6,7 @@ import ast.Ast.Stm.Assign;
 import ast.Ast.Stm.If;
 import ast.Ast.Stm.Print;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class SamplePrograms {
@@ -87,9 +88,9 @@ public class SamplePrograms {
 //        }
 //    }
     static MainClass.T sumRec = new MainClass.Singleton(
-            "Factorial", "a",
+            "SumRec", "a",
             new Print(new Call(new NewObject("Doit"), "doit",
-                    List.of(new Num(100)), null, null, null)));
+                    List.of(new Num(100)), new LinkedList<>(), new LinkedList<>(), new LinkedList<>())));
 
     // // class "Fac"
     static ast.Ast.Class.T doitSumRec = new ast.Ast.Class.Singleton(
@@ -110,7 +111,7 @@ public class SamplePrograms {
                                             new Call(new This(), "doit",
                                                     List.of(new Bop(new Id("n", null, false),
                                                             "-", new Num(1))),
-                                                    null, null, null)),
+                                                    new LinkedList<>(), new LinkedList<>(), new LinkedList<>())),
                                     null))),
                     new Id("sum", null, false))));
 

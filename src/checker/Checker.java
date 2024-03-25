@@ -43,15 +43,16 @@ public class Checker {
                     Exp.T callee,
                     String id,
                     List<Exp.T> args,
-                    String type,
+                    List<Type.T> calleeType_0,  // only [0]
                     List<Type.T> argTypes,
-                    Type.T retType
+                    List<Type.T> retType_0 // only
             ) -> {
-
+                Type.T theCalleeType = checkExp(callee);
+                calleeType_0.add(theCalleeType);
                 return new Type.Int();
             }
             case Exp.NewObject(String id) -> {
-                new Type.ClassType(id);
+                return new Type.ClassType(id);
             }
             case Exp.Num(int n) -> {
                 return new Type.Int();
@@ -95,7 +96,6 @@ public class Checker {
                 throw new Todo();
             }
         }
-        throw new Bug();
     }
 
     // statements

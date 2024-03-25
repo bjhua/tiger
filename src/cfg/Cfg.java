@@ -36,7 +36,7 @@ public class Cfg {
     //  type
     public static class Type {
         public sealed interface T
-                permits ClassType, Int, IntArray {
+                permits ClassType, Int, IntArray, Ptr {
         }
 
         public record Int() implements T {
@@ -46,6 +46,9 @@ public class Cfg {
         }
 
         public record IntArray() implements T {
+        }
+
+        public record Ptr() implements T {
         }
 
         public static void pp(T ty) {
@@ -58,6 +61,9 @@ public class Cfg {
                 }
                 case IntArray() -> {
                     say("int[]");
+                }
+                case Ptr() -> {
+                    say("Ptr");
                 }
             }
         }
@@ -91,6 +97,7 @@ public class Cfg {
         }
 
         public record Entry(Type.T retType,
+                            String clsName,
                             String funcName,
                             List<Dec.T> argTypes) {
         }
@@ -118,7 +125,16 @@ public class Cfg {
                     }
                     unIndent();
                     printSpaces();
-                    say("};\n");
+                    say("} V_" + name + "_ = {\n");
+                    indent();
+                    for (Entry e : funcTypes) {
+                        printSpaces();
+                        say("." + e.funcName + " = " + e.clsName + "_" + e.funcName);
+                        say(",\n");
+                    }
+                    unIndent();
+                    printSpaces();
+                    say("};\n\n");
                 }
             }
         }
@@ -130,24 +146,32 @@ public class Cfg {
         public sealed interface T permits Singleton {
         }
 
-        public record Singleton(String name,
+        public record Singleton(String clsName,
                                 List<Cfg.Dec.T> fields) implements T {
         }
 
         public static void pp(T s) {
             switch (s) {
-                case Singleton(String name, List<Cfg.Dec.T> fields) -> {
+                case Singleton(String clsName, List<Cfg.Dec.T> fields) -> {
                     printSpaces();
-                    say("struct S_" + name + " {\n");
+                    say("struct S_" + clsName + " {\n");
                     indent();
+                    // the first field is special
+                    printSpaces();
+                    say("struct V_" + clsName + " *vptr;\n");
                     for (Cfg.Dec.T dec : fields) {
                         printSpaces();
                         Dec.pp(dec);
-
                     }
                     unIndent();
                     printSpaces();
-                    say("};\n");
+                    say("} S_" + clsName + "_ = {\n");
+                    indent();
+                    printSpaces();
+                    say(".vptr = " + "&V_" + clsName + "_;\n");
+                    unIndent();
+                    printSpaces();
+                    say("};\n\n");
                 }
             }
         }
@@ -185,7 +209,7 @@ public class Cfg {
     // statement
     public static class Stm {
         public sealed interface T
-                permits Assign, AssignBop, AssignCall, AssignArray, Print {
+                permits Assign, AssignBop, AssignCall, AssignNew, AssignArray, Print, GetMethod {
         }
 
         // assign
@@ -200,6 +224,9 @@ public class Cfg {
         public record AssignCall(String id, String func, List<Value.T> args, Type.T retType) implements T {
         }
 
+        public record AssignNew(String id, String cls) implements T {
+        }
+
 
         // assign-array
         public record AssignArray(String id, Value.T index, Value.T right) implements T {
@@ -207,6 +234,10 @@ public class Cfg {
 
         // Print
         public record Print(Value.T value) implements T {
+        }
+
+        // get virtual method
+        public record GetMethod(String id, Value.T value, Type.T cls, String methodName) implements T {
         }
 
         public static void pp(T t) {
@@ -239,6 +270,24 @@ public class Cfg {
                     say(");  @ty:");
                     Type.pp(retType);
                     sayln("");
+                }
+                case AssignNew(String id, String cls) -> {
+                    printSpaces();
+                    say(id + " = new " + cls + "();\n");
+                }
+                case Print(Value.T value) -> {
+                    printSpaces();
+                    say("print(");
+                    Value.pp(value);
+                    say(");\n");
+                }
+                case GetMethod(String id, Value.T value, Type.T cls, String methodName) -> {
+                    printSpaces();
+                    say(id + " = getMethod(");
+                    Value.pp(value);
+                    say(", \"" + methodName + "\");  @ty:");
+                    Type.pp(cls);
+                    say("\n");
                 }
                 default -> {
                     System.out.println("to do\n");
@@ -409,9 +458,8 @@ public class Cfg {
                         Block.pp(block);
                     }
                     unIndent();
-                    sayln("");
                     printSpaces();
-                    say("}\n");
+                    say("}\n\n");
                 }
 
             }

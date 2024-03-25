@@ -43,9 +43,9 @@ public class PrettyPrinter {
                     Exp.T callee,
                     String id,
                     List<Exp.T> args,
-                    String type,
+                    List<Type.T> calleeType,
                     List<Type.T> argTypes,
-                    Type.T retType
+                    List<Type.T> retType
             ) -> {
                 ppExp(callee);
                 say("." + id + "(");
