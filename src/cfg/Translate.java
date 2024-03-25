@@ -1,6 +1,9 @@
 package cfg;
 
 import ast.Ast;
+import util.Label;
+import util.Temp;
+import util.Todo;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -10,6 +13,11 @@ public class Translate {
     private final Vector<Cfg.Vtable.T> vtables;
     private final Vector<Cfg.Struct.T> structs;
     private final Vector<Cfg.Function.T> functions;
+    // for code generation purpose
+    private String currentClassName = null;
+    private Cfg.Function.T currentFunction = null;
+    private Cfg.Block.T currentBlock = null;
+    private LinkedList<Cfg.Dec.T> newDecs = new LinkedList<>();
 
     public Translate() {
         this.vtables = new Vector<>();
@@ -52,7 +60,136 @@ public class Translate {
         return newDecs;
     }
 
-    public Cfg.Function.T translateMethod(Ast.Method.T method) {
+
+    private void emit(Cfg.Stm.T s) {
+        Cfg.Block.add(this.currentBlock, s);
+    }
+
+    private void emitTransfer(Cfg.Transfer.T s) {
+        Cfg.Block.addTransfer(this.currentBlock, s);
+    }
+
+    private void emitDec(Cfg.Dec.T dec) {
+        this.newDecs.add(dec);
+    }
+
+    /////////////////////////////
+    // translate an expression
+    public Cfg.Value.T transExp(Ast.Exp.T exp) throws Exception {
+        switch (exp) {
+            case Ast.Exp.Id(String id, Ast.Type.T type, boolean isField) -> {
+                // for now, this is a fake type
+                Cfg.Type.T newType = new Cfg.Type.Int();
+                return new Cfg.Value.Id(id, newType);
+            }
+            case Ast.Exp.Num(int num) -> {
+                return new Cfg.Value.Int(num);
+            }
+            case Ast.Exp.Call(
+                    Ast.Exp.T exp1, String id, List<Ast.Exp.T> args, String type, List<Ast.Type.T> at, Ast.Type.T rt
+            ) -> {
+                String newVar = Temp.fresh();
+                // a fake type
+                Cfg.Type.T newRetType = new Cfg.Type.Int();
+                emitDec(new Cfg.Dec.Singleton(newRetType, newVar));
+
+                Cfg.Value.T callee = transExp(exp1);
+
+
+                LinkedList<Cfg.Value.T> newArgs = new LinkedList<>();
+                newArgs.add(callee);
+                for (Ast.Exp.T arg : args) {
+                    newArgs.add(transExp(arg));
+                }
+
+                emit(new Cfg.Stm.AssignCall(newVar, id, newArgs, newRetType));
+                return new Cfg.Value.Id(newVar, newRetType);
+            }
+            case Ast.Exp.Bop(Ast.Exp.T left, String op, Ast.Exp.T right) -> {
+                Cfg.Value.T lvalue = transExp(left);
+                Cfg.Value.T rvalue = transExp(right);
+                String newVar = Temp.fresh();
+                switch (op) {
+                    case "+" -> {
+                        Cfg.Type.T newType = new Cfg.Type.Int();
+                        emitDec(new Cfg.Dec.Singleton(newType, newVar));
+                        emit(new Cfg.Stm.AssignBop(newVar, lvalue, "+", rvalue, newType));
+                        return new Cfg.Value.Id(newVar, newType);
+                    }
+                    case "-" -> {
+                        Cfg.Type.T newType = new Cfg.Type.Int();
+                        emitDec(new Cfg.Dec.Singleton(newType, newVar));
+                        emit(new Cfg.Stm.AssignBop(newVar, lvalue, "-", rvalue, newType));
+                        return new Cfg.Value.Id(newVar, newType);
+                    }
+                    case "<" -> {
+                        Cfg.Type.T newType = new Cfg.Type.Int();
+                        emitDec(new Cfg.Dec.Singleton(newType, newVar));
+                        emit(new Cfg.Stm.AssignBop(newVar, lvalue, "<", rvalue, newType));
+                        return new Cfg.Value.Id(newVar, newType);
+                    }
+                    default -> {
+                        throw new Todo();
+                    }
+                }
+            }
+            case Ast.Exp.This() -> {
+                return new Cfg.Value.Id("this", new Cfg.Type.ClassType(this.currentClassName));
+            }
+            case Ast.Exp.NewObject(String id) -> {
+                throw new Todo();
+            }
+            default -> {
+                throw new Todo();
+            }
+        }
+    }
+
+    /////////////////////////////
+    // translate a statement
+    // this function does not return its result,
+    // as the result has been saved into currentBlock
+    public void transStm(Ast.Stm.T stm) throws Exception {
+        switch (stm) {
+            case Ast.Stm.Assign(String id, Ast.Exp.T exp, Ast.Type.T type) -> {
+                Cfg.Value.T value = transExp(exp);
+                // a fake type, to be corrected
+                Cfg.Type.T newType = new Cfg.Type.Int();
+                emit(new Cfg.Stm.Assign(id, value, newType));
+            }
+            case Ast.Stm.If(Ast.Exp.T cond, Ast.Stm.T thenn, Ast.Stm.T elsee) -> {
+                Cfg.Value.T value = transExp(cond);
+                Cfg.Block.T trueBlock = new Cfg.Block.Singleton(new Label(),
+                        new LinkedList<>(),
+                        new LinkedList<>());
+                Cfg.Block.T falseBlock = new Cfg.Block.Singleton(new Label(),
+                        new LinkedList<>(),
+                        new LinkedList<>());
+                Cfg.Block.T mergeBlock = new Cfg.Block.Singleton(new Label(),
+                        new LinkedList<>(),
+                        new LinkedList<>());
+
+                // a branching point
+                emitTransfer(new Cfg.Transfer.If(value, trueBlock, falseBlock));
+                // all jump to the merge block
+                Cfg.Block.addTransfer(trueBlock, new Cfg.Transfer.Jmp(mergeBlock));
+                Cfg.Block.addTransfer(falseBlock, new Cfg.Transfer.Jmp(mergeBlock));
+                this.currentBlock = trueBlock;
+                transStm(thenn);
+                Cfg.Function.addBlock(currentFunction, trueBlock);
+                this.currentBlock = falseBlock;
+                transStm(elsee);
+                Cfg.Function.addBlock(currentFunction, falseBlock);
+                Cfg.Function.addBlock(currentFunction, mergeBlock);
+                this.currentBlock = mergeBlock;
+            }
+            default -> {
+                throw new Todo();
+            }
+        }
+    }
+
+    public Cfg.Function.T translateMethod(Ast.Method.T method) throws Exception {
         switch (method) {
             case Ast.Method.Singleton(
                     Ast.Type.T retType,
@@ -62,20 +199,47 @@ public class Translate {
                     List<Ast.Stm.T> stms,
                     Ast.Exp.T retExp
             ) -> {
-                return new Cfg.Function.Singleton(transType(retType),
-                        id,
+                // clear the caches:
+                Cfg.Function.T newFunc = new Cfg.Function.Singleton(transType(retType),
+                        this.currentClassName + "_" + id,
                         transDecList(formals),
                         transDecList(locals),
                         new LinkedList<Cfg.Block.T>());
+
+                Cfg.Block.T newBlock = new Cfg.Block.Singleton(new Label(),
+                        new LinkedList<>(),
+                        new LinkedList<>());
+                // add the new block into the function
+                Cfg.Function.addBlock(newFunc, newBlock);
+                // clear the caches:
+                this.currentFunction = newFunc;
+                this.currentBlock = newBlock;
+                this.newDecs = new LinkedList<>();
+                for (Ast.Stm.T stmt : stms) {
+                    transStm(stmt);
+                }
+
+                // translate the "retExp"
+                Cfg.Value.T retValue = transExp(retExp);
+                emitTransfer(new Cfg.Transfer.Ret(retValue));
+
+                // close the method:
+                Cfg.Dec.T newFormal = new Cfg.Dec.Singleton(new Cfg.Type.ClassType(this.currentClassName), "this");
+                Cfg.Function.addFirstFormal(newFunc, newFormal);
+                // add newly generated locals
+                Cfg.Function.addDecs(newFunc, this.newDecs);
+
+                return newFunc;
             }
         }
     }
 
-
+    // the prefixing algorithm
     public void prefixing(InheritTree.Node root,
                           Vector<Cfg.Dec.T> decs,
-                          Vector<Cfg.Vtable.Entry> functions) {
+                          Vector<Cfg.Vtable.Entry> functions) throws Exception {
         Ast.Class.T cls = root.theClass;
+        this.currentClassName = Ast.Class.getName(cls);
 
         // instance variables
         List<Ast.Dec.T> localDecs = ((Ast.Class.Singleton) cls).decs();
@@ -126,7 +290,7 @@ public class Translate {
 
     // given an abstract syntax tree, lower it down
     // to a corresponding control-flow graph.
-    public Cfg.Program.T translate(Ast.Program.T ast) {
+    public Cfg.Program.T translate(Ast.Program.T ast) throws Exception {
         // build the inheritance tree
         InheritTree.Node root = new InheritTree(ast).buildTree();
 

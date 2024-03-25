@@ -180,7 +180,8 @@ public class Ast {
     // /////////////////////////////////////////////////////////
     // statement
     public static class Stm {
-        public interface T {
+        public sealed interface T
+                permits Assign, AssignArray, Block, If, Print, While {
         }
 
         // assign
@@ -237,7 +238,7 @@ public class Ast {
 
         public static String getName(T cls) {
             switch (cls) {
-                case Singleton(String id, String extends_, List<Dec.T> decs, List<Method.T> methods) -> {
+                case Singleton(String id, _, _, _) -> {
                     return id;
                 }
             }
@@ -277,9 +278,9 @@ public class Ast {
                         switch (cls) {
                             case Ast.Class.Singleton(
                                     String id,
-                                    String extends_,
-                                    List<Dec.T> decs,
-                                    List<Method.T> methods
+                                    _,
+                                    _,
+                                    _
                             ) -> {
                                 if (id.equals(className))
                                     return cls;

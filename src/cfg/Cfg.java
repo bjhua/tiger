@@ -1,6 +1,5 @@
 package cfg;
 
-import ast.Ast;
 import util.Label;
 
 import java.util.List;
@@ -157,7 +156,8 @@ public class Cfg {
     // /////////////////////////////////////////////////////////
     // values
     public static class Value {
-        public interface T {
+        public sealed interface T
+                permits Int, Id {
         }
 
         // integer constant
@@ -165,7 +165,18 @@ public class Cfg {
         }
 
         // variable
-        public record Id(String x, Ast.Type.T ty) implements T {
+        public record Id(String x, Type.T ty) implements T {
+        }
+
+        public static void pp(T ty) {
+            switch (ty) {
+                case Int(int n) -> {
+                    say(Integer.toString(n));
+                }
+                case Id(String x, _) -> {
+                    say(x);
+                }
+            }
         }
     }
     // end of value
@@ -173,23 +184,109 @@ public class Cfg {
     // /////////////////////////////////////////////////////////
     // statement
     public static class Stm {
-        public interface T {
+        public sealed interface T
+                permits Assign, AssignBop, AssignCall, AssignArray, Print {
         }
 
         // assign
-        public record Assign(String id, Value.T right, Ast.Type.T type) implements T {
+        public record Assign(String id, Value.T right, Type.T type) implements T {
         }
+
+        // assign
+        public record AssignBop(String id, Value.T left, String bop, Value.T right, Type.T type) implements T {
+        }
+
+        // assign
+        public record AssignCall(String id, String func, List<Value.T> args, Type.T retType) implements T {
+        }
+
 
         // assign-array
         public record AssignArray(String id, Value.T index, Value.T right) implements T {
         }
 
-
         // Print
         public record Print(Value.T value) implements T {
         }
+
+        public static void pp(T t) {
+            switch (t) {
+                case Assign(String id, Value.T right, Type.T type) -> {
+                    printSpaces();
+                    say(id + " = ");
+                    Value.pp(right);
+                    say(";  @ty:");
+                    Type.pp(type);
+                    sayln("");
+                }
+                case AssignBop(String id, Value.T left, String op, Value.T right, Type.T type) -> {
+                    printSpaces();
+                    say(id + " = ");
+                    Value.pp(left);
+                    say(" " + op + " ");
+                    Value.pp(right);
+                    say(";  @ty:");
+                    Type.pp(type);
+                    sayln("");
+                }
+                case AssignCall(String id, String func, List<Value.T> args, Type.T retType) -> {
+                    printSpaces();
+                    say(id + " = " + func + "(");
+                    for (Value.T arg : args) {
+                        Value.pp(arg);
+                        say(", ");
+                    }
+                    say(");  @ty:");
+                    Type.pp(retType);
+                    sayln("");
+                }
+                default -> {
+                    System.out.println("to do\n");
+                }
+            }
+        }
     }
     // end of statement
+
+
+    // /////////////////////////////////////////////////////////
+    // transfer
+    public static class Transfer {
+        public sealed interface T permits If, Jmp, Ret {
+        }
+
+        public record If(Value.T value, Block.T trueBlock, Block.T falseBlock)
+                implements T {
+        }
+
+        public record Jmp(Block.T target) implements T {
+        }
+
+        public record Ret(Value.T retValue) implements T {
+
+        }
+
+        public static void pp(T t) {
+            switch (t) {
+                case If(Value.T value, Block.T thenn, Block.T elsee) -> {
+                    printSpaces();
+                    say("if(");
+                    Value.pp(value);
+                    say(", " + Block.getName(thenn) + ", " + Block.getName(elsee) + ");");
+                }
+                case Jmp(Block.T target) -> {
+                    printSpaces();
+                    say("jmp " + Block.getName(target));
+
+                }
+                case Ret(Value.T value) -> {
+                    printSpaces();
+                    say("ret ");
+                    Value.pp(value);
+                }
+            }
+        }
+    }
 
     // /////////////////////////////////////////////////////////
     // block
@@ -199,21 +296,50 @@ public class Cfg {
 
         public record Singleton(Label label,
                                 List<Stm.T> stms,
-                                Transfer.T transfer) implements T {
+                                // this is a special hack
+                                // the transfer field is final, so that
+                                // we use a list instead of a singleton field
+                                List<Transfer.T> transfer) implements T {
+        }
+
+        public static void add(T b, Stm.T s) {
+            switch (b) {
+                case Singleton(Label label, List<Stm.T> stms, List<Transfer.T> transfer) -> {
+                    stms.add(s);
+                }
+            }
+        }
+
+        public static void addTransfer(T b, Transfer.T s) {
+            switch (b) {
+                case Singleton(Label label, List<Stm.T> stms, List<Transfer.T> transfer) -> {
+                    transfer.add(s);
+                }
+            }
+        }
+
+        public static String getName(Block.T t) {
+            switch (t) {
+                case Singleton(Label label, List<Stm.T> stms, List<Transfer.T> transfer) -> {
+                    return label.toString();
+                }
+            }
         }
 
         public static void pp(T b) {
-            say("block todo\n;");
-        }
-    }
-
-    // /////////////////////////////////////////////////////////
-    // transfer
-    public static class Transfer {
-        public sealed interface T permits Jmp {
-        }
-
-        public record Jmp(Block.T target) implements T {
+            switch (b) {
+                case Singleton(Label label, List<Stm.T> stms, List<Transfer.T> transfer) -> {
+                    printSpaces();
+                    say(label.toString() + ":\n");
+                    indent();
+                    for (Stm.T s : stms) {
+                        Stm.pp(s);
+                    }
+                    Transfer.pp(transfer.get(0));
+                    unIndent();
+                    sayln("");
+                }
+            }
         }
     }
 
@@ -228,6 +354,36 @@ public class Cfg {
                                 List<Dec.T> formals,
                                 List<Dec.T> locals,
                                 List<Block.T> blocks) implements T {
+        }
+
+        public static void addBlock(T func, Block.T block) {
+            switch (func) {
+                case Singleton(
+                        Type.T retType, String id, List<Dec.T> formals, List<Dec.T> locals, List<Block.T> blocks
+                ) -> {
+                    blocks.add(block);
+                }
+            }
+        }
+
+        public static void addFirstFormal(T func, Dec.T formal) {
+            switch (func) {
+                case Singleton(
+                        Type.T retType, String id, List<Dec.T> formals, List<Dec.T> locals, List<Block.T> blocks
+                ) -> {
+                    formals.addFirst(formal);
+                }
+            }
+        }
+
+        public static void addDecs(T func, List<Dec.T> decs) {
+            switch (func) {
+                case Singleton(
+                        Type.T retType, String id, List<Dec.T> formals, List<Dec.T> locals, List<Block.T> blocks
+                ) -> {
+                    locals.addAll(decs);
+                }
+            }
         }
 
         public static void pp(T f) {
@@ -253,6 +409,8 @@ public class Cfg {
                         Block.pp(block);
                     }
                     unIndent();
+                    sayln("");
+                    printSpaces();
                     say("}\n");
                 }
 

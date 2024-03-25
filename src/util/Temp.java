@@ -7,7 +7,7 @@ public class Temp {
     }
 
     // Factory pattern
-    public static String next() {
+    public static String fresh() {
         return "x_" + (Temp.count++);
     }
 }
