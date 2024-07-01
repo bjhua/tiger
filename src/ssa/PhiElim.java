@@ -49,7 +49,6 @@ public class PhiElim {
         }
     }
 
-    // TODO: lab7, exercise 13.
     public Program.T doitProgram(Program.T prog) {
         switch (prog) {
             case Program.Singleton(

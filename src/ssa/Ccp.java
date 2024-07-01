@@ -7,6 +7,7 @@ import util.Todo;
 
 import java.util.List;
 
+// Conditional constant propagation.
 public class Ccp {
 
     // /////////////////////////////////////////////////////////

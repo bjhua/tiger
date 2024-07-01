@@ -7,6 +7,7 @@ import util.Todo;
 
 import java.util.List;
 
+// Global value numbering.
 public class ValueNumber {
 
 
@@ -51,7 +52,6 @@ public class ValueNumber {
         }
     }
 
-    // TODO: lab7.
     public Program.T doitProgram(Program.T prog) {
         switch (prog) {
             case Program.Singleton(

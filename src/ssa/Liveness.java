@@ -50,7 +50,6 @@ public class Liveness {
         }
     }
 
-    // TODO: lab7.
     public Program.T doitProgram(Program.T prog) {
         switch (prog) {
             case Program.Singleton(
