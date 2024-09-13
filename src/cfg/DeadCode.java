@@ -1,6 +1,9 @@
 package cfg;
 
-import util.*;
+import util.Id;
+import util.Label;
+import util.Todo;
+import util.Tuple;
 import util.set.Set;
 
 import java.util.HashMap;
@@ -31,6 +34,7 @@ public class DeadCode {
         switch (b) {
             case Cfg.Block.Singleton(
                     Label label,
+                    List<Cfg.Stm.T> phis,
                     List<Cfg.Stm.T> stms,
                     List<Cfg.Transfer.T> transfer
             ) -> throw new Todo();
