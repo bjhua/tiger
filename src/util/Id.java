@@ -80,11 +80,11 @@ public class Id {
     @Override
     public String toString() {
         if (this.origName == null)
-            return STR."\{prefix}\{this.counter}";
+            return prefix + this.counter;
         if (dumpId) {
-            return STR."\{this.origName}(\{prefix}\{this.counter})";
+            return this.origName + "(" + prefix + this.counter;
         }
-        return STR."\{this.origName}";
+        return this.origName;
     }
 
 }

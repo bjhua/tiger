@@ -26,7 +26,7 @@ public class MethodTable {
             Ast.AstId aid = decc.aid();
             Id freshId = aid.genFreshId();
             if (this.table.get(aid.id) != null) {
-                System.out.println(STR."duplicated parameter: \{aid.id}");
+                System.out.println("duplicated parameter: " + aid.id);
                 System.exit(1);
             }
             this.table.put(aid.id, new Tuple.Two<>(decc.type(), freshId));
@@ -37,7 +37,7 @@ public class MethodTable {
             Ast.AstId aid = decc.aid();
             Id freshId = aid.genFreshId();
             if (this.table.get(aid.id) != null) {
-                System.out.println(STR."duplicated variable: \{aid.id}");
+                System.out.println("duplicated variable: " + aid.id);
                 System.exit(1);
             }
             this.table.put(aid.id, new Tuple.Two<>(decc.type(), freshId));
