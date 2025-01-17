@@ -6,11 +6,11 @@ public class Error extends AssertionError {
 
     public Error() {
         super();
-        System.out.println(STR."\n\{this.foregroundColor}Compiler error\{backgroundColor}");
+        System.out.println("\n" + this.foregroundColor + "Compiler error" + backgroundColor);
     }
 
     public Error(Object obj) {
         super(obj);
-        System.out.println(STR."\n\{this.foregroundColor}Compiler error\{backgroundColor}");
+        System.out.println("\n" + this.foregroundColor + "Compiler error" + backgroundColor);
     }
 }

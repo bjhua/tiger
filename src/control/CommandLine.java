@@ -24,7 +24,7 @@ public class CommandLine {
     private final List<Arg> args;
 
     public void error(String message) {
-        System.err.println(STR."Error: \{message}");
+        System.err.println("Error: " + message);
         usage();
         System.exit(1);
     }
@@ -38,7 +38,7 @@ public class CommandLine {
                         (Object x) -> {
                             switch ((String) x) {
                                 case "token" -> Control.Lexer.dumpToken = true;
-                                default -> error(STR."unknown argument: \{x}");
+                                default -> error("unknown argument: " + x);
                             }
                         }),
                 new Arg(
@@ -96,7 +96,7 @@ public class CommandLine {
                         switch (param) {
                             case "true" -> arg.action.accept(true);
                             case "false" -> arg.action.accept(false);
-                            default -> error(STR."\{arg.name} requires a boolean");
+                            default -> error(arg.name + " requires a boolean");
                         }
                     }
                     case Int -> {
@@ -104,7 +104,7 @@ public class CommandLine {
                         try {
                             num = Integer.parseInt(param);
                         } catch (java.lang.NumberFormatException e) {
-                            error(STR."\{arg.name} requires an integer");
+                            error(arg.name + " requires an integer");
                         }
                         arg.action.accept(num);
                     }
@@ -117,7 +117,7 @@ public class CommandLine {
                 }
             }
             if (!foundArg) {
-                error(STR."invalid option: \{cmdLineArgs[i]}");
+                error("invalid option: " + cmdLineArgs[i]);
             }
         }
         return filename;
@@ -143,7 +143,7 @@ public class CommandLine {
         System.out.println("Available options:");
         for (Arg a : this.args) {
             int current = a.name.length();
-            System.out.print(STR."   -\{a.name} ");
+            System.out.print("   -" + a.name);
             if (a.option != null) {
                 current += a.option.length();
                 System.out.print(a.option);
@@ -159,10 +159,9 @@ public class CommandLine {
 
     public void usage() {
         final int startYear = 2013;
-        System.out.println(STR."""
-                The Tiger compiler. Copyright (C) \{startYear}-, SSE of USTC.
-                Usage: java Tiger [options] <filename>
-                """);
+        System.out.println(
+                "The Tiger compiler. Copyright (C) " + startYear + "-, SSE of USTC.\n" +
+                        "Usage: java Tiger [options] <filename>\n");
         output();
     }
 }

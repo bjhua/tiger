@@ -26,8 +26,8 @@ public class Compiler {
 
     private void compileExp(Exp.T exp) {
         switch (exp) {
-            case Id(String x) -> emit(STR."\tmovq\t\{x}, %rax\n");
-            case Num(int n) -> emit(STR."\tmovq\t$\{n}, %rax\n");
+            case Id(String x) -> emit("\tmovq\t" + x + ", %rax\n");
+            case Num(int n) -> emit("\tmovq\t$" + n + ", %rax\n");
             case Op(
                     Exp.T left,
                     String op,
@@ -69,7 +69,7 @@ public class Compiler {
             ) -> {
                 ids.add(x);
                 compileExp(e);
-                emit(STR."\tmovq\t%rax, \{x}\n");
+                emit("\tmovq\t%rax, " + x + "\n");
             }
             case Stm.Print(List<Exp.T> exps) -> {
                 exps.forEach(e -> {
@@ -110,7 +110,7 @@ public class Compiler {
                             .string "\\n"
                         """);
         for (String s : this.ids) {
-            fileWriter.write(STR."\{s}:");
+            fileWriter.write(s + ":");
             fileWriter.write("\t.long 0\n");
         }
         fileWriter.write(
