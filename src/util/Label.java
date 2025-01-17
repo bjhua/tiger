@@ -17,7 +17,7 @@ public class Label {
 
     @Override
     public String toString() {
-        return STR."L_\{this.i}";
+        return "L_" + this.i;
     }
 }
 

@@ -13,12 +13,12 @@ public record Trace<X, Y>(String name,
     public Y doit() {
         boolean flag = Control.beingTraced(name);
         if (flag) {
-            System.out.println(STR."before \{this.name}:");
+            System.out.println("before " + this.name);
             consumeX.accept(x);
         }
         Y y = f.apply(x);
         if (flag) {
-            System.out.println(STR."after \{this.name}:");
+            System.out.println("after " + this.name);
             consumeY.accept(y);
         }
         return y;
