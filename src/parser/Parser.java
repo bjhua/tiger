@@ -33,13 +33,13 @@ public class Parser {
             advance();
             return;
         }
-        System.out.println(STR."Expects: \{kind}");
-        System.out.println(STR."But got: \{current.kind}");
+        System.out.println("Expects: " + kind);
+        System.out.println("But got: " + current.kind);
         error("syntax error");
     }
 
     private void error(String errMsg) {
-        System.out.println(STR."Error: \{errMsg}, compilation aborting...\n");
+        System.out.println("Error: " + errMsg + ", compilation aborting...\n");
         exit(1);
     }
 
@@ -271,7 +271,7 @@ public class Parser {
         try {
             this.inputStream = new BufferedInputStream(new FileInputStream(this.inputFileName));
         } catch (Exception e) {
-            error(STR."unable to open file \{this.inputFileName}");
+            error("unable to open file" + this.inputFileName);
         }
 
         this.lexer = new Lexer(this.inputFileName, this.inputStream);
@@ -292,7 +292,7 @@ public class Parser {
                 new Trace<>("parser.Parser.parse",
                         this::parseProgram,
                         this.inputFileName,
-                        (s) -> System.out.println(STR."parsing: \{s}"),
+                        (s) -> System.out.println("parsing: " + s),
                         new PrettyPrinter()::ppProgram);
         Ast.Program.T ast = trace.doit();
         finalizeParser();

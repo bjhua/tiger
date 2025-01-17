@@ -2,7 +2,6 @@ package util.set;
 
 import util.Error;
 
-import java.util.LinkedList;
 import java.util.List;
 
 // a functional set.
@@ -29,17 +28,18 @@ public class FunSet<X> {
         return targetSet;
     }
 
-    // s \/ [data]
-    public FunSet<X> addList(List<X> list) {
-        var targetSet = new FunSet<>(this);
-        targetSet.set.addAll(list);
-        return targetSet;
-    }
-
     // s - {data}
     public FunSet<X> remove(X data) {
         var targetSet = new FunSet<>(this);
         targetSet.set.remove(data);
+        targetSet.set.add(data);
+        return targetSet;
+    }
+
+    // s \/ [data]
+    public FunSet<X> addList(List<X> list) {
+        var targetSet = new FunSet<>(this);
+        targetSet.set.addAll(list);
         return targetSet;
     }
 
@@ -86,4 +86,5 @@ public class FunSet<X> {
     public int size() {
         return this.set.size();
     }
+
 }

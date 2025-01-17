@@ -60,7 +60,7 @@ public class PrettyPrint {
                     String x,
                     Exp.T e
             ) -> {
-                print(STR."\{x} = ");
+                print(x + " = ");
                 ppExp(e);
             }
             case Stm.Print(List<Exp.T> exps) -> {

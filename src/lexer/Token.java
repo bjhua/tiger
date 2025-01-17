@@ -1,5 +1,7 @@
 package lexer;
 
+import java.util.Optional;
+
 // Lab 1, exercise 8: read the MiniJava specification carefully,
 // and fill in other possible tokens.
 public class Token {
@@ -24,7 +26,7 @@ public class Token {
     // kind of the token
     public Kind kind;
     // extra lexeme for this token, if any
-    public String lexeme;
+    public Optional<String> lexeme;
     // position of the token in the source file: (row, column)
     public Integer rowNum;
     public Integer colNum;
@@ -34,6 +36,7 @@ public class Token {
                  Integer rowNum,
                  Integer colNum) {
         this.kind = kind;
+        this.lexeme = Optional.empty();
         this.rowNum = rowNum;
         this.colNum = colNum;
     }
@@ -43,7 +46,7 @@ public class Token {
                  Integer rowNum,
                  Integer colNum) {
         this.kind = kind;
-        this.lexeme = lexeme;
+        this.lexeme = Optional.of(lexeme);
         this.rowNum = rowNum;
         this.colNum = colNum;
     }
@@ -52,11 +55,9 @@ public class Token {
     public String toString() {
         String s;
 
-        s = STR."""
-        : \{(this.lexeme == null) ? "<NONE>" : this.lexeme}
-        : at row \{this.rowNum == null ? "<null>" : rowNum.toString()}
-        : at column \{this.colNum == null ? "<null>" : colNum.toString()}
-        """;
+        s = ": " + (this.lexeme.orElse("<NONE>")) +
+                ": at row " + (this.rowNum == null ? "<null>" : rowNum.toString()) +
+                ": at column " + (this.colNum == null ? "<null>" : colNum.toString());
         return this.kind + s;
     }
 }
