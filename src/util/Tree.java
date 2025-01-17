@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Vector;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 
 // a tree is parameterized by its containing data "X"
@@ -84,7 +83,7 @@ public class Tree<X> {
 
     public void output(Node n) {
         for (Node child : n.children)
-            System.out.println(STR."\{n} -> \{child}");
+            System.out.println(n + " -> " + child);
         for (Node child : n.children)
             output(child);
     }

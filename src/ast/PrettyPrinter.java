@@ -62,7 +62,7 @@ public class PrettyPrinter {
                     Tuple.One<Type.T> retType
             ) -> {
                 ppExp(callee);
-                sayLocal(STR.".");
+                sayLocal(".");
                 ppAstId(methodId);
                 sayLocal("(");
                 for (Exp.T arg : args) {
@@ -72,7 +72,7 @@ public class PrettyPrinter {
                 sayLocal(")");
             }
             case Exp.NewObject(Id id) -> {
-                sayLocal(STR."new \{id.toString()}()");
+                sayLocal("new " + id.toString() + "()");
             }
             case Exp.Num(int n) -> sayLocal(n);
             case Exp.Bop(
@@ -81,7 +81,7 @@ public class PrettyPrinter {
                     Exp.T right
             ) -> {
                 ppExp(left);
-                sayLocal(STR." \{bop} ");
+                sayLocal(" " + bop + " ");
                 ppExp(right);
             }
             case Exp.This() -> sayLocal("this");
@@ -120,7 +120,7 @@ public class PrettyPrinter {
             ) -> {
                 say("");
                 ppAstId(aid);
-                sayLocal(STR." = ");
+                sayLocal(" = ");
                 ppExp(exp);
                 sayLocal(";\n");
             }
@@ -151,7 +151,7 @@ public class PrettyPrinter {
         ppType(m.retType());
         this.sayLocal(" ");
         ppAstId(m.methodId());
-        this.sayLocal(STR."(");
+        this.sayLocal("(");
         m.formals().forEach(x -> {
             ppDec(x);
             sayLocal(", ");
@@ -175,9 +175,9 @@ public class PrettyPrinter {
     // class
     public void ppOneClass(Ast.Class.T cls) {
         Ast.Class.Singleton c = (Ast.Class.Singleton) cls;
-        this.say(STR."class \{c.classId()}");
+        this.say("class " + c.classId());
         if (c.extends_() != null) {
-            this.sayLocal(STR." extends \{c.extends_()}");
+            this.sayLocal(" extends " + c.extends_());
         } else {
             this.sayLocal("");
         }
@@ -192,9 +192,9 @@ public class PrettyPrinter {
     // main class
     public void ppMainClass(MainClass.T m) {
         MainClass.Singleton mc = (MainClass.Singleton) m;
-        this.sayln(STR."class \{mc.classId()}{");
+        this.sayln("class " + mc.classId() + "{");
         indent();
-        this.say(STR."public static void main(String[] ");
+        this.say("public static void main(String[] ");
         ppAstId(mc.arg());
         sayLocal("){\n");
         indent();

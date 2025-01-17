@@ -25,9 +25,9 @@ public class ClassTable {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("(");
             for (Type.T type : this.argsType) {
-                stringBuilder.append(STR."\{type.toString()}, ");
+                stringBuilder.append(type.toString() + ", ");
             }
-            stringBuilder.append(STR.") -> \{this.retType.toString()}");
+            stringBuilder.append(") -> " + this.retType.toString());
             return stringBuilder.toString();
         }
     }
@@ -44,14 +44,14 @@ public class ClassTable {
 
         public void putField(Id fieldId, Type.T type, Id freshId) {
             if (this.fields.get(fieldId) != null) {
-                error(STR."duplicated class field: \{fieldId}");
+                error("duplicated class field: " + fieldId);
             }
             this.fields.put(fieldId, new Tuple.Two<>(type, freshId));
         }
 
         public void putMethod(Id mid, MethodType methodType, Id freshId) {
             if (this.methods.get(mid) != null) {
-                error(STR."duplicated class method: \{mid}");
+                error("duplicated class method: " + mid);
             }
             this.methods.put(mid, new Tuple.Two<>(methodType, freshId));
         }
@@ -78,7 +78,7 @@ public class ClassTable {
     // Duplication is not allowed
     public void putClass(Id classId, Id extends_, Ast.Class.T self) {
         if (this.classTable.get(classId) != null) {
-            error(STR."duplicated class: \{classId}");
+            error("duplicated class: " + classId);
         }
         Binding classBinding = new Binding(extends_,
                 self,

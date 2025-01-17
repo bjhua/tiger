@@ -1,8 +1,8 @@
 package checker;
 
 import ast.Ast;
-import ast.Ast.Class;
 import ast.Ast.*;
+import ast.Ast.Class;
 import ast.PrettyPrinter;
 import control.Control;
 import util.*;
@@ -25,12 +25,12 @@ public class Checker {
     }
 
     private void error(String s) {
-        System.out.println(STR."Error: type mismatch: \{s}");
+        System.out.println("Error: type mismatch: " + s);
         System.exit(1);
     }
 
     private void error(String s, Type.T expected, Type.T got) {
-        System.out.println(STR."Error: type mismatch: \{s}");
+        System.out.println("Error: type mismatch: " + s);
         Type.output(expected);
         Type.output(got);
         System.exit(1);
@@ -78,7 +78,7 @@ public class Checker {
                 }
                 var resultMethodId = this.classTable.getMethod(calleeClassId, methodId.id);
                 if (resultMethodId == null) {
-                    error(STR."method not found: \{calleeClassId} . \{methodId}");
+                    error("method not found: " + calleeClassId + "." + methodId);
                 }
                 var resultArgs = args.stream().map(this::checkExp).toList();
                 assert resultMethodId != null;

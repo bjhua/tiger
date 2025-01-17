@@ -47,7 +47,7 @@ public class Layout {
                                                     Id clsId,
                                                     List<Cfg.Dec.T> fields
                                             ) -> {
-                                                System.out.println(STR."class \{clsId.toString()} size = \{sizeOfClassProp.get(clsId).toString()}");
+                                                System.out.println("class " + clsId.toString() + " size = " + sizeOfClassProp.get(clsId).toString());
                                                 for (var entry : fields) {
                                                     // TODO: lab 4, exercise 2
                                                     throw new Todo();

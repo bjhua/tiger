@@ -59,7 +59,7 @@ public class Pass<FromType, ToType> {
         if (Control.verbose.order >= this.verbose.order) {
             printSpaces();
             indent();
-            System.out.println(STR."\{this.passName} starting");
+            System.out.println(this.passName + " starting");
             if (Control.verbose.order >= Control.Verbose.L1.order) {
                 this.startTime = System.nanoTime();
             }
@@ -70,10 +70,10 @@ public class Pass<FromType, ToType> {
         if (Control.verbose.order >= this.verbose.order) {
             unindent();
             printSpaces();
-            System.out.print(STR."\{this.passName} finished");
+            System.out.print(this.passName + " finished");
             if (Control.verbose.order >= Control.Verbose.L1.order) {
                 this.endTime = System.nanoTime();
-                System.out.print(STR.": @ \{(this.endTime - this.startTime) / 1000000.00}ms");
+                System.out.print(": @ " + ((this.endTime - this.startTime) / 1000000.00));
             }
             System.out.println();
         }
