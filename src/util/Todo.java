@@ -6,11 +6,11 @@ public class Todo extends AssertionError {
 
     public Todo() {
         super();
-        System.out.println(STR."\n\{foregroundColor}TODO: please add your code here:\n\{backgroundColor}");
+        System.out.println("\n" + foregroundColor + "TODO: please add your code here:\n" + backgroundColor);
     }
 
     public Todo(Object o) {
         super(o);
-        System.out.println(STR."\n\{foregroundColor}TODO: please add your code here:\n\{backgroundColor}");
+        System.out.println("\n" + foregroundColor + "TODO: please add your code here:\n" + backgroundColor);
     }
 }

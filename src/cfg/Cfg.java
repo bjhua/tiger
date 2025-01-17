@@ -80,7 +80,7 @@ public class Cfg {
                     return false;
                 if (!(o instanceof Singleton))
                     return false;
-                return this.id().equals(((Singleton) o).id());
+                return this.id().equals(((Dec.Singleton) o).id());
             }
 
             @Override
@@ -96,7 +96,7 @@ public class Cfg {
                         Id id
                 ) -> {
                     Type.pp(type);
-                    say(STR." \{id}");
+                    say(" " + id);
                 }
             }
         }
@@ -123,13 +123,13 @@ public class Cfg {
             switch (vtable) {
                 case Singleton(Id name, List<Entry> funcTypes) -> {
                     printSpaces();
-                    sayln(STR."struct V_\{name} {");
+                    sayln("struct V_" + name + " {");
                     // all entries
                     indent();
                     for (Entry e : funcTypes) {
                         printSpaces();
                         Type.pp(e.retType);
-                        say(STR." \{e.functionId}(");
+                        say(" " + e.functionId + "(");
                         for (Dec.T dec : e.argTypes) {
                             Dec.pp(dec);
                             say(", ");
@@ -138,11 +138,11 @@ public class Cfg {
                     }
                     unIndent();
                     printSpaces();
-                    sayln(STR."} V_\{name}_ = {");
+                    sayln("} V_" + name + "_ = {");
                     indent();
                     for (Entry e : funcTypes) {
                         printSpaces();
-                        say(STR.".\{e.functionId} = \{e.classId}_\{e.functionId}");
+                        say("." + e.functionId + " = " + e.classId + "_" + e.functionId);
                         say(",\n");
                     }
                     unIndent();
@@ -171,22 +171,21 @@ public class Cfg {
                         List<Cfg.Dec.T> fields
                 ) -> {
                     printSpaces();
-                    sayln(STR."struct S_\{clsName.toString()} {");
+                    sayln("struct S_" + clsName.toString() + " {");
                     indent();
                     // the first field is special
                     printSpaces();
-                    sayln(STR."struct V_\{clsName} *vptr;");
-                    fields.forEach((dec) -> {
+                    sayln("struct V_" + clsName + " *vptr;");
+                    for (Cfg.Dec.T dec : fields) {
                         printSpaces();
                         Dec.pp(dec);
-                        sayln(";");
-                    });
+                    }
                     unIndent();
                     printSpaces();
-                    sayln(STR."} S_\{clsName}_ = {");
+                    sayln("} S_" + clsName + "_ = {");
                     indent();
                     printSpaces();
-                    sayln(STR.".vptr = &V_\{clsName}_;");
+                    sayln(".vptr = &V_" + clsName + "_;");
                     unIndent();
                     printSpaces();
                     say("};\n\n");
@@ -223,7 +222,6 @@ public class Cfg {
                                 Id methodId) implements T {
         }
 
-        // integer constant
         public record Int(int n) implements T {
         }
 
@@ -236,23 +234,27 @@ public class Cfg {
         public static void pp(Exp.T t) {
             switch (t) {
                 case Bop(String op, List<Id> operands, Type.T type) -> {
-                    say(STR."\{op}(");
-                    operands.forEach((e) -> say(STR."\{e.toString()}, "));
+                    say(op + "(");
+                    operands.forEach((e) -> {
+                        say(e.toString() + ", ");
+                    });
                     say(")  @ty:");
                     Type.pp(type);
                 }
                 case Call(Id func, List<Id> args, Type.T retType) -> {
-                    say(STR."\{func.toString()}(");
-                    args.forEach((e) -> say(STR."\{e.toString()}, "));
+                    say(func.toString() + "(");
+                    args.forEach((e) -> {
+                        say(e.toString() + ", ");
+                    });
                     say(")  @retType:");
                     Type.pp(retType);
                 }
-                case Eid(Id id, Type.T type) -> say(STR."\{id}");
+                case Eid(Id id, Type.T type) -> say(id);
                 case GetMethod(Id objId, Id classId, Id methodId) ->
-                        say(STR."getMethod(\{objId.toString()}, \{classId.toString()}, \{methodId.toString()})");
-                case Int(int n) -> say(STR."\{n}");
-                case New(Id classId) -> say(STR."new \{classId.toString()}()");
-                case Print(Id x) -> say(STR."print(\{x.toString()})");
+                        say("getMethod(" + objId.toString() + ", " + classId.toString() + ", " + methodId.toString());
+                case Int(int n) -> say(n);
+                case New(Id classId) -> say("new " + classId.toString() + "()");
+                case Print(Id x) -> say("print(" + x.toString() + ")");
                 default -> throw new Todo(t);
             }
         }
@@ -276,7 +278,7 @@ public class Cfg {
             switch (t) {
                 case Assign(Id x, Exp.T exp) -> {
                     printSpaces();
-                    say(STR."\{x.toString()} = ");
+                    say(x + " = ");
                     Exp.pp(exp);
                     sayln(";");
                 }
@@ -328,17 +330,17 @@ public class Cfg {
                         Block.T elsee
                 ) -> {
                     printSpaces();
-                    say(STR."if(\{x.toString()}");
-                    say(STR.", \{Block.getLabel(thenn).toString()}, \{Block.getLabel(elsee).toString()});");
-                    say(STR.", \{Block.getLabel(thenn)}, \{Block.getLabel(elsee)});");
+                    say("if(" + x.toString());
+                    say(", " + Block.getLabel(thenn).toString() + ", " + Block.getLabel(elsee).toString() + ");");
                 }
                 case Jmp(Block.T target) -> {
                     printSpaces();
-                    say(STR."jmp \{Block.getLabel(target).toString()};");
+                    say("jmp " + Block.getLabel(target).toString() + ";");
+
                 }
                 case Ret(Id x) -> {
                     printSpaces();
-                    say(STR."ret \{x.toString()};");
+                    say("ret " + x.toString() + ";");
                 }
             }
         }
@@ -410,7 +412,7 @@ public class Cfg {
                         List<Transfer.T> transfer
                 ) -> {
                     printSpaces();
-                    sayln(STR."\{label.toString()}:");
+                    sayln(label.toString() + ":");
                     indent();
                     stms.forEach(Stm::pp);
                     Transfer.pp(transfer.getFirst());
@@ -486,7 +488,7 @@ public class Cfg {
                         List<Dec.T> locals,
                         List<Block.T> blocks
                 ) -> {
-                    Dot d = new util.Dot(STR."\{classId.toString()}-\{functionId.toString()}");
+                    Dot d = new util.Dot(classId.toString() + "-" + functionId.toString());
                     blocks.forEach((b) -> Block.dot(b, d));
                     d.visualize();
                 }
@@ -505,12 +507,12 @@ public class Cfg {
                 ) -> {
                     printSpaces();
                     Type.pp(retType);
-                    say(STR." \{id}(");
+                    say(" " + id + "(");
                     formals.forEach(x -> {
                         Dec.pp(x);
                         say(", ");
                     });
-                    say(STR."){ @classId: \{classId.toString()}\n");
+                    say("){ @classId: " + classId.toString() + "\n");
                     indent();
                     locals.forEach(x -> {
                         printSpaces();
@@ -561,7 +563,7 @@ public class Cfg {
                         List<Function.T> functions
                 ) -> {
                     printSpaces();
-                    sayln(STR."// the entry function: \{mainClassId}: \{mainFuncId}");
+                    sayln("// the entry function: " + mainClassId + ": " + mainFuncId);
                     // vtables
                     vtables.forEach(Vtable::pp);
                     // structs

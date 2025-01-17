@@ -10,7 +10,6 @@ import util.Label;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.List;
-import java.util.function.BiFunction;
 
 public class PpAssem {
 
@@ -61,7 +60,7 @@ public class PpAssem {
                     Id id
             ) -> {
                 // Type.pp(type);
-                say(STR." \{id}");
+                say(" " + id);
             }
         }
     }
@@ -75,14 +74,12 @@ public class PpAssem {
                     List<String> funcs
             ) -> {
                 printSpaces();
-                say(STR."""
-.V_\{name}:
-""");
+                say(".V_" + name + ":");
                 // all entries
                 indent();
                 funcs.forEach((s) -> {
                     printSpaces();
-                    sayln(STR.".quad \{s}");
+                    sayln(".quad " + s);
                 });
                 unIndent();
             }
@@ -148,7 +145,7 @@ public class PpAssem {
                     X64.Block.T elsee
             ) -> {
                 printSpaces();
-                say(STR."\{instr} ");
+                say(instr + " ");
                 sayln(X64.Block.getLabel(thenn).toString());
                 printSpaces();
                 say("jmp ");
@@ -156,7 +153,7 @@ public class PpAssem {
             }
             case X64.Transfer.Jmp(X64.Block.T target) -> {
                 printSpaces();
-                sayln(STR."jmp \{Block.getLabel(target).toString()}");
+                sayln("jmp " + Block.getLabel(target).toString());
             }
             case X64.Transfer.Ret() -> {
                 printSpaces();
@@ -175,9 +172,7 @@ public class PpAssem {
                     List<X64.Transfer.T> transfers
             ) -> {
                 printSpaces();
-                say(STR."""
-\{label.toString()}:
-""");
+                say(label.toString() + ":");
                 indent();
                 instrs.forEach(this::ppInstr);
                 ppTransfer(transfers.getFirst());
@@ -200,10 +195,10 @@ public class PpAssem {
             ) -> {
                 printSpaces();
 //                Type.pp(retType);
-                sayln(STR."\t.globl \{classId}_\{methodId}");
+                sayln("\t.globl " + classId + "_" + methodId);
                 printSpaces();
 //                Type.pp(retType);
-                sayln(STR."\{classId}_\{methodId}:");
+                sayln(classId + "_" + methodId + ":");
 //                for (Dec.T dec : formals) {
 //                    Dec.pp(dec);
 //                    say(", ");
@@ -255,22 +250,22 @@ public class PpAssem {
                 functions.forEach(this::ppFunction);
                 // an entry:
                 printSpaces();
-                sayln(STR."\t.globl Tiger_main");
+                sayln("\t.globl Tiger_main");
                 printSpaces();
-                sayln(STR."Tiger_main:");
+                sayln("Tiger_main:");
                 indent();
                 printSpaces();
-                sayln(STR."call\t\{classId}_\{entryFuncName}");
+                sayln("call\t" + classId + "_" + entryFuncName);
                 printSpaces();
-                sayln(STR."ret");
+                sayln("ret");
                 unIndent();
 
                 // extra information to turn off GAS assembler warnings
                 printSpaces();
                 sayln("");
-                sayln(STR."\t.ident\t\"Tiger compiler: 0.1\"");
+                sayln("\t.ident\t\"Tiger compiler: 0.1\"");
                 printSpaces();
-                sayln(STR."\t.section\t.note.GNU-stack,\"\",@progbits");
+                sayln("\t.section\t.note.GNU-stack,\"\",@progbits");
                 try {
                     writer.close();
                 } catch (Exception _) {

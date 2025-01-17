@@ -12,9 +12,7 @@ public class Dot {
 
         @Override
         public String toString() {
-            return STR."""
-"\{x}"->"\{y}"\{z};
-""";
+            return x + "->" + y + z;
         }
     }
     // end of Element
@@ -33,7 +31,7 @@ public class Dot {
     }
 
     public void insert(String from, String to, String info) {
-        String s = STR."[label=\"\{info}\"]";
+        String s = "[label=\"" + info + "\"]";
         this.list.addFirst(new Element(from, to, s));
     }
 
@@ -44,11 +42,11 @@ public class Dot {
     }
 
     public void toDot() {
-        String fileName = STR."\{this.name}.dot";
+        String fileName = this.name + ".dot";
         try {
             FileWriter fw = new FileWriter(fileName);
             BufferedWriter bw = new BufferedWriter(fw);
-            bw.write(STR."""
+            bw.write("""
                     digraph g{
                     \tsize = "10, 10";
                     \tnode [color=lightblue2, style=filled];""");
@@ -64,7 +62,7 @@ public class Dot {
     public void visualize() {
         this.toDot();
         String format = Control.Dot.format;
-        String[] args = {"dot", "-T", format, "-O", STR."\{this.name}.dot"};
+        String[] args = {"dot", "-T", format, "-O", this.name + ".dot"};
         try {
             final class StreamDrainer implements Runnable {
                 private final InputStream ins;
@@ -95,7 +93,7 @@ public class Dot {
                 throw new util.Error(exitValue);
             }
             if (!Control.Dot.keep) {
-                if (!new File(STR."\{name}.dot").delete())
+                if (!new File(name + ".dot").delete())
                     throw new util.Error("Cannot delete dot");
             }
         } catch (Exception o) {
