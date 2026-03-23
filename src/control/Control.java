@@ -52,7 +52,7 @@ public class Control {
 
     // the lexer
     public static class Lexer {
-        public static boolean dumpToken = false;
+        public static boolean shouldDumpToken = false;
     }
 
     // the parser

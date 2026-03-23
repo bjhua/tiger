@@ -82,7 +82,7 @@ public class CommandLine {
                         (Object x) -> {
                             switch ((String) x) {
                                 case "id" -> Control.Util.dumpId = true;
-                                case "token" -> Control.Lexer.dumpToken = true;
+                                case "token" -> Control.Lexer.shouldDumpToken = true;
                                 default -> error("unknown argument: " + x);
                             }
                         }),

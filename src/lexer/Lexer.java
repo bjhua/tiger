@@ -4,7 +4,7 @@ import util.Todo;
 
 import java.io.InputStream;
 
-import static control.Control.Lexer.dumpToken;
+import static control.Control.Lexer.shouldDumpToken;
 
 public record Lexer(String fileName,
                     InputStream fileStream) {
@@ -54,7 +54,7 @@ public record Lexer(String fileName,
             //e.printStackTrace();
             System.exit(1);
         }
-        if (dumpToken) {
+        if (shouldDumpToken) {
             System.out.println(t);
         }
         return t;
