@@ -25,7 +25,7 @@ public class TestSlp {
     void testInterpreter() {
         Interpreter interpreter = new Interpreter();
         final StringBuilder builder = new StringBuilder();
-        interpreter.interpreteStm(prog1, builder::append);
+        interpreter.interpretStm(prog1, builder::append);
         assertEquals("8 7\n80\n", builder.toString());
     }
 

@@ -7,13 +7,18 @@ import util.Todo;
 
 import java.io.BufferedReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 // a simple compiler for SLP, to x64.
 public class Compiler {
     // ////////////////////////////////////////
+    private static final Logger logger = Logger.getLogger(Compiler.class.getName());
+
     // whether to keep the generated assembly file.
     boolean keepAsm = false;
     String asmFile = "/tmp/slp_out.s";
@@ -106,7 +111,7 @@ public class Compiler {
     }
 
     // ////////////////////////////////////////
-    public String compileStm(Stm prog, StringBuffer sb) throws Exception {
+    public void compileStm(Stm prog, StringBuffer sb) throws Exception {
         // we always reset these two variables, so that this
         // method is re-entrant.
         this.ids = new HashSet<>();
@@ -163,7 +168,7 @@ public class Compiler {
                 String all = reader.readAllAsString();
                 sb.append(all);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.log(Level.SEVERE, "command failed: " + String.join(" ", runCmdStr), e);
             }
         });
         stdoutThread.start();
@@ -174,10 +179,12 @@ public class Compiler {
         // remove, if necessary
         if (!keepAsm) {
             String[] cmdStr2 = {"rm", "-rf", asmFile};
-            Process childRemove = Runtime.getRuntime().exec(cmdStr2, null, null);
-            childRemove.waitFor();
+            try (Process childRemove = Runtime.getRuntime().exec(cmdStr2, null, null)) {
+                childRemove.waitFor();
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "command failed: " + String.join(" ", runCmdStr), e);
+            }
         }
-        return "";
     }
 
     public String compile(Stm prog) {
@@ -185,7 +192,7 @@ public class Compiler {
         try {
             compileStm(prog, sb);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "command failed: " + String.join(" ", ""), e);
             return "";
         }
         return sb.toString();

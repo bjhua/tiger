@@ -8,8 +8,7 @@ public class Slp2 {
     // expression
     public sealed interface Exp permits Exp.Eseq, Exp.Id, Exp.Op, Exp.Num {
         // s, e
-        record Eseq(Stm stm,
-                    Exp exp) implements Exp {
+        record Eseq(Stm stm, Exp exp) implements Exp {
         }
 
         // x
@@ -17,9 +16,7 @@ public class Slp2 {
         }
 
         // e bop e
-        record Op(Exp left,
-                  String op,
-                  Exp right) implements Exp {
+        record Op(Exp left, String op, Exp right) implements Exp {
         }
 
         // n

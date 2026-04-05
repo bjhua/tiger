@@ -6,7 +6,7 @@ import slp.Slp2.Stm.*;
 
 import java.util.List;
 
-// two sample programs.
+// sample programs.
 /*
  a = 5 + 3;
  b = (print(a, a - 1), 10*a);

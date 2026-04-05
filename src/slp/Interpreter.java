@@ -2,12 +2,9 @@ package slp;
 
 import slp.Slp2.Exp;
 import slp.Slp2.Stm;
-import util.Todo;
 
 import java.util.HashMap;
 import java.util.List;
-
-import static java.lang.System.out;
 
 // an interpreter for the SLP language.
 public class Interpreter {
@@ -54,19 +51,18 @@ public class Interpreter {
             }
             case Stm.Print(List<Exp> exps) -> {
                 var values = exps.stream().map(this::interpExp);
-                util.StreamConvert.appAllButLast(values, v -> {
+                util.StreamConvert.appAllExceptLast(values, v -> {
                             consumer.accept(v.toString());
-                            consumer.accept(" ");
                         },
-                        v -> {
-                            consumer.accept(String.valueOf(v));
+                        _ -> {
+                            consumer.accept(" ");
                         });
                 consumer.accept("\n");
             }
         }
     }
 
-    public void interpreteStm(Stm stm, java.util.function.Consumer<String> consumer) {
+    public void interpretStm(Stm stm, java.util.function.Consumer<String> consumer) {
         this.consumer = consumer;
         interpStm(stm);
     }

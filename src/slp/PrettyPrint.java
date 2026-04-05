@@ -65,6 +65,7 @@ public class PrettyPrint {
             }
             case Stm.Print(List<Exp> exps) -> {
                 System.out.print("print(");
+                
                 exps.forEach(x -> {
                             ppExp(x);
                             print(", ");
