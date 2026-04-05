@@ -9,7 +9,8 @@ import static control.Control.Lexer.shouldDumpToken;
 public record Lexer(String fileName,
                     InputStream fileStream) {
 
-    // When called, return the next token (refer to the code "Token.java")
+    // When called, return the next token (refer to the code in
+    // the file "Token.java")
     // from the input stream.
     // Return TOKEN_EOF when reaching the end of the input stream.
     private Token nextToken0() throws Exception {

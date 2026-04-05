@@ -1,19 +1,19 @@
 package slp;
 
-import slp.Slp.Exp.Eseq;
-import slp.Slp.Exp.Id;
-import slp.Slp.Exp.Num;
-import slp.Slp.Exp.Op;
-import slp.Slp.Stm;
-import slp.Slp.Stm.Assign;
-import slp.Slp.Stm.Compound;
-import slp.Slp.Stm.Print;
+import slp.Slp2.Exp.*;
+import slp.Slp2.Stm;
+import slp.Slp2.Stm.*;
 
 import java.util.List;
 
 // two sample programs.
+/*
+ a = 5 + 3;
+ b = (print(a, a - 1), 10*a);
+ print(b);
+ */
 public class SamplePrograms {
-    public static Stm.T sample1 = new Compound(
+    public static Stm sample1 = new Compound(
             new Assign("a", new Op(new Num(5), "+", new Num(3))),
             new Compound(
                     new Assign("b", new Eseq(new Print(List.of(
@@ -24,5 +24,5 @@ public class SamplePrograms {
 
     // lab 1, exercise 3:
     // replace the "null" with your code:
-    public static Stm.T sample2 = null;
+    public static Stm sample2 = null;
 }

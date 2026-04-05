@@ -1,25 +1,73 @@
 package slp;
 
-import slp.Slp.Exp;
-import slp.Slp.Stm;
+import slp.Slp2.Exp;
+import slp.Slp2.Stm;
 import util.Todo;
 
 import java.util.HashMap;
+import java.util.List;
+
+import static java.lang.System.out;
 
 // an interpreter for the SLP language.
 public class Interpreter {
-    // an abstract memory mapping each variable to its value
+    java.util.function.Consumer<String> consumer;
+
+    // an abstract memory mapping each variable to its corresponding value
     HashMap<String, Integer> memory = new HashMap<>();
 
     // ///////////////////////////////////////////
-    // interpret an expression
-    private int interpExp(Exp.T exp) {
-        throw new Todo(exp);
+    // print expression
+    private int interpExp(Exp exp) {
+        return switch (exp) {
+            case Exp.Num(int n) -> n;
+            case Exp.Id(String x) -> memory.get(x);
+            case Exp.Op(Exp left, String bop, Exp right) -> {
+                int v1 = interpExp(left);
+                int v2 = interpExp(right);
+                yield switch (bop) {
+                    case "+" -> v1 + v2;
+                    case "-" -> v1 - v2;
+                    case "*" -> v1 * v2;
+                    case "/" -> v1 / v2;
+                    default -> 0;
+                };
+            }
+            case Exp.Eseq(Stm stm, Exp e) -> {
+                interpStm(stm);
+                yield interpExp(e);
+            }
+        };
     }
 
     // ///////////////////////////////////////////
-    // interpret a statement
-    public void interpStm(Stm.T stm) {
-        throw new Todo(stm);
+    // statement
+    private void interpStm(Stm stm) {
+        switch (stm) {
+            case Stm.Compound(Stm s1, Stm s2) -> {
+                interpStm(s1);
+                interpStm(s2);
+            }
+            case Stm.Assign(String x, Exp e) -> {
+                int v = interpExp(e);
+                memory.put(x, v);
+            }
+            case Stm.Print(List<Exp> exps) -> {
+                var values = exps.stream().map(this::interpExp);
+                util.StreamConvert.appAllButLast(values, v -> {
+                            consumer.accept(v.toString());
+                            consumer.accept(" ");
+                        },
+                        v -> {
+                            consumer.accept(String.valueOf(v));
+                        });
+                consumer.accept("\n");
+            }
+        }
+    }
+
+    public void interpreteStm(Stm stm, java.util.function.Consumer<String> consumer) {
+        this.consumer = consumer;
+        interpStm(stm);
     }
 }

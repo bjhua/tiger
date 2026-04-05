@@ -1,6 +1,6 @@
 package lexer;
 
-import java.util.Optional;
+import util.Maybe;
 
 // Lab 1, exercise 8: read the MiniJava specification carefully,
 // and fill in other possible tokens.
@@ -26,7 +26,7 @@ public class Token {
     // kind of the token
     public Kind kind;
     // extra lexeme for this token, if any
-    public Optional<String> lexeme;
+    public Maybe.T<String> lexeme;
     // position of the token in the source file: (row, column)
     public Integer rowNum;
     public Integer colNum;
@@ -36,7 +36,7 @@ public class Token {
                  Integer rowNum,
                  Integer colNum) {
         this.kind = kind;
-        this.lexeme = Optional.empty();
+        this.lexeme = Maybe.none();
         this.rowNum = rowNum;
         this.colNum = colNum;
     }
@@ -46,7 +46,7 @@ public class Token {
                  Integer rowNum,
                  Integer colNum) {
         this.kind = kind;
-        this.lexeme = Optional.of(lexeme);
+        this.lexeme = Maybe.some(lexeme);
         this.rowNum = rowNum;
         this.colNum = colNum;
     }
@@ -55,7 +55,7 @@ public class Token {
     public String toString() {
         String s;
 
-        s = ": " + (this.lexeme.orElse("<NONE>")) +
+        s = ": " + (Maybe.getOrDefault(this.lexeme, "<NONE>")) +
                 ": at row " + (this.rowNum == null ? "<null>" : rowNum.toString()) +
                 ": at column " + (this.colNum == null ? "<null>" : colNum.toString());
         return this.kind + s;
