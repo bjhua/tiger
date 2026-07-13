@@ -85,20 +85,30 @@ class Tree {
         return true;
     }
 
-    public Tree GetRight() { return right; }
+    public Tree GetRight() {
+        return right;
+    }
 
-    public Tree GetLeft() { return left; }
+    public Tree GetLeft() {
+        return left;
+    }
 
-    public int GetKey() { return key; }
+    public int GetKey() {
+        return key;
+    }
 
     public boolean SetKey(int v_key) {
         key = v_key;
         return true;
     }
 
-    public boolean GetHas_Right() { return has_right; }
+    public boolean GetHas_Right() {
+        return has_right;
+    }
 
-    public boolean GetHas_Left() { return has_left; }
+    public boolean GetHas_Left() {
+        return has_left;
+    }
 
     public boolean SetHas_Left(boolean val) {
         has_left = val;
@@ -190,7 +200,7 @@ class Tree {
             else {
                 if (is_root)
                     if (!current_node.GetHas_Right() &&
-                        !current_node.GetHas_Left())
+                            !current_node.GetHas_Left())
                         ntb = true;
                     else
                         ntb = this.Remove(parent_node, current_node);
