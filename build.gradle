@@ -1,0 +1,35 @@
+plugins {
+    id 'java'          // 添加 Java 插件
+}
+
+group = 'sse.ustc'  // 组织ID
+version = '1.0' // 项目版本
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']  // 代码目录
+        }
+    }
+    test {
+        java {
+            srcDirs = ['test'] // 测试目录
+        }
+    }
+}
+
+repositories {
+    mavenCentral()     // Maven 中央仓库
+}
+
+dependencies {
+    // 项目依赖
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.10.0'
+
+
+}
+
+test {
+    useJUnitPlatform() // 使用 JUnit 5 运行测试
+}
